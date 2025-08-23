@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>Condomínio Cotovias</title>
+    <meta name="theme-color" content="#FFFFFF">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <style>
+        /* --- VARIÁVEIS DE DESIGN E RESET GLOBAL --- */
+        :root {
+            --cor-primaria: #4A90E2; /* Azul moderno */
+            --cor-primaria-hover: #357ABD;
+            --cor-fundo: #F9F9FB;
+            --cor-surface: #FFFFFF;
+            --cor-texto-principal: #333333;
+            --cor-texto-secundario: #777777;
+            --cor-borda: #EAEAEA;
+            --cor-erro: #E74C3C;
+            --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --fonte-principal: 'Inter', sans-serif;
+            --raio-borda: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--fonte-principal);
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto-principal);
+            height: 100vh;
+            height: -webkit-fill-available;
+            width: 100%;
+            overflow: hidden;
+            position: fixed;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* --- ESTRUTURA PRINCIPAL --- */
+        .drawer-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .app-content {
+            flex: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: var(--cor-fundo);
+        }
+
+        /* --- MENU LATERAL (DRAWER) --- */
+        .mdc-drawer {
+            width: 260px;
+            height: 100vh;
+            background-color: var(--cor-surface);
+            border-right: 1px solid var(--cor-borda);
+            padding: 16px 8px;
+            position: fixed;
+            left: -260px;
+            top: 0;
+            z-index: 200;
+            transition: transform 0.3s ease;
+        }
+
+        .mdc-drawer--open {
+            transform: translateX(260px);
+            box-shadow: 10px 0 30px -15px rgba(0,0,0,0.2);
+        }
+        
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 199;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay--visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .mdc-list {
+            list-style: none;
+        }
+        
+        .mdc-list-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 4px;
+            border-radius: var(--raio-borda);
+            cursor: pointer;
+            color: var(--cor-texto-secundario);
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .mdc-list-item:hover {
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto-principal);
+        }
+
+        .mdc-list-item.active {
+            background-color: var(--cor-primaria);
+            color: white;
+            font-weight: 600;
+        }
+
+        .mdc-list-item .material-icons-outlined {
+            margin-right: 16px;
+            font-size: 22px;
+        }
+
+        /* --- BARRA SUPERIOR E BOTÃO DE MENU --- */
+        .top-app-bar {
+            height: 64px;
+            background-color: var(--cor-surface);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--cor-borda);
+            z-index: 100;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cor-texto-principal);
+            transition: background-color 0.2s;
+        }
+
+        .menu-button:hover {
+            background-color: var(--cor-fundo);
+        }
+
+        .page-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* --- MODAL DE SENHA --- */
+        .password-modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.4);
+            z-index: 300;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .password-modal-content {
+            background: var(--cor-surface);
+            border-radius: 12px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: modal-appear 0.3s ease-out forwards;
+        }
+        
+        .password-modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--cor-borda);
+        }
+
+        .password-modal-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .password-modal-body {
+            padding: 24px;
+        }
+
+        .password-input-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--raio-borda);
+            padding: 12px;
+            margin-top: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .password-input-container:focus-within {
+            border-color: var(--cor-primaria);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .password-input-container .material-icons-outlined {
+            margin-right: 10px;
+            color: var(--cor-texto-secundario);
+        }
+
+        .password-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background: transparent;
+        }
+
+        .password-error {
+            display: none;
+            align-items: center;
+            color: var(--cor-erro);
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .password-error .material-icons-outlined {
+             font-size: 1.1rem;
+             margin-right: 6px;
+        }
+
+        .password-modal-footer {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .password-button {
+            font-family: var(--fonte-principal);
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--raio-borda);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .password-button.cancel {
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto-principal);
+        }
+        
+        .password-button.cancel:hover {
+            background-color: #e0e0e0;
+        }
+
+        .password-button.submit {
+            background-color: var(--cor-primaria);
+            color: white;
+        }
+
+        .password-button.submit:hover {
+            background-color: var(--cor-primaria-hover);
+        }
+        
+        /* --- SPINNER DE CARREGAMENTO --- */
+        .loading {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--cor-primaria);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* --- ANIMAÇÕES --- */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* --- RESPONSIVIDADE --- */
+        @media (min-width: 1024px) {
+            .mdc-drawer {
+                position: relative;
+                left: 0;
+                transform: none;
+                box-shadow: none;
+            }
+            .app-content {
+                margin-left: 0;
+            }
+            .menu-button, .overlay {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="drawer-container">
+        
+        <div class="overlay" id="overlay"></div>
+
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <div class="password-modal" id="passwordModal">
+            <div class="password-modal-content">
+                <div class="password-modal-header">
+                    <h2>Acesso Administrativo</h2>
+                </div>
+                <div class="password-modal-body">
+                    <p>Esta área é restrita. Por favor, digite a senha para continuar.</p>
+                    <div class="password-input-container">
+                        <i class="material-icons-outlined">lock</i>
+                        <input type="password" class="password-input" id="adminPassword" placeholder="Sua senha">
+                    </div>
+                    <div class="password-error" id="passwordError">
+                        <i class="material-icons-outlined">error_outline</i>
+                        <span>Senha incorreta. Tente novamente.</span>
+                    </div>
+                </div>
+                <div class="password-modal-footer">
+                    <button class="password-button cancel" id="cancelPassword">Cancelar</button>
+                    <button class="password-button submit" id="submitPassword">Acessar</button>
+                </div>
+            </div>
+        </div>
+
+        <aside class="mdc-drawer" id="drawer">
+            <nav class="mdc-list">
+                <div class="mdc-list-item" data-page="aviso.html">
+                    <i class="material-icons-outlined">campaign</i>
+                    <span>Avisos</span>
+                </div>
+                <div class="mdc-list-item" data-page="lojas.html">
+                    <i class="material-icons-outlined">storefront</i>
+                    <span>Estabelecimentos</span>
+                </div>
+                <div class="mdc-list-item" data-page="criarlojas.html">
+                    <i class="material-icons-outlined">add_business</i>
+                    <span>Crie sua loja</span>
+                </div>
+                <div class="mdc-list-item" data-page="login.html">
+                    <i class="material-icons-outlined">people_alt</i>
+                    <span>Usuários</span>
+                </div>
+                <div class="mdc-list-item" id="adminMenuItem">
+                    <i class="material-icons-outlined">admin_panel_settings</i>
+                    <span>Administração</span>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="app-content">
+            <header class="top-app-bar">
+                <button class="menu-button" id="menuButton">
+                    <i class="material-icons-outlined">menu</i>
+                </button>
+                <h1 class="page-title" id="pageTitle">Avisos</h1>
+            </header>
+            <main class="main-content">
+                <iframe class="content-frame" id="contentFrame" src="aviso.html"></iframe>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- SELEÇÃO DE ELEMENTOS ---
+            const ui = {
+                menuButton: document.getElementById('menuButton'),
+                drawer: document.getElementById('drawer'),
+                overlay: document.getElementById('overlay'),
+                loading: document.getElementById('loading'),
+                contentFrame: document.getElementById('contentFrame'),
+                pageTitle: document.getElementById('pageTitle'),
+                passwordModal: document.getElementById('passwordModal'),
+                adminPasswordInput: document.getElementById('adminPassword'),
+                submitPasswordBtn: document.getElementById('submitPassword'),
+                cancelPasswordBtn: document.getElementById('cancelPassword'),
+                passwordError: document.getElementById('passwordError'),
+                adminMenuItem: document.getElementById('adminMenuItem'),
+                menuItems: document.querySelectorAll('.mdc-list-item')
+            };
+
+            let isMenuOpen = false;
+
+            // --- FUNÇÕES PRINCIPAIS ---
+
+            const toggleMenu = () => {
+                isMenuOpen = !isMenuOpen;
+                ui.drawer.classList.toggle('mdc-drawer--open', isMenuOpen);
+                ui.overlay.classList.toggle('overlay--visible', isMenuOpen);
+            };
+
+            const setActiveMenuItem = (selectedItem) => {
+                ui.menuItems.forEach(item => item.classList.remove('active'));
+                if (selectedItem) {
+                    selectedItem.classList.add('active');
+                }
+            };
+            
+            const loadPage = (pageUrl, title, activeItem) => {
+                ui.loading.style.display = 'flex';
+                ui.pageTitle.textContent = title;
+                document.title = `${title} | Condomínio Cotovias`;
+                
+                ui.contentFrame.src = pageUrl;
+
+                ui.contentFrame.onload = () => {
+                    ui.loading.style.display = 'none';
+                };
+
+                setActiveMenuItem(activeItem);
+
+                if (isMenuOpen && window.innerWidth < 1024) {
+                    toggleMenu();
+                }
+            };
+
+            const showPasswordModal = () => {
+                ui.passwordModal.style.display = 'flex';
+                ui.adminPasswordInput.focus();
+                if (isMenuOpen && window.innerWidth < 1024) {
+                    toggleMenu();
+                }
+            };
+            
+            const closePasswordModal = () => {
+                ui.passwordModal.style.display = 'none';
+                ui.passwordError.style.display = 'none';
+                ui.adminPasswordInput.value = '';
+            };
+
+            // --- EVENT LISTENERS ---
+
+            ui.menuButton.addEventListener('click', toggleMenu);
+            ui.overlay.addEventListener('click', toggleMenu);
+
+            ui.menuItems.forEach(item => {
+                if (item.id !== 'adminMenuItem') {
+                    item.addEventListener('click', () => {
+                        const pageUrl = item.getAttribute('data-page');
+                        const title = item.querySelector('span').textContent.trim();
+                        loadPage(pageUrl, title, item);
+                    });
+                }
+            });
+
+            ui.adminMenuItem.addEventListener('click', showPasswordModal);
+            
+            ui.cancelPasswordBtn.addEventListener('click', closePasswordModal);
+
+            ui.submitPasswordBtn.addEventListener('click', () => {
+                // ⚠️ ATENÇÃO: A senha diretamente no código é uma falha de segurança.
+                // Isto é apenas para fins de demonstração.
+                if (ui.adminPasswordInput.value === 'ADM12345') {
+                    closePasswordModal();
+                    loadPage('admin.html', 'Administração', ui.adminMenuItem);
+                } else {
+                    ui.passwordError.style.display = 'flex';
+                    ui.adminPasswordInput.focus();
+                }
+            });
+            
+            ui.adminPasswordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    ui.submitPasswordBtn.click();
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024 && isMenuOpen) {
+                    toggleMenu();
+                }
+            });
+            
+            // --- INICIALIZAÇÃO ---
+            // Define o primeiro item do menu como ativo ao carregar a página
+            setActiveMenuItem(document.querySelector('.mdc-list-item'));
+        });
+    </script>
+
+</body>
+</html>

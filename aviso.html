@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Condomínio Cotovias - Avisos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/6.0.0/introjs.min.css" rel="stylesheet">
+
+    <style>
+        /* --- VARIÁVEIS DE DESIGN (CONSISTENTE COM A APLICAÇÃO PRINCIPAL) --- */
+        :root {
+            --cor-primaria: #4A90E2;
+            --cor-fundo: #F9F9FB;
+            --cor-surface: #FFFFFF;
+            --cor-texto-principal: #333333;
+            --cor-texto-secundario: #777777;
+            --cor-borda: #EAEAEA;
+            --cor-aviso-urgente: red;
+            --cor-aviso-normal: green;
+            --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --fonte-principal: 'Inter', sans-serif;
+            --raio-borda: 8px;
+        }
+
+        /* --- RESET E ESTILOS GERAIS --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--fonte-principal);
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto-principal);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* --- CONTAINER E LAYOUT --- */
+        .page-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            color: var(--cor-texto-secundario);
+        }
+
+        /* --- GRID DE AVISOS --- */
+        .avisos-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        /* --- CARD DE AVISO (NOVO DESIGN) --- */
+        .aviso-card {
+            background-color: var(--cor-surface);
+            border-radius: var(--raio-borda);
+            box-shadow: var(--sombra-suave);
+            border-left: 4px solid;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .aviso-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .aviso-card.normal { border-color: var(--cor-aviso-normal);
+        background-color: white ;
+          
+        }
+        .aviso-card.urgente { border-color: var(--cor-aviso-urgente); 
+          background-color:  white ;
+          
+        }
+        
+        .aviso-card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .aviso-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--cor-texto-secundario);
+            margin-bottom: 12px;
+        }
+        
+        .aviso-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .aviso-meta .material-icons-outlined {
+            font-size: 1rem;
+        }
+
+        .aviso-resumo {
+            font-size: 0.95rem;
+            color: var(--cor-texto-secundario);
+        }
+
+        /* --- MODAL DE AVISO (ESTILO DA APLICAÇÃO PRINCIPAL) --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: none; /* Inicia escondido */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        
+        .modal-container {
+            background: var(--cor-surface);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: modal-appear 0.3s ease-out forwards;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--cor-borda);
+            border-left: 5px solid;
+        }
+        .modal-header.normal { border-color: var(--cor-aviso-normal); }
+        .modal-header.urgente { border-color: var(--cor-aviso-urgente); }
+        
+        .modal-header h3 { font-size: 1.25rem; font-weight: 600; }
+        
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            line-height: 1.7;
+            color: var(--cor-texto-secundario);
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--cor-borda);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-close-btn {
+            font-family: var(--fonte-principal);
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto-principal);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--raio-borda);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .modal-close-btn:hover { background-color: #e0e0e0; }
+        
+        /* --- ESTADOS DE CARREGAMENTO E VAZIO --- */
+        .loading-container, .no-avisos {
+            text-align: center;
+            padding: 48px 0;
+            color: var(--cor-texto-secundario);
+        }
+        .loading-spinner {
+            width: 40px; height: 40px; border: 4px solid var(--cor-borda);
+            border-top: 4px solid var(--cor-primaria);
+            border-radius: 50%; margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+        .no-avisos .material-icons-outlined {
+            font-size: 48px; color: var(--cor-borda); margin-bottom: 16px;
+        }
+
+        /* --- ANIMAÇÕES --- */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes modal-appear { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <main class="page-container">
+        <div class="page-header" data-intro="Bem-vindo à área de avisos!" data-step="1">
+            <h1>Quadro de Avisos</h1>
+            <p>Fique por dentro das últimas informações e comunicados do condomínio.</p>
+        </div>
+
+        <div id="avisos-grid" class="avisos-grid" data-intro="Os avisos mais recentes aparecem aqui. A cor da borda indica a urgência. Clique em um para ver os detalhes." data-step="2">
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="avisoModalOverlay" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header" id="modalHeader">
+                <h3 id="modalTitulo"></h3>
+            </div>
+            <div class="modal-body">
+                <div id="modalConteudo"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="aviso-meta-item" id="modalAutor"></div>
+                <button class="modal-close-btn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/6.0.0/intro.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- CONFIGURAÇÃO DO FIREBASE ---
+            const firebaseConfig = {
+                // Suas chaves do Firebase aqui
+                apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+                authDomain: "rifas-c414b.firebaseapp.com",
+                databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+                projectId: "rifas-c414b",
+                storageBucket: "rifas-c414b.firebasestorage.app",
+                messagingSenderId: "770195193538",
+                appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+            const avisosRef = db.ref('avisos');
+
+            // --- SELEÇÃO DE ELEMENTOS DO DOM ---
+            const avisosGrid = document.getElementById('avisos-grid');
+            const modalOverlay = document.getElementById('avisoModalOverlay');
+            const modalTitulo = document.getElementById('modalTitulo');
+            const modalConteudo = document.getElementById('modalConteudo');
+            const modalAutor = document.getElementById('modalAutor');
+            const modalHeader = document.getElementById('modalHeader');
+
+            // --- LÓGICA DO MODAL (CUSTOMIZADO) ---
+            const openModal = () => modalOverlay.style.display = 'flex';
+            const closeModal = () => modalOverlay.style.display = 'none';
+
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay || e.target.classList.contains('modal-close-btn')) {
+                    closeModal();
+                }
+            });
+
+            // --- CARREGAMENTO E EXIBIÇÃO DOS AVISOS ---
+            avisosRef.orderByChild('data').on('value', (snapshot) => {
+                avisosGrid.innerHTML = ''; // Limpa a grade
+                if (!snapshot.exists()) {
+                    avisosGrid.innerHTML = `
+                        <div class="no-avisos">
+                            <i class="material-icons-outlined">notifications_off</i>
+                            <h3>Nenhum aviso disponível</h3>
+                            <p>Volte mais tarde para conferir as novidades.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const avisos = [];
+                snapshot.forEach(child => { avisos.push({ id: child.key, ...child.val() }); });
+                
+                // Ordena por data, mais recentes primeiro
+                avisos.sort((a, b) => b.data - a.data).forEach(aviso => {
+                    const card = createAvisoCard(aviso);
+                    card.addEventListener('click', () => openModalWithAviso(aviso));
+                    avisosGrid.appendChild(card);
+                });
+
+                // Inicia o tutorial se for a primeira visita
+                if (localStorage.getItem('tutorialAvisosCompleto') !== 'true') {
+                    setTimeout(startTutorial, 1000);
+                }
+            });
+
+            // --- FUNÇÕES AUXILIARES ---
+            function createAvisoCard(aviso) {
+                const card = document.createElement('div');
+                const isUrgente = aviso.urgente;
+                card.className = `aviso-card ${isUrgente ? 'urgente' : 'normal'}`;
+                
+                const data = new Date(aviso.data);
+                const dataFormatada = data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+                const resumo = aviso.mensagem.length > 120 ? aviso.mensagem.substring(0, 120) + '...' : aviso.mensagem;
+
+                card.innerHTML = `
+                    <h2>${aviso.titulo}</h2>
+                    <div class="aviso-meta">
+                        <div class="aviso-meta-item">
+                            <i class="material-icons-outlined">event</i>
+                            <span>${dataFormatada}</span>
+                        </div>
+                        <div class="aviso-meta-item">
+                            <i class="material-icons-outlined">person_outline</i>
+                            <span>${aviso.autor || 'Administração'}</span>
+                        </div>
+                    </div>
+                    <p class="aviso-resumo">${resumo}</p>
+                `;
+                return card;
+            }
+
+            function openModalWithAviso(aviso) {
+                modalTitulo.textContent = aviso.titulo;
+                modalConteudo.innerHTML = formatContent(aviso.mensagem);
+                modalAutor.innerHTML = `
+                    <i class="material-icons-outlined">person_outline</i>
+                    <span>${aviso.autor || 'Administração'}</span>
+                `;
+                modalHeader.className = `modal-header ${aviso.urgente ? 'urgente' : 'normal'}`;
+                openModal();
+            }
+
+            function formatContent(text) {
+                return text ? `<p>${text.replace(/\n/g, '</p><p>')}</p>` : '';
+            }
+
+            function startTutorial() {
+                introJs().setOptions({
+                    nextLabel: 'Próximo',
+                    prevLabel: 'Anterior',
+                    doneLabel: 'Entendi!',
+                    showStepNumbers: false,
+                    tooltipClass: 'custom-tooltip',
+                    exitOnOverlayClick: false
+                }).oncomplete(() => {
+                    localStorage.setItem('tutorialAvisosCompleto', 'true');
+                }).start();
+            }
+        });
+    </script>
+</body>
+</html>

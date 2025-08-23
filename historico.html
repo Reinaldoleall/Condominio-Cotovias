@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico - Sistema de Encomendas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<style>
+/* ==========================================================================
+   ESTILO MODERNO E CLEAN
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. VARIÁVEIS E CONFIGURAÇÕES GLOBAIS
+   -------------------------------------------------------------------------- */
+:root {
+    /* Paleta de Cores */
+    --color-primary: #4f46e5; /* Roxo/Azul principal */
+    --color-primary-light: #eef2ff;
+    --color-danger: #ef4444;
+    --color-danger-light: #fee2e2;
+    --color-success: #22c55e;
+    
+    /* Cores de UI */
+    --color-bg: #f8fafc; /* Fundo (quase branco) */
+    --color-surface: #ffffff; /* Superfície dos cards */
+    --color-border: #e2e8f0; /* Bordas e divisores */
+    --color-text-primary: #0f172a; /* Texto principal (escuro) */
+    --color-text-secondary: #64748b; /* Texto secundário (cinza) */
+    
+    /* Tipografia */
+    --font-family: 'Inter', -apple-system, BlinkMacSystem-Font, "Segoe UI", Roboto, sans-serif;
+    
+    /* Layout */
+    --border-radius-md: 0.75rem; /* 12px */
+    --border-radius-lg: 1rem; /* 16px */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --------------------------------------------------------------------------
+   1. ESTILOS DE BASE
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --------------------------------------------------------------------------
+   2. LAYOUT E COMPONENTES PRINCIPAIS
+   -------------------------------------------------------------------------- */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.card {
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.actions-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   3. COMPONENTES DE UI
+   -------------------------------------------------------------------------- */
+
+/* ----- Botões ----- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 44px;
+    padding: 0 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-decoration: none;
+}
+.btn .material-icons-outlined { font-size: 1.125rem; }
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-danger {
+    background-color: var(--color-danger);
+    color: white;
+}
+.btn-danger:hover { opacity: 0.9; }
+
+.btn-secondary {
+    background-color: var(--color-surface);
+    color: var(--color-text-secondary);
+    border-color: var(--color-border);
+}
+.btn-secondary:hover {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+    border-color: var(--color-primary-light);
+}
+
+.btn-text {
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    height: auto;
+    padding: 0.5rem;
+}
+.btn-text:hover { color: var(--color-primary); }
+
+/* ----- Campos de Input ----- */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.input-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+.input-group input {
+    width: 100%;
+    height: 44px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-bg);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    transition: all var(--transition);
+}
+.input-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+/* ----- Tabela ----- */
+.table-wrapper { overflow-x: auto; }
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+.table th, .table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+}
+.table th {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.table tbody tr:hover { background-color: var(--color-primary-light); }
+.table-actions { display: flex; gap: 0.25rem; }
+
+/* ----- Badge de Status ----- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+.badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+.status-retirado {
+    color: #1e40af;
+    background-color: #dbeafe;
+}
+.status-retirado::before { background-color: #2563eb; }
+.status-pendente {
+    color: #991b1b;
+    background-color: #fee2e2;
+}
+.status-pendente::before { background-color: #b91c1c; }
+
+/* ----- Modal ----- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgb(15 23 42 / 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition);
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal {
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: var(--shadow-md);
+    transform: scale(0.95);
+    transition: transform var(--transition);
+}
+.modal-overlay.active .modal { transform: scale(1); }
+.modal-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+.modal-content { color: var(--color-text-secondary); margin-bottom: 1.5rem; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; }
+.share-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+.share-option { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: var(--border-radius-md); background-color: var(--color-bg); }
+.share-option:hover { background-color: var(--color-primary-light); color: var(--color-primary); }
+
+/* ----- Toast/Snackbar ----- */
+.toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translate(-50%, 150%);
+    background-color: var(--color-text-primary);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    z-index: 2000;
+    transition: transform var(--transition);
+    pointer-events: none;
+}
+.toast.show { transform: translate(-50%, 0); }
+.toast.success { background-color: var(--color-success); }
+.toast.error { background-color: var(--color-danger); }
+
+/* ----- Estados Vazios/Carregando ----- */
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+.empty-state .material-icons-outlined { font-size: 3rem; margin-bottom: 1rem; }
+.loading {
+    width: 20px;
+    height: 20px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --------------------------------------------------------------------------
+   4. RESPONSIVIDADE
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .table thead { display: none; }
+    .table tr {
+        display: block;
+        border: 1px solid var(--color-border);
+        border-radius: var(--border-radius-lg);
+        margin-bottom: 1rem;
+    }
+    .table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--color-border);
+    }
+    .table tr td:last-child { border-bottom: none; }
+    .table td::before {
+        content: attr(data-label);
+        font-weight: 500;
+        text-align: left;
+        color: var(--color-text-secondary);
+    }
+    .page-title { font-size: 1.5rem; }
+}
+
+</style>
+<body>
+    <main class="container">
+        <div class="card">
+            <div class="card-content">
+                <div class="page-header">
+                    <h1 class="page-title">Histórico de Encomendas</h1>
+                    <div class="actions-group">
+                        <button id="btnExportarHistorico" class="btn btn-secondary" style="display: none;">
+                            <span class="material-icons-outlined">download</span>
+                            <span>Exportar</span>
+                        </button>
+                        <button id="btnLimparHistorico" class="btn btn-danger">
+                            <span class="material-icons-outlined">delete_sweep</span>
+                            <span>Limpar Entregues</span>
+                        </button>
+                    </div>
+                </div>
+
+                <form id="filterForm" class="filter-grid">
+                    <div class="input-group">
+                        <label for="filtroBloco">Filtrar por Bloco</label>
+                        <input type="text" id="filtroBloco">
+                    </div>
+                    <div class="input-group">
+                        <label for="filtroApto">Filtrar por Apartamento</label>
+                        <input type="text" id="filtroApto">
+                    </div>
+                    <div class="actions-group">
+                        <button id="btnFiltrar" type="submit" class="btn btn-primary">
+                            <span class="material-icons-outlined">search</span>
+                            <span>Filtrar</span>
+                        </button>
+                        <button id="btnLimparFiltro" type="reset" class="btn btn-secondary">
+                            <span class="material-icons-outlined">clear</span>
+                            <span>Limpar</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Bloco/Apto</th>
+                                <th>Detalhes</th>
+                                <th>Porteiro</th>
+                                <th>Retirado por</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaHistorico">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="modalLimparHistorico" class="modal-overlay">
+        <div class="modal">
+            <h2 class="modal-title">Confirmar Limpeza</h2>
+            <p class="modal-content">
+                Tem certeza de que deseja remover **todas as encomendas já entregues**? Esta ação não pode ser desfeita.
+            </p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cancelar</button>
+                <button id="btnConfirmarLimparHistorico" class="btn btn-danger">Sim, Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalCompartilhar" class="modal-overlay">
+        <div class="modal">
+            <h2 class="modal-title">Compartilhar Encomenda</h2>
+            <div class="modal-content">
+                <div id="detalhesCompartilhar" style="margin-bottom: 1rem;"></div>
+                <div class="share-options">
+                    <button class="btn share-option" data-share="whatsapp"><span class="material-icons-outlined">whatsapp</span> WhatsApp</button>
+                    <button class="btn share-option" data-share="email"><span class="material-icons-outlined">email</span> E-mail</button>
+                    <button class="btn share-option" data-share="copy"><span class="material-icons-outlined">content_copy</span> Copiar</button>
+                    <button class="btn share-option" data-share="pdf"><span class="material-icons-outlined">picture_as_pdf</span> PDF</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+    const App = {
+        state: {
+            firebaseConfig: {
+                apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+                authDomain: "rifas-c414b.firebaseapp.com",
+                databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+                projectId: "rifas-c414b",
+                storageBucket: "rifas-c414b.firebasestorage.app",
+                messagingSenderId: "770195193538",
+                appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+            },
+            database: null,
+            historicoCompleto: [],
+            encomendaAtual: null,
+        },
+        methods: {
+            async carregarHistorico() {
+                try {
+                    App.helpers.renderLoadingState(true);
+                    const snapshot = await App.state.database.ref('encomendas').once('value');
+                    
+                    if (!snapshot.exists()) {
+                        App.helpers.renderEmptyState('Nenhum registro no histórico');
+                        return;
+                    }
+                    
+                    const encomendas = [];
+                    snapshot.forEach(child => {
+                        encomendas.push({ id: child.key, ...child.val() });
+                    });
+                    
+                    App.state.historicoCompleto = encomendas.sort((a, b) => (b.data || 0) - (a.data || 0));
+                    App.methods.atualizarTabela(App.state.historicoCompleto);
+                    
+                } catch (error) {
+                    console.error('Erro ao carregar histórico:', error);
+                    App.helpers.showToast('Erro ao carregar histórico', 'error');
+                    App.helpers.renderEmptyState('Falha ao carregar dados');
+                } finally {
+                    App.helpers.renderLoadingState(false);
+                    document.getElementById('btnExportarHistorico').style.display = App.state.historicoCompleto.length > 0 ? 'inline-flex' : 'none';
+                }
+            },
+            atualizarTabela(dados) {
+                const tabelaBody = document.getElementById('tabelaHistorico');
+                if (dados.length === 0) {
+                    App.helpers.renderEmptyState('Nenhum registro encontrado para os filtros aplicados');
+                    return;
+                }
+                tabelaBody.innerHTML = '';
+                dados.forEach(item => {
+                    const tr = document.createElement('tr');
+                    const statusClass = item.status === 'pendente' ? 'status-pendente' : 'status-retirado';
+                    const statusText = item.status === 'pendente' ? 'Pendente' : 'Retirado';
+                    tr.innerHTML = `
+                        <td data-label="Data">${App.helpers.formatarData(item.data)}</td>
+                        <td data-label="Bloco/Apto">${item.blocoApto || 'N/A'}</td>
+                        <td data-label="Detalhes">${item.quantidade || 0} item(s) - ${item.descricao || 'Sem detalhes'}</td>
+                        <td data-label="Porteiro">${item.registradoPorNome || 'N/A'}</td>
+                        <td data-label="Retirado por">${item.retiradoPorNome || 'N/A'}</td>
+                        <td data-label="Status"><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td data-label="Ações" class="table-actions">
+                            <button class="btn btn-text" data-id="${item.id}" onclick="App.handlers.abrirModalCompartilhar(this)" aria-label="Compartilhar encomenda de ${item.blocoApto}">
+                                <span class="material-icons-outlined">share</span>
+                            </button>
+                        </td>`;
+                    tabelaBody.appendChild(tr);
+                });
+            },
+            aplicarFiltros(event) {
+                event.preventDefault();
+                const filtroBloco = document.getElementById('filtroBloco').value.trim().toLowerCase();
+                const filtroApto = document.getElementById('filtroApto').value.trim().toLowerCase();
+                const dadosFiltrados = App.state.historicoCompleto.filter(item => {
+                    const blocoApto = (item.blocoApto || '').toLowerCase();
+                    return (!filtroBloco || blocoApto.includes(filtroBloco)) && (!filtroApto || blocoApto.includes(filtroApto));
+                });
+                App.methods.atualizarTabela(dadosFiltrados);
+            },
+            limparFiltros(event) {
+                event.preventDefault();
+                document.getElementById('filterForm').reset();
+                App.methods.atualizarTabela(App.state.historicoCompleto);
+            },
+            async limparHistoricoEntregues() {
+                const btn = document.getElementById('btnConfirmarLimparHistorico');
+                App.helpers.toggleButtonLoading(btn, true);
+                try {
+                    const snapshot = await App.state.database.ref('encomendas').orderByChild('status').equalTo('retirado').once('value');
+                    if (!snapshot.exists()) {
+                        App.helpers.showToast('Nenhuma encomenda entregue para limpar.', 'info');
+                        return;
+                    }
+                    const updates = {};
+                    snapshot.forEach(child => { updates[child.key] = null; });
+                    await App.state.database.ref('encomendas').update(updates);
+                    App.helpers.showToast('Histórico de entregues limpo!', 'success');
+                    await App.methods.carregarHistorico();
+                    App.helpers.toggleModal('modalLimparHistorico', false);
+                } catch (error) {
+                    App.helpers.showToast('Erro ao limpar histórico.', 'error');
+                } finally {
+                    App.helpers.toggleButtonLoading(btn, false);
+                }
+            }
+        },
+        helpers: {
+            formatarData(timestamp) {
+                return timestamp ? new Date(timestamp).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : 'N/A';
+            },
+            toggleModal(modalId, show) {
+                const modal = document.getElementById(modalId);
+                modal.classList.toggle('active', show);
+            },
+            showToast(message, type = 'info') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = `toast show ${type}`;
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            },
+            toggleButtonLoading(button, isLoading) {
+                button.disabled = isLoading;
+                if (isLoading) {
+                    button.dataset.originalText = button.innerHTML;
+                    button.innerHTML = `<span class="loading"></span>`;
+                } else {
+                    button.innerHTML = button.dataset.originalText;
+                }
+            },
+            renderLoadingState(isLoading) {
+                if (isLoading) {
+                    document.getElementById('tabelaHistorico').innerHTML = `<tr><td colspan="7"><div class="empty-state"><span class="loading"></span><p>Carregando histórico...</p></div></td></tr>`;
+                }
+            },
+            renderEmptyState(message) {
+                 document.getElementById('tabelaHistorico').innerHTML = `<tr><td colspan="7"><div class="empty-state"><span class="material-icons-outlined">inbox</span><p>${message}</p></div></td></tr>`;
+            },
+            gerarTextoCompartilhamento(encomenda) {
+                return `📦 Detalhes da Encomenda 📦\n\n` +
+                       `Para: ${encomenda.blocoApto}\n` +
+                       `Data de Registro: ${App.helpers.formatarData(encomenda.data)}\n` +
+                       `Quantidade: ${encomenda.quantidade} item(s)\n` +
+                       `Descrição: ${encomenda.descricao || 'N/A'}\n` +
+                       `Status: ${encomenda.status === 'pendente' ? 'Pendente para retirada' : 'Já retirado'}`;
+            },
+            gerarPDF(encomendas, title, filename) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.setFontSize(18);
+                doc.text(title, 14, 22);
+                const head = [['Data', 'Bloco/Apto', 'Qtd', 'Porteiro', 'Retirado por', 'Status']];
+                const body = encomendas.map(item => [ App.helpers.formatarData(item.data), item.blocoApto, item.quantidade, item.registradoPorNome || 'N/A', item.retiradoPorNome || 'N/A', item.status === 'pendente' ? 'Pendente' : 'Retirado' ]);
+                doc.autoTable({ startY: 30, head, body, theme: 'grid', headStyles: { fillColor: [79, 70, 229] } });
+                doc.save(filename);
+            }
+        },
+        handlers: {
+            abrirModalCompartilhar(button) {
+                const id = button.dataset.id;
+                App.state.encomendaAtual = App.state.historicoCompleto.find(item => item.id === id);
+                if (!App.state.encomendaAtual) return;
+                document.getElementById('detalhesCompartilhar').innerHTML = `<p><strong>Para:</strong> ${App.state.encomendaAtual.blocoApto}<br><strong>Data:</strong> ${App.helpers.formatarData(App.state.encomendaAtual.data)}</p>`;
+                App.helpers.toggleModal('modalCompartilhar', true);
+            },
+            compartilhar(event) {
+                const action = event.currentTarget.dataset.share;
+                const encomenda = App.state.encomendaAtual;
+                if (!encomenda) return;
+                const texto = App.helpers.gerarTextoCompartilhamento(encomenda);
+                switch(action) {
+                    case 'whatsapp': window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank'); break;
+                    case 'email': window.location.href = `mailto:?subject=Detalhes da Encomenda - ${encomenda.blocoApto}&body=${encodeURIComponent(texto)}`; break;
+                    case 'copy': navigator.clipboard.writeText(texto).then(() => App.helpers.showToast('Texto copiado!', 'success')).catch(() => App.helpers.showToast('Falha ao copiar.', 'error')); break;
+                    case 'pdf': App.helpers.gerarPDF([encomenda], `Detalhes da Encomenda`, `encomenda_${encomenda.blocoApto}.pdf`); break;
+                }
+            },
+            exportarTabelaCompleta() {
+                const btn = document.getElementById('btnExportarHistorico');
+                App.helpers.toggleButtonLoading(btn, true);
+                try {
+                    const form = document.getElementById('filterForm');
+                    const formData = new FormData(form);
+                    const filtroBloco = formData.get('filtroBloco')?.trim().toLowerCase() ?? '';
+                    const filtroApto = formData.get('filtroApto')?.trim().toLowerCase() ?? '';
+                    const dadosFiltrados = App.state.historicoCompleto.filter(item => {
+                         const blocoApto = (item.blocoApto || '').toLowerCase();
+                         return (!filtroBloco || blocoApto.includes(filtroBloco)) && (!filtroApto || blocoApto.includes(filtroApto));
+                    });
+                    App.helpers.gerarPDF(dadosFiltrados, 'Histórico de Encomendas', 'historico_encomendas.pdf');
+                } catch(e) {
+                    App.helpers.showToast('Erro ao gerar o PDF.', 'error');
+                } finally {
+                    App.helpers.toggleButtonLoading(btn, false);
+                }
+            }
+        },
+        init() {
+            firebase.initializeApp(App.state.firebaseConfig);
+            App.state.database = firebase.database();
+            document.addEventListener('DOMContentLoaded', () => {
+                App.methods.carregarHistorico();
+                document.getElementById('btnLimparHistorico').addEventListener('click', () => App.helpers.toggleModal('modalLimparHistorico', true));
+                document.getElementById('btnConfirmarLimparHistorico').addEventListener('click', App.methods.limparHistoricoEntregues);
+                document.getElementById('btnExportarHistorico').addEventListener('click', App.handlers.exportarTabelaCompleta);
+                document.getElementById('filterForm').addEventListener('submit', App.methods.aplicarFiltros);
+                document.getElementById('filterForm').addEventListener('reset', App.methods.limparFiltros);
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.addEventListener('click', (e) => { if (e.target === modal) App.helpers.toggleModal(modal.id, false); });
+                });
+                document.querySelectorAll('.modal-close').forEach(btn => {
+                    btn.addEventListener('click', () => App.helpers.toggleModal(btn.closest('.modal-overlay').id, false));
+                });
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        document.querySelectorAll('.modal-overlay.active').forEach(modal => App.helpers.toggleModal(modal.id, false));
+                    }
+                });
+                document.querySelectorAll('.share-option').forEach(btn => {
+                    btn.addEventListener('click', App.handlers.compartilhar);
+                });
+            });
+        }
+    };
+    App.init();
+    </script>
+</body>
+</html>

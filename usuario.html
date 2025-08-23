@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Morador - Sistema de Encomendas</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+</head>
+<style>
+    
+/* ==========================================================================
+   1. Variáveis de Tema e Estilos Base
+   ========================================================================== */
+:root {
+    --primary-color: #34495e;  /* Azul petróleo */
+    --secondary-color: #2980b9; /* Azul mais claro */
+    --accent-color: #3498db;   /* Azul para destaque */
+    --success-color: #27ae60;  /* Verde */
+    --warning-color: #f39c12;  /* Laranja */
+    --danger-color: #c0392b;   /* Vermelho */
+    --light-gray: #ecf0f1;
+    --dark-text: #2c3e50;
+}
+
+body {
+    background-color: var(--light-gray);
+    color: var(--dark-text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 95%;
+    max-width: 1200px;
+    margin-top: 2rem;
+    flex: 1;
+}
+
+h4, h5 {
+    font-weight: 300;
+    color: var(--primary-color);
+}
+
+    /* ==========================================================================
+   AJUSTE DE POSICIONAMENTO PARA NOTIFICAÇÕES (TOASTS)
+   ========================================================================== */
+
+#toast-container {
+    /* Posicionamento Fixo e Centralizado */
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%); /* O truque para centralização perfeita */
+    
+    /* Distância da parte inferior da tela */
+    bottom: 30px; 
+    
+    /* Garante que não fique preso nos cantos */
+    top: auto;
+    right: auto; 
+    
+    /* Largura e Segurança */
+    width: fit-content; /* Faz o container ter a largura do conteúdo */
+    max-width: 90%; /* Evita que o toast toque as bordas em telas pequenas */
+    
+    /* Empilhamento e Alinhamento */
+    z-index: 10000; /* Garante que a notificação fique sobre todos os elementos */
+    text-align: center; /* Centraliza o texto dentro do toast */
+}
+
+/* Opcional: Garante que os toasts dentro do container se comportem bem */
+.toast {
+    display: inline-block;
+    word-wrap: break-word; /* Evita que texto longo "quebre" o layout */
+}
+
+/* ==========================================================================
+   2. Cabeçalho e Botões de Ação
+   ========================================================================== */
+.header-actions {
+    padding: 1rem 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+#btnAtualizar, #btnLogout {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+#btnAtualizar:hover, #btnLogout:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+}
+
+.rotate {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   3. Cards e Listas de Encomendas
+   ========================================================================== */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden; /* Garante que o conteúdo respeite o border-radius */
+}
+
+.card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card .card-content {
+    padding: 24px;
+}
+
+.collapsible {
+    border: none;
+    box-shadow: none;
+}
+
+.collapsible-header {
+    font-weight: 500;
+    border-bottom: 1px solid #ddd !important;
+    transition: background-color 0.3s ease;
+}
+
+.collapsible-header:hover {
+    background-color: rgba(0,0,0,0.03);
+}
+
+.collapsible-header i {
+    margin-right: 15px;
+    color: var(--secondary-color);
+}
+
+.collapsible-body {
+    background-color: #fafafa;
+    border-bottom: 1px solid #ddd !important;
+}
+
+.collapsible-body p {
+    padding: 0.5rem 0;
+}
+
+.updated {
+    animation: fadeIn 1.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   4. Estilos de Status (Badges)
+   ========================================================================== */
+.badge {
+    color: white !important;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    text-align: center;
+}
+
+.badge.orange { background-color: var(--warning-color); }
+.badge.blue { background-color: var(--accent-color); }
+.badge.green { background-color: var(--success-color); }
+
+
+/* ==========================================================================
+   5. Modal e Estado Vazio
+   ========================================================================== */
+.modal {
+    border-radius: 8px;
+    max-width: 600px;
+}
+
+.modal .modal-footer {
+    background-color: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+    border-radius: 0 0 8px 8px;
+}
+
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    margin: 1rem;
+}
+
+.empty-state .material-icons {
+    font-size: 4rem;
+    color: #bbb;
+}
+
+.empty-state p {
+    font-size: 1.2rem;
+    color: #999;
+    margin-top: 1rem;
+}
+
+
+/* ==========================================================================
+   6. Indicador de Conexão
+   ========================================================================== */
+#connectionStatus {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 20px 20px 0 0;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    transition: all 0.5s ease;
+}
+
+#connectionStatus.online {
+    background-color: var(--success-color);
+}
+
+#connectionStatus.offline {
+    background-color: var(--danger-color);
+}
+
+#connectionStatus i {
+    margin-right: 8px;
+}
+
+/* Esconde o status após a animação de entrada */
+#connectionStatus:not(.show) {
+    bottom: -60px;
+    opacity: 0;
+}
+</style>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col s12 right-align">
+<button id="btnAtualizar" class="btn waves-effect waves-light blue darken-2" onclick="window.location.href='usuario.html'">
+    <i class="material-icons left">refresh</i> Atualizar
+</button>
+                <button id="btnLogout" class="btn waves-effect waves-light red darken-2">
+                    <i class="material-icons left">exit_to_app</i> Sair
+                </button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h4>Minhas Encomendas</h4>
+            <p>Bem-vindo, <span id="nomeUsuario"></span> (Bloco/Apto: <span id="blocoApto"></span>)</p>
+            
+            <div class="card" id="cardPendentes">
+                <div class="card-content">
+                    <span class="card-title"><h5>Encomendas Pendentes</h5></span>
+                    <ul class="collapsible" id="listaEncomendasPendentes">
+                        <li class="empty-state">
+                            <div class="center-align grey-text">
+                                <i class="material-icons large">local_shipping</i>
+                                <p>Carregando encomendas...</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="cardFinalizadas">
+                <div class="card-content">
+                    <span class="card-title"><h5>Encomendas Finalizadas</h5></span>
+                    <ul class="collapsible" id="listaEncomendasFinalizadas">
+                        <li class="empty-state">
+                            <div class="center-align grey-text">
+                                <i class="material-icons large">assignment_turned_in</i>
+                                <p>Nenhuma encomenda finalizada</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes da Encomenda -->
+    <div id="modalEncomenda" class="modal">
+        <div class="modal-content">
+            <h4 id="modalTitulo">Detalhes da Encomenda</h4>
+            <div class="row">
+                <div class="col s6">
+                    <p><strong>Data/Hora Recebimento:</strong> <span id="modalData"></span></p>
+                    <p><strong>Recebido por:</strong> <span id="modalPorteiro"></span></p>
+                    <p><strong>Quantidade:</strong> <span id="modalQuantidade"></span></p>
+                </div>
+                <div class="col s6">
+                    <p><strong>Status:</strong> <span id="modalStatus" class="badge"></span></p>
+                    <p><strong>Descrição:</strong> <span id="modalDescricao"></span></p>
+                </div>
+            </div>
+            <div class="row" id="modalRetiradaSection">
+                <div class="col s12">
+                    <p><strong>Retirado por:</strong> <span id="modalRetiradoPor"></span></p>
+                    <p><strong>Data da Retirada:</strong> <span id="modalDataRetirada"></span></p>
+                    <p><strong>Registrado por:</strong> <span id="modalPorteiroRetirada"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Fechar</a>
+            <a href="#!" class="waves-effect waves-light btn blue darken-3" id="btnConfirmarRetirada">Confirmar Retirada</a>
+        </div>
+    </div>
+    
+    <!-- Modal de Confirmação de Retirada -->
+    <div id="modalConfirmacaoRetirada" class="modal">
+        <div class="modal-content">
+            <h4>Confirmação de Retirada</h4>
+            <p>O porteiro <span id="confirmacaoPorteiroNome"></span> registrou a retirada desta encomenda por <span id="confirmacaoRetiranteNome"></span>.</p>
+            <p>Deseja confirmar esta retirada?</p>
+            <div class="row">
+                <div class="col s12">
+                    <p><strong>Data/Hora:</strong> <span id="confirmacaoData"></span></p>
+                    <p><strong>Descrição:</strong> <span id="confirmacaoDescricao"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-red btn-flat" id="btnRejeitarRetirada">Rejeitar</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn" id="btnConfirmarRetiradaModal">Confirmar</a>
+        </div>
+    </div>
+
+    <!-- Status de Conexão -->
+    <div id="connectionStatus" class="hide">
+        <i class="material-icons left">wifi</i>
+        <span id="connectionText">Conectado</span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+            authDomain: "rifas-c414b.firebaseapp.com",
+            databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+            projectId: "rifas-c414b",
+            storageBucket: "rifas-c414b.firebasestorage.app",
+            messagingSenderId: "770195193538",
+            appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+        };
+        
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Variáveis globais
+        let userData = null;
+        let encomendasListener = null;
+        let solicitacoesVerificadas = false;
+        let lastUpdateTime = 0;
+        
+        // Objeto para cache local
+        const localCache = {
+            encomendas: null,
+            userData: null,
+            lastUpdated: 0
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializa componentes do Materialize
+            M.Modal.init(document.querySelectorAll('.modal'));
+            M.Collapsible.init(document.querySelectorAll('.collapsible'));
+            
+            // Configura botões
+            document.getElementById('btnConfirmarRetiradaModal').addEventListener('click', confirmarRetiradaSolicitada);
+            document.getElementById('btnRejeitarRetirada').addEventListener('click', rejeitarRetiradaSolicitada);
+            document.getElementById('btnConfirmarRetirada').addEventListener('click', confirmarRetiradaEncomenda);
+            document.getElementById('btnLogout').addEventListener('click', fazerLogout);
+            document.getElementById('btnAtualizar').addEventListener('click', function() {
+                atualizarEncomendas();
+            });
+            
+            // Monitora estado da conexão
+            monitorarConexao();
+            
+            // Monitora autenticação e carrega encomendas
+            firebase.auth().onAuthStateChanged(user => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Tenta carregar do cache local primeiro
+                if (localCache.userData && Date.now() - localCache.lastUpdated < 300000) { // 5 minutos
+                    userData = localCache.userData;
+                    atualizarInterfaceUsuario();
+                    carregarEncomendasDoCache();
+                } else {
+                    // Carrega dados do usuário do Firebase
+                    firebase.database().ref('users/' + user.uid).once('value').then(snapshot => {
+                        userData = snapshot.val();
+                        localCache.userData = userData;
+                        localCache.lastUpdated = Date.now();
+                        atualizarInterfaceUsuario();
+                        
+                        if (userData.tipo !== 'morador') {
+                            window.location.href = 'index.html';
+                            return;
+                        }
+                        
+                        // Configura listener em tempo real para as encomendas
+                        configurarListenerEncomendas();
+                    });
+                }
+            });
+        });
+        
+                // Função para forçar atualização das encomendas
+        function atualizarEncomendas() {
+            const btnAtualizar = document.getElementById('btnAtualizar');
+            const icon = btnAtualizar.querySelector('i');
+            
+            // Adiciona animação de carregamento
+            icon.classList.add('rotate');
+            btnAtualizar.disabled = true;
+            
+            // Força uma nova leitura do banco de dados
+            if (userData) {
+                const blocoApto = `Bloco ${userData.bloco}, Apt ${userData.apartamento}`;
+                
+                firebase.database().ref('encomendas')
+                    .orderByChild('blocoApto')
+                    .equalTo(blocoApto)
+                    .once('value')
+                    .then(snapshot => {
+                        processarEncomendas(snapshot.val());
+                        M.toast({html: 'Encomendas atualizadas com sucesso!', classes: 'green'});
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar encomendas:', error);
+                        M.toast({html: 'Erro ao atualizar encomendas', classes: 'red'});
+                    })
+                    .finally(() => {
+                        // Remove animação de carregamento
+                        icon.classList.remove('rotate');
+                        btnAtualizar.disabled = false;
+                    });
+            } else {
+                // Remove animação de carregamento
+                icon.classList.remove('rotate');
+                btnAtualizar.disabled = false;
+                M.toast({html: 'Dados do usuário não carregados', classes: 'orange'});
+            }
+        }
+        
+        function monitorarConexao() {
+            const connectionStatus = document.getElementById('connectionStatus');
+            const connectionText = document.getElementById('connectionText');
+            
+            firebase.database().ref('.info/connected').on('value', function(snapshot) {
+                if (snapshot.val() === true) {
+                    connectionStatus.className = 'online';
+                    connectionText.textContent = 'Conectado';
+                    connectionStatus.style.display = 'block';
+                    
+                    // Esconde após 3 segundos
+                    setTimeout(() => {
+                        connectionStatus.style.display = 'none';
+                    }, 3000);
+                } else {
+                    connectionStatus.className = 'offline';
+                    connectionText.textContent = 'Offline - Tentando reconectar...';
+                    connectionStatus.style.display = 'block';
+                }
+            });
+        }
+        
+        function atualizarInterfaceUsuario() {
+            document.getElementById('nomeUsuario').textContent = userData.nome;
+            document.getElementById('blocoApto').textContent = `${userData.bloco}/${userData.apartamento}`;
+        }
+        
+        function carregarEncomendasDoCache() {
+            if (localCache.encomendas) {
+                processarEncomendas(localCache.encomendas);
+            }
+        }
+        
+function configurarListenerEncomendas() {
+    const blocoApto = `Bloco ${userData.bloco}, Apt ${userData.apartamento}`;
+    
+    // Remove listener anterior se existir
+    if (encomendasListener) {
+        firebase.database().ref('encomendas').off('value', encomendasListener);
+    }
+    
+    // Configura listener para value (carregamento inicial)
+    encomendasListener = firebase.database().ref('encomendas')
+        .orderByChild('blocoApto')
+        .equalTo(blocoApto)
+        .on('value', snapshot => {
+            processarEncomendas(snapshot.val());
+            
+            // Verifica solicitações pendentes apenas uma vez
+            if (!solicitacoesVerificadas) {
+                verificarSolicitacoesPendentes(snapshot);
+                solicitacoesVerificadas = true;
+            }
+        });
+    
+    // Configura listener separado para child_changed
+    firebase.database().ref('encomendas')
+        .orderByChild('blocoApto')
+        .equalTo(blocoApto)
+        .on('child_changed', snapshot => {
+            const encomenda = snapshot.val();
+            
+            // Atualiza a encomenda específica na interface
+            atualizarItemEncomenda(snapshot.key, encomenda);
+            
+            // Se for uma solicitação de retirada, mostra modal
+            if (encomenda.status === 'aguardando_confirmacao' && 
+                (!encomenda.confirmacoes || !encomenda.confirmacoes[firebase.auth().currentUser.uid])) {
+                abrirModalConfirmacaoRetirada(snapshot.key, encomenda);
+            }
+        });
+}
+
+function atualizarItemEncomenda(id, encomenda) {
+    // Encontra o item na lista e atualiza apenas ele
+    const item = document.querySelector(`[data-id="${id}"]`);
+    if (item) {
+        item.innerHTML = criarItemEncomenda(id, encomenda);
+        item.classList.add('updated');
+        setTimeout(() => item.classList.remove('updated'), 1500);
+    }
+    
+    // Atualiza o cache local
+    if (!localCache.encomendas) localCache.encomendas = {};
+    localCache.encomendas[id] = encomenda;
+    localCache.lastUpdated = Date.now();
+}
+        
+        function processarEncomendas(encomendasData) {
+            const listaPendentes = document.getElementById('listaEncomendasPendentes');
+            const listaFinalizadas = document.getElementById('listaEncomendasFinalizadas');
+            
+            // Limpa as listas
+            listaPendentes.innerHTML = '';
+            listaFinalizadas.innerHTML = '';
+            
+            if (!encomendasData) {
+                listaPendentes.innerHTML = criarEstadoVazio('local_shipping', 'Nenhuma encomenda pendente');
+                listaFinalizadas.innerHTML = criarEstadoVazio('assignment_turned_in', 'Nenhuma encomenda finalizada');
+                return;
+            }
+            
+            let temPendentes = false;
+            let temFinalizadas = false;
+            
+            // Processa cada encomenda
+            Object.entries(encomendasData).forEach(([id, encomenda]) => {
+                const li = document.createElement('li');
+                li.className = 'updated'; // Adiciona classe para animação
+                
+                li.innerHTML = criarItemEncomenda(id, encomenda);
+                
+                if (encomenda.status === 'pendente' || encomenda.status === 'aguardando_confirmacao') {
+                    listaPendentes.appendChild(li);
+                    temPendentes = true;
+                } else {
+                    listaFinalizadas.appendChild(li);
+                    temFinalizadas = true;
+                }
+                
+                // Remove a classe de animação após 1.5s
+                setTimeout(() => {
+                    li.classList.remove('updated');
+                }, 1500);
+            });
+            
+            // Adiciona estados vazios se necessário
+            if (!temPendentes) {
+                listaPendentes.innerHTML = criarEstadoVazio('local_shipping', 'Nenhuma encomenda pendente');
+            }
+            
+            if (!temFinalizadas) {
+                listaFinalizadas.innerHTML = criarEstadoVazio('assignment_turned_in', 'Nenhuma encomenda finalizada');
+            }
+            
+            // Adiciona animação aos cards
+            document.getElementById('cardPendentes').classList.add('updated');
+            document.getElementById('cardFinalizadas').classList.add('updated');
+            setTimeout(() => {
+                document.getElementById('cardPendentes').classList.remove('updated');
+                document.getElementById('cardFinalizadas').classList.remove('updated');
+            }, 1500);
+            
+            // Re-inicializa collapsible para os novos itens
+            M.Collapsible.init(document.querySelectorAll('.collapsible'));
+            
+            // Adiciona eventos aos botões
+            document.querySelectorAll('.btn-detalhes').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const encomendaId = this.getAttribute('data-id');
+                    abrirModalEncomenda(encomendaId);
+                });
+            });
+            
+            document.querySelectorAll('.btn-retirar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const encomendaId = this.getAttribute('data-id');
+                    retirarEncomenda(encomendaId);
+                });
+            });
+        }
+        
+        function criarItemEncomenda(id, encomenda) {
+            return `
+                <div class="collapsible-header">
+                    <i class="material-icons">${encomenda.status === 'pendente' ? 'local_shipping' : 'assignment_turned_in'}</i>
+                    Encomenda #${id.substring(0, 8)}
+                    <span class="badge ${getBadgeClass(encomenda)}">
+                        ${getStatusText(encomenda)}
+                    </span>
+                </div>
+                <div class="collapsible-body">
+                    <p><strong>Data:</strong> ${formatarData(encomenda.data)}</p>
+                    <p><strong>Recebido por:</strong> ${encomenda.registradoPorNome || 'Porteiro'}</p>
+                    <p><strong>Quantidade:</strong> ${encomenda.quantidade}</p>
+                    ${encomenda.descricao ? `<p><strong>Descrição:</strong> ${encomenda.descricao}</p>` : ''}
+                    <div class="right-align">
+                        <a href="#!" class="btn blue darken-3 btn-detalhes" data-id="${id}">
+                            <i class="material-icons left">info</i> Detalhes
+                        </a>
+                        ${encomenda.status === 'pendente' ? 
+                            `<a href="#!" class="btn green btn-retirar" data-id="${id}">
+                                <i class="material-icons left">check</i> Retirar
+                            </a>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function criarEstadoVazio(icone, mensagem) {
+            return `
+                <li class="empty-state">
+                    <div class="center-align grey-text">
+                        <i class="material-icons large">${icone}</i>
+                        <p>${mensagem}</p>
+                    </div>
+                </li>
+            `;
+        }
+        
+        function getBadgeClass(encomenda) {
+            if (encomenda.status === 'pendente') return 'orange';
+            if (encomenda.status === 'aguardando_confirmacao') return 'blue';
+            return 'green';
+        }
+        
+        function getStatusText(encomenda) {
+            if (encomenda.status === 'pendente') return 'Pendente';
+            if (encomenda.status === 'aguardando_confirmacao') return 'Aguardando Confirmação';
+            return 'Retirada';
+        }
+        
+function verificarSolicitacoesPendentes(snapshot) {
+    const user = firebase.auth().currentUser;
+    if (!user || !snapshot.exists()) return;
+    
+    snapshot.forEach(item => {
+        const encomenda = item.val();
+        if (encomenda.status === 'aguardando_confirmacao' && 
+            (!encomenda.confirmacoes || !encomenda.confirmacoes[user.uid])) {
+            // Adiciona um pequeno delay para garantir que a UI esteja pronta
+            setTimeout(() => {
+                abrirModalConfirmacaoRetirada(item.key, encomenda);
+            }, 500);
+        }
+    });
+}
+        
+        function abrirModalConfirmacaoRetirada(encomendaId, encomenda) {
+            document.getElementById('confirmacaoPorteiroNome').textContent = encomenda.solicitacaoRetirada.porteiro;
+            document.getElementById('confirmacaoRetiranteNome').textContent = encomenda.solicitacaoRetirada.nomeRetirante;
+            document.getElementById('confirmacaoData').textContent = formatarData(encomenda.solicitacaoRetirada.data);
+            document.getElementById('confirmacaoDescricao').textContent = encomenda.descricao || 'Nenhuma descrição';
+            
+            document.getElementById('btnConfirmarRetiradaModal').setAttribute('data-id', encomendaId);
+            document.getElementById('btnRejeitarRetirada').setAttribute('data-id', encomendaId);
+            
+            const modal = M.Modal.getInstance(document.getElementById('modalConfirmacaoRetirada'));
+            modal.open();
+        }
+        
+        async function fazerLogout() {
+            try {
+                if (encomendasListener) {
+                    encomendasListener();
+                }
+                await firebase.auth().signOut();
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error);
+                M.toast({html: 'Erro ao fazer logout', classes: 'red'});
+            }
+        }
+        
+        async function confirmarRetiradaSolicitada() {
+            const encomendaId = this.getAttribute('data-id');
+            const user = firebase.auth().currentUser;
+            
+            try {
+                const snapshot = await firebase.database().ref(`encomendas/${encomendaId}`).once('value');
+                const encomenda = snapshot.val();
+                
+                if (encomenda.status !== 'aguardando_confirmacao') {
+                    M.toast({html: 'Esta encomenda já foi processada', classes: 'orange'});
+                    return;
+                }
+                
+                const updates = {
+                    status: 'retirado',
+                    confirmadoPor: user.uid,
+                    confirmadoPorNome: userData.nome,
+                    dataConfirmacao: firebase.database.ServerValue.TIMESTAMP,
+                    [`confirmacoes/${user.uid}`]: true,
+                    retiradoPor: encomenda.solicitacaoRetirada.nomeRetirante,
+                    retiradoPorNome: encomenda.solicitacaoRetirada.nomeRetirante,
+                    porteiroRetiradaNome: encomenda.solicitacaoRetirada.porteiro,
+                    dataRetirada: encomenda.solicitacaoRetirada.data
+                };
+                
+                await firebase.database().ref(`encomendas/${encomendaId}`).update(updates);
+                M.toast({html: 'Retirada confirmada com sucesso!', classes: 'green'});
+                
+            } catch (error) {
+                console.error('Erro ao confirmar retirada:', error);
+                M.toast({html: 'Erro ao confirmar retirada', classes: 'red'});
+            }
+        }
+        
+        async function rejeitarRetiradaSolicitada() {
+            const encomendaId = this.getAttribute('data-id');
+            const user = firebase.auth().currentUser;
+            
+            try {
+                const snapshot = await firebase.database().ref(`encomendas/${encomendaId}`).once('value');
+                const encomenda = snapshot.val();
+                
+                if (encomenda.status !== 'aguardando_confirmacao') {
+                    M.toast({html: 'Esta encomenda já foi processada', classes: 'orange'});
+                    return;
+                }
+                
+                const updates = {
+                    status: 'pendente',
+                    solicitacaoRetirada: null,
+                    [`confirmacoes/${user.uid}`]: false
+                };
+                
+                await firebase.database().ref(`encomendas/${encomendaId}`).update(updates);
+                M.toast({html: 'Retirada rejeitada', classes: 'orange'});
+                
+            } catch (error) {
+                console.error('Erro ao rejeitar retirada:', error);
+                M.toast({html: 'Erro ao rejeitar retirada', classes: 'red'});
+            }
+        }
+        
+        function retirarEncomenda(encomendaId) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            
+            firebase.database().ref('encomendas/' + encomendaId).once('value').then(snapshot => {
+                const encomenda = snapshot.val();
+                
+                if (!encomenda || encomenda.status !== 'pendente') {
+                    M.toast({html: 'Esta encomenda já foi retirada', classes: 'orange'});
+                    return;
+                }
+                
+                const updates = {
+                    status: 'retirado',
+                    retiradoPor: user.uid,
+                    retiradoPorNome: userData.nome,
+                    dataRetirada: firebase.database.ServerValue.TIMESTAMP,
+                    porteiroRetiradaNome: 'Morador'
+                };
+                
+                firebase.database().ref('encomendas/' + encomendaId).update(updates)
+                    .then(() => {
+                        M.toast({html: 'Encomenda retirada com sucesso!', classes: 'green'});
+                    })
+                    .catch(error => {
+                        console.error('Erro ao retirar encomenda:', error);
+                        M.toast({html: 'Erro ao retirar encomenda', classes: 'red'});
+                    });
+            });
+        }
+        
+        function abrirModalEncomenda(encomendaId) {
+            firebase.database().ref('encomendas/' + encomendaId).once('value').then(snapshot => {
+                const encomenda = snapshot.val();
+                
+                if (!encomenda) {
+                    M.toast({html: 'Encomenda não encontrada', classes: 'red'});
+                    return;
+                }
+                
+                // Preenche os dados no modal
+                document.getElementById('modalTitulo').textContent = `Encomenda #${encomendaId.substring(0, 8)}`;
+                document.getElementById('modalData').textContent = formatarData(encomenda.data);
+                document.getElementById('modalPorteiro').textContent = encomenda.registradoPorNome || 'Porteiro';
+                document.getElementById('modalQuantidade').textContent = encomenda.quantidade;
+                document.getElementById('modalDescricao').textContent = encomenda.descricao || 'Nenhuma descrição';
+                
+                const statusBadge = document.getElementById('modalStatus');
+                statusBadge.textContent = getStatusText(encomenda);
+                statusBadge.className = `badge ${getBadgeClass(encomenda)}`;
+                
+                const retiradaSection = document.getElementById('modalRetiradaSection');
+                const btnConfirmar = document.getElementById('btnConfirmarRetirada');
+                
+                if (encomenda.status === 'pendente') {
+                    retiradaSection.classList.add('hide');
+                    btnConfirmar.classList.remove('hide');
+                    btnConfirmar.setAttribute('data-id', encomendaId);
+                } else {
+                    document.getElementById('modalRetiradoPor').textContent = encomenda.retiradoPorNome || 'N/A';
+                    document.getElementById('modalDataRetirada').textContent = formatarData(encomenda.dataRetirada);
+                    document.getElementById('modalPorteiroRetirada').textContent = encomenda.porteiroRetiradaNome || 'Porteiro';
+                    retiradaSection.classList.remove('hide');
+                    btnConfirmar.classList.add('hide');
+                }
+                
+                // Abre o modal
+                const modal = M.Modal.getInstance(document.getElementById('modalEncomenda'));
+                modal.open();
+            });
+        }
+        
+        function confirmarRetiradaEncomenda() {
+            const encomendaId = this.getAttribute('data-id');
+            retirarEncomenda(encomendaId);
+            
+            // Fecha o modal
+            const modal = M.Modal.getInstance(document.getElementById('modalEncomenda'));
+            modal.close();
+        }
+        
+        function formatarData(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            return date.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>
