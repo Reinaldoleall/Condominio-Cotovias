@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Condomínio Cotovias - Avisos</title>
-    <meta name="viewport" content="width=1280">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,19 +13,37 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/6.0.0/introjs.min.css" rel="stylesheet">
 
     <style>
+    
+    /* --- ESCONDER BOTÕES DE LIKE --- */
+.like-btn, .modal-like-btn {
+    display: none !important;
+}
+
+/* --- AJUSTAR LAYOUT SEM OS BOTÕES --- */
+.aviso-actions {
+    justify-content: flex-end;
+}
+
+.modal-actions {
+    justify-content: flex-end;
+}
         /* --- VARIÁVEIS DE DESIGN (CONSISTENTE COM A APLICAÇÃO PRINCIPAL) --- */
         :root {
             --cor-primaria: #4A90E2;
+            --cor-secundaria: #6E5DC6;
             --cor-fundo: #F9F9FB;
             --cor-surface: #FFFFFF;
             --cor-texto-principal: #333333;
             --cor-texto-secundario: #777777;
             --cor-borda: #EAEAEA;
-            --cor-aviso-urgente: red;
-            --cor-aviso-normal: green;
+            --cor-aviso-urgente: #FF5252;
+            --cor-aviso-normal: #4CAF50;
+            --cor-aviso-informativo: #2196F3;
             --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --sombra-media: 0 6px 16px rgba(0, 0, 0, 0.12);
             --fonte-principal: 'Inter', sans-serif;
             --raio-borda: 8px;
+            --transition: all 0.3s ease;
         }
 
         /* --- RESET E ESTILOS GERAIS --- */
@@ -48,21 +66,97 @@
         .page-container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 24px;
+            padding: 24px 16px;
         }
 
         .page-header {
             margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        .page-header h1 {
-            font-size: 1.5rem;
+        .header-content h1 {
+            font-size: 1.75rem;
             font-weight: 600;
             margin-bottom: 4px;
+            color: var(--cor-texto-principal);
         }
 
-        .page-header p {
+        .header-content p {
             color: var(--cor-texto-secundario);
+            max-width: 500px;
+        }
+
+        /* --- CONTROLES E FILTROS --- */
+        .controls-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--raio-borda);
+            font-family: var(--fonte-principal);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--cor-primaria);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--cor-texto-secundario);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--cor-surface);
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--raio-borda);
+            font-family: var(--fonte-principal);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-btn:hover {
+            background: #f1f1f1;
+        }
+
+        .filter-btn.active {
+            background: var(--cor-primaria);
+            color: white;
+            border-color: var(--cor-primaria);
         }
 
         /* --- GRID DE AVISOS --- */
@@ -80,27 +174,37 @@
             border-left: 4px solid;
             padding: 20px;
             cursor: pointer;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
         
         .aviso-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--sombra-media);
         }
         
-        .aviso-card.normal { border-color: var(--cor-aviso-normal);
-        background-color: white ;
-          
-        }
-        .aviso-card.urgente { border-color: var(--cor-aviso-urgente); 
-          background-color:  white ;
-          
-        }
+        .aviso-card.normal { border-color: var(--cor-aviso-normal); }
+        .aviso-card.urgente { border-color: var(--cor-aviso-urgente); }
+        .aviso-card.informativo { border-color: var(--cor-aviso-informativo); }
         
+        .urgente-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--cor-aviso-urgente);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 0 var(--raio-borda) 0 var(--raio-borda);
+        }
+
         .aviso-card h2 {
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 8px;
+            padding-right: 60px;
         }
 
         .aviso-meta {
@@ -110,6 +214,7 @@
             font-size: 0.85rem;
             color: var(--cor-texto-secundario);
             margin-bottom: 12px;
+            flex-wrap: wrap;
         }
         
         .aviso-meta-item {
@@ -125,6 +230,58 @@
         .aviso-resumo {
             font-size: 0.95rem;
             color: var(--cor-texto-secundario);
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .aviso-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--cor-borda);
+        }
+
+        .like-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: var(--cor-texto-secundario);
+            font-family: var(--fonte-principal);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .like-btn:hover {
+            color: var(--cor-aviso-urgente);
+            background: rgba(255, 82, 82, 0.1);
+        }
+
+        .like-btn.liked {
+            color: var(--cor-aviso-urgente);
+        }
+
+        .aviso-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .aviso-tag {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            color: var(--cor-texto-secundario);
         }
 
         /* --- MODAL DE AVISO (ESTILO DA APLICAÇÃO PRINCIPAL) --- */
@@ -132,17 +289,18 @@
             position: fixed;
             inset: 0;
             background-color: rgba(0,0,0,0.5);
-            display: none; /* Inicia escondido */
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             padding: 16px;
+            animation: fadeIn 0.3s ease-out forwards;
         }
         
         .modal-container {
             background: var(--cor-surface);
             border-radius: 12px;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             animation: modal-appear 0.3s ease-out forwards;
@@ -155,11 +313,17 @@
             padding: 20px 24px;
             border-bottom: 1px solid var(--cor-borda);
             border-left: 5px solid;
+            position: relative;
         }
         .modal-header.normal { border-color: var(--cor-aviso-normal); }
         .modal-header.urgente { border-color: var(--cor-aviso-urgente); }
+        .modal-header.informativo { border-color: var(--cor-aviso-informativo); }
         
-        .modal-header h3 { font-size: 1.25rem; font-weight: 600; }
+        .modal-header h3 { 
+            font-size: 1.25rem; 
+            font-weight: 600; 
+            padding-right: 30px;
+        }
         
         .modal-body {
             padding: 24px;
@@ -178,17 +342,48 @@
         
         .modal-close-btn {
             font-family: var(--fonte-principal);
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto-principal);
+            background-color: var(--cor-primaria);
+            color: white;
             border: none;
             padding: 10px 20px;
             border-radius: var(--raio-borda);
             font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: var(--transition);
         }
-        .modal-close-btn:hover { background-color: #e0e0e0; }
+        .modal-close-btn:hover { 
+            background-color: #3a7bc8; 
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-like-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0f0f0;
+            border: none;
+            color: var(--cor-texto-secundario);
+            font-family: var(--fonte-principal);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: var(--raio-borda);
+        }
+
+        .modal-like-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .modal-like-btn.liked {
+            color: var(--cor-aviso-urgente);
+            background: rgba(255, 82, 82, 0.1);
+        }
         
         /* --- ESTADOS DE CARREGAMENTO E VAZIO --- */
         .loading-container, .no-avisos {
@@ -196,34 +391,222 @@
             padding: 48px 0;
             color: var(--cor-texto-secundario);
         }
+
         .loading-spinner {
-            width: 40px; height: 40px; border: 4px solid var(--cor-borda);
+            width: 40px; 
+            height: 40px; 
+            border: 4px solid var(--cor-borda);
             border-top: 4px solid var(--cor-primaria);
-            border-radius: 50%; margin: 0 auto;
+            border-radius: 50%; 
+            margin: 0 auto;
             animation: spin 1s linear infinite;
         }
+
         .no-avisos .material-icons-outlined {
-            font-size: 48px; color: var(--cor-borda); margin-bottom: 16px;
+            font-size: 48px; 
+            color: var(--cor-borda); 
+            margin-bottom: 16px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--cor-texto-secundario);
+        }
+
+        .no-results .material-icons-outlined {
+            font-size: 48px;
+            color: var(--cor-borda);
+            margin-bottom: 16px;
+        }
+
+        /* --- PAGINAÇÃO --- */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 32px;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--raio-borda);
+            background: var(--cor-surface);
+            color: var(--cor-texto-principal);
+            font-family: var(--fonte-principal);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-btn:hover {
+            border-color: var(--cor-primaria);
+            color: var(--cor-primaria);
+        }
+
+        .pagination-btn.active {
+            background: var(--cor-primaria);
+            color: white;
+            border-color: var(--cor-primaria);
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* --- ESTILOS PARA VÍDEOS --- */
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* Proporção 16:9 */
+            margin: 16px 0;
+            border-radius: var(--raio-borda);
+            overflow: hidden;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .video-link {
+            display: inline-block;
+            margin: 10px 0;
+            color: var(--cor-primaria);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .video-link:hover {
+            text-decoration: underline;
         }
 
         /* --- ANIMAÇÕES --- */
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes modal-appear { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
+        
+        @keyframes modal-appear { 
+            from { opacity: 0; transform: scale(0.95); } 
+            to { opacity: 1; transform: scale(1); } 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+            }
+            
+            .controls-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+            
+            .aviso-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .modal-container {
+                margin: 0 10px;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-end;
+            }
+            
+            .modal-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .aviso-card {
+                padding: 16px;
+            }
+            
+            .aviso-card h2 {
+                font-size: 1rem;
+                padding-right: 50px;
+            }
+            
+            .modal-body {
+                padding: 16px;
+            }
+            
+            .modal-header, .modal-footer {
+                padding: 16px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <main class="page-container">
-        <div class="page-header" data-intro="Bem-vindo à área de avisos!" data-step="1">
-            <h1>Quadro de Avisos</h1>
-            <p>Fique por dentro das últimas informações e comunicados do condomínio.</p>
+        <div class="page-header">
+            <div class="header-content" data-intro="Bem-vindo à área de avisos!" data-step="1">
+                <h1>Quadro de Avisos</h1>
+                <p>Fique por dentro das últimas informações e comunicados do condomínio.</p>
+            </div>
+            
+            
+        </div>
+
+        <div class="controls-container">
+            <div class="search-box">
+                <i class="material-icons-outlined search-icon">search</i>
+                <input type="text" id="search-input" placeholder="Buscar avisos...">
+            </div>
+            
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="todos">
+                    <i class="material-icons-outlined">all_inbox</i>
+                    Todos
+                </button>
+                <button class="filter-btn" data-filter="urgente">
+                    <i class="material-icons-outlined">error_outline</i>
+                    Urgentes
+                </button>
+
+            </div>
         </div>
 
         <div id="avisos-grid" class="avisos-grid" data-intro="Os avisos mais recentes aparecem aqui. A cor da borda indica a urgência. Clique em um para ver os detalhes." data-step="2">
             <div class="loading-container">
                 <div class="loading-spinner"></div>
+                <p>Carregando avisos...</p>
             </div>
         </div>
+
+        <div id="pagination" class="pagination" style="display: none;"></div>
     </main>
 
     <div id="avisoModalOverlay" class="modal-overlay">
@@ -236,7 +619,13 @@
             </div>
             <div class="modal-footer">
                 <div class="aviso-meta-item" id="modalAutor"></div>
-                <button class="modal-close-btn">Fechar</button>
+                <div class="modal-actions">
+                    <button class="modal-like-btn" id="modalLikeBtn">
+                        <i class="material-icons-outlined">thumb_up</i>
+                        <span id="modalLikeCount">0</span>
+                    </button>
+                    <button class="modal-close-btn">Fechar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -249,7 +638,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // --- CONFIGURAÇÃO DO FIREBASE ---
             const firebaseConfig = {
-                // Suas chaves do Firebase aqui
                 apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
                 authDomain: "rifas-c414b.firebaseapp.com",
                 databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
@@ -258,9 +646,18 @@
                 messagingSenderId: "770195193538",
                 appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
             };
-            firebase.initializeApp(firebaseConfig);
+            
+            // Inicializar Firebase
+            try {
+                firebase.initializeApp(firebaseConfig);
+            } catch (error) {
+                console.error("Erro ao inicializar Firebase:", error);
+                showError("Erro de conexão. Por favor, recarregue a página.");
+            }
+            
             const db = firebase.database();
             const avisosRef = db.ref('avisos');
+            const likesRef = db.ref('likes');
 
             // --- SELEÇÃO DE ELEMENTOS DO DOM ---
             const avisosGrid = document.getElementById('avisos-grid');
@@ -269,10 +666,33 @@
             const modalConteudo = document.getElementById('modalConteudo');
             const modalAutor = document.getElementById('modalAutor');
             const modalHeader = document.getElementById('modalHeader');
+            const modalLikeBtn = document.getElementById('modalLikeBtn');
+            const modalLikeCount = document.getElementById('modalLikeCount');
+            const searchInput = document.getElementById('search-input');
+            const filterButtons = document.querySelectorAll('.filter-btn[data-filter]');
+            const paginationContainer = document.getElementById('pagination');
+            const tutorialBtn = document.getElementById('tutorial-btn');
 
-            // --- LÓGICA DO MODAL (CUSTOMIZADO) ---
-            const openModal = () => modalOverlay.style.display = 'flex';
-            const closeModal = () => modalOverlay.style.display = 'none';
+            // --- VARIÁVEIS GLOBAIS ---
+            let allAvisos = [];
+            let filteredAvisos = [];
+            let currentFilter = 'todos';
+            let currentSearch = '';
+            let currentPage = 1;
+            const AVISOS_PER_PAGE = 5;
+            let currentAvisoId = null;
+            let userLikes = JSON.parse(localStorage.getItem('userLikes') || '{}');
+
+            // --- LÓGICA DO MODAL ---
+            const openModal = () => {
+                modalOverlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            };
+            
+            const closeModal = () => {
+                modalOverlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            };
 
             modalOverlay.addEventListener('click', (e) => {
                 if (e.target === modalOverlay || e.target.classList.contains('modal-close-btn')) {
@@ -280,47 +700,223 @@
                 }
             });
 
+            // --- LÓGICA DE LIKES ---
+            const toggleLike = (avisoId) => {
+                if (!avisoId) return;
+                
+                const userLiked = userLikes[avisoId] || false;
+                const newLikeStatus = !userLiked;
+                
+                // Atualizar estado local
+                userLikes[avisoId] = newLikeStatus;
+                localStorage.setItem('userLikes', JSON.stringify(userLikes));
+                
+                // Atualizar Firebase
+                const likeUpdate = {};
+                likeUpdate[avisoId] = newLikeStatus;
+                likesRef.update(likeUpdate);
+                
+                // Atualizar UI
+                updateLikeUI(avisoId);
+            };
+
+            const updateLikeUI = (avisoId) => {
+                const isLiked = userLikes[avisoId] || false;
+                
+                // Atualizar botão no modal se for o aviso atual
+                if (currentAvisoId === avisoId) {
+                    if (isLiked) {
+                        modalLikeBtn.classList.add('liked');
+                        modalLikeBtn.innerHTML = `<i class="material-icons-outlined">thumb_up</i> <span id="modalLikeCount">${getLikeCount(avisoId)}</span>`;
+                    } else {
+                        modalLikeBtn.classList.remove('liked');
+                        modalLikeBtn.innerHTML = `<i class="material-icons-outlined">thumb_up</i> <span id="modalLikeCount">${getLikeCount(avisoId)}</span>`;
+                    }
+                }
+                
+                // Atualizar botões nos cards
+                const likeBtn = document.querySelector(`.like-btn[data-id="${avisoId}"]`);
+                if (likeBtn) {
+                    if (isLiked) {
+                        likeBtn.classList.add('liked');
+                        likeBtn.innerHTML = `<i class="material-icons-outlined">thumb_up</i> <span>${getLikeCount(avisoId)}</span>`;
+                    } else {
+                        likeBtn.classList.remove('liked');
+                        likeBtn.innerHTML = `<i class="material-icons-outlined">thumb_up</i> <span>${getLikeCount(avisoId)}</span>`;
+                    }
+                }
+            };
+
+            const getLikeCount = (avisoId) => {
+                // Esta é uma implementação simplificada
+                // Em uma aplicação real, você buscaria essa informação do Firebase
+                return Math.floor(Math.random() * 20); // Simulação
+            };
+
             // --- CARREGAMENTO E EXIBIÇÃO DOS AVISOS ---
             avisosRef.orderByChild('data').on('value', (snapshot) => {
                 avisosGrid.innerHTML = ''; // Limpa a grade
+                
                 if (!snapshot.exists()) {
-                    avisosGrid.innerHTML = `
-                        <div class="no-avisos">
-                            <i class="material-icons-outlined">notifications_off</i>
-                            <h3>Nenhum aviso disponível</h3>
-                            <p>Volte mais tarde para conferir as novidades.</p>
-                        </div>
-                    `;
+                    showNoAvisos();
                     return;
                 }
 
-                const avisos = [];
-                snapshot.forEach(child => { avisos.push({ id: child.key, ...child.val() }); });
+                allAvisos = [];
+                snapshot.forEach(child => { 
+                    allAvisos.push({ id: child.key, ...child.val() }); 
+                });
                 
-                // Ordena por data, mais recentes primeiro
-                avisos.sort((a, b) => b.data - a.data).forEach(aviso => {
+                // Ordenar por data, mais recentes primeiro
+                allAvisos.sort((a, b) => b.data - a.data);
+                
+                // Aplicar filtros e busca
+                applyFilters();
+                
+            }, (error) => {
+                console.error("Erro ao carregar avisos:", error);
+                showError("Erro ao carregar avisos. Por favor, recarregue a página.");
+            });
+
+            // --- FILTROS E BUSCA ---
+            searchInput.addEventListener('input', (e) => {
+                currentSearch = e.target.value.toLowerCase();
+                currentPage = 1;
+                applyFilters();
+            });
+
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    currentPage = 1;
+                    applyFilters();
+                });
+            });
+
+            const applyFilters = () => {
+                filteredAvisos = allAvisos.filter(aviso => {
+                    // Aplicar filtro de tipo
+                    let matchesFilter = true;
+                    if (currentFilter !== 'todos') {
+                        if (currentFilter === 'urgente') {
+                            matchesFilter = aviso.urgente === true;
+                        } else if (currentFilter === 'normal') {
+                            matchesFilter = !aviso.urgente;
+                        }
+                    }
+                    
+                    // Aplicar filtro de busca
+                    let matchesSearch = true;
+                    if (currentSearch) {
+                        matchesSearch = (
+                            aviso.titulo.toLowerCase().includes(currentSearch) ||
+                            aviso.mensagem.toLowerCase().includes(currentSearch) ||
+                            (aviso.autor && aviso.autor.toLowerCase().includes(currentSearch))
+                        );
+                    }
+                    
+                    return matchesFilter && matchesSearch;
+                });
+                
+                // Exibir resultados
+                displayAvisos();
+            };
+
+            const displayAvisos = () => {
+                avisosGrid.innerHTML = '';
+                
+                if (filteredAvisos.length === 0) {
+                    showNoResults();
+                    paginationContainer.style.display = 'none';
+                    return;
+                }
+                
+                // Calcular páginas
+                const totalPages = Math.ceil(filteredAvisos.length / AVISOS_PER_PAGE);
+                const startIndex = (currentPage - 1) * AVISOS_PER_PAGE;
+                const endIndex = Math.min(startIndex + AVISOS_PER_PAGE, filteredAvisos.length);
+                const currentAvisos = filteredAvisos.slice(startIndex, endIndex);
+                
+                // Renderizar avisos da página atual
+                currentAvisos.forEach(aviso => {
                     const card = createAvisoCard(aviso);
                     card.addEventListener('click', () => openModalWithAviso(aviso));
                     avisosGrid.appendChild(card);
                 });
-
-                // Inicia o tutorial se for a primeira visita
+                
+                // Adicionar paginação se necessário
+                if (filteredAvisos.length > AVISOS_PER_PAGE) {
+                    renderPagination(totalPages);
+                    paginationContainer.style.display = 'flex';
+                } else {
+                    paginationContainer.style.display = 'none';
+                }
+                
+                // Iniciar tutorial se for a primeira visita
                 if (localStorage.getItem('tutorialAvisosCompleto') !== 'true') {
                     setTimeout(startTutorial, 1000);
                 }
-            });
+            };
+
+            const renderPagination = (totalPages) => {
+                let paginationHTML = '';
+                
+                // Botão anterior
+                paginationHTML += `
+                    <button class="pagination-btn ${currentPage === 1 ? 'disabled' : ''}" 
+                            ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}">
+                        <i class="material-icons-outlined">chevron_left</i>
+                    </button>
+                `;
+                
+                // Páginas
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHTML += `
+                        <button class="pagination-btn ${currentPage === i ? 'active' : ''}" data-page="${i}">
+                            ${i}
+                        </button>
+                    `;
+                }
+                
+                // Botão próximo
+                paginationHTML += `
+                    <button class="pagination-btn ${currentPage === totalPages ? 'disabled' : ''}" 
+                            ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}">
+                        <i class="material-icons-outlined">chevron_right</i>
+                    </button>
+                `;
+                
+                paginationContainer.innerHTML = paginationHTML;
+                
+                // Adicionar event listeners aos botões
+                paginationContainer.querySelectorAll('.pagination-btn:not(.disabled)').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        currentPage = parseInt(btn.dataset.page);
+                        displayAvisos();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+                });
+            };
 
             // --- FUNÇÕES AUXILIARES ---
             function createAvisoCard(aviso) {
                 const card = document.createElement('div');
                 const isUrgente = aviso.urgente;
-                card.className = `aviso-card ${isUrgente ? 'urgente' : 'normal'}`;
+                const tipo = isUrgente ? 'urgente' : 'normal';
+                
+                card.className = `aviso-card ${tipo} fade-in`;
                 
                 const data = new Date(aviso.data);
                 const dataFormatada = data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
                 const resumo = aviso.mensagem.length > 120 ? aviso.mensagem.substring(0, 120) + '...' : aviso.mensagem;
+                
+                const isLiked = userLikes[aviso.id] || false;
+                const likeCount = getLikeCount(aviso.id);
 
                 card.innerHTML = `
+                    ${isUrgente ? '<div class="urgente-badge">URGENTE</div>' : ''}
                     <h2>${aviso.titulo}</h2>
                     <div class="aviso-meta">
                         <div class="aviso-meta-item">
@@ -333,23 +929,129 @@
                         </div>
                     </div>
                     <p class="aviso-resumo">${resumo}</p>
+                    <div class="aviso-actions">
+                        <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${aviso.id}">
+                            <i class="material-icons-outlined">thumb_up</i>
+                            <span>${likeCount}</span>
+                        </button>
+                        <div class="aviso-tags">
+                            <span class="aviso-tag">${tipo.toUpperCase()}</span>
+                        </div>
+                    </div>
                 `;
+                
+                // Adicionar event listener para o botão de like
+                const likeBtn = card.querySelector('.like-btn');
+                likeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Impedir que o clique abra o modal
+                    toggleLike(aviso.id);
+                });
+                
                 return card;
             }
 
             function openModalWithAviso(aviso) {
+                currentAvisoId = aviso.id;
                 modalTitulo.textContent = aviso.titulo;
                 modalConteudo.innerHTML = formatContent(aviso.mensagem);
                 modalAutor.innerHTML = `
                     <i class="material-icons-outlined">person_outline</i>
                     <span>${aviso.autor || 'Administração'}</span>
                 `;
-                modalHeader.className = `modal-header ${aviso.urgente ? 'urgente' : 'normal'}`;
+                
+                const tipo = aviso.urgente ? 'urgente' : 'normal';
+                modalHeader.className = `modal-header ${tipo}`;
+                
+                // Configurar like no modal
+                const isLiked = userLikes[aviso.id] || false;
+                const likeCount = getLikeCount(aviso.id);
+                
+                if (isLiked) {
+                    modalLikeBtn.classList.add('liked');
+                } else {
+                    modalLikeBtn.classList.remove('liked');
+                }
+                
+                modalLikeCount.textContent = likeCount;
+                
+                // Adicionar event listener para o like no modal
+                modalLikeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleLike(aviso.id);
+                };
+                
                 openModal();
             }
 
             function formatContent(text) {
-                return text ? `<p>${text.replace(/\n/g, '</p><p>')}</p>` : '';
+                if (!text) return '';
+                
+                // Processa URLs de vídeo
+                const processedText = processVideoLinks(text);
+                
+                // Converte quebras de linha em parágrafos
+                return `<p>${processedText.replace(/\n/g, '</p><p>')}</p>`;
+            }
+
+            function processVideoLinks(text) {
+                // Expressão regular para encontrar URLs
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                
+                return text.replace(urlRegex, (url) => {
+                    // Verifica se é um link do YouTube
+                    const youtubeMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+                    
+                    if (youtubeMatch) {
+                        const videoId = youtubeMatch[1];
+                        return `</p><div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><p>`;
+                    }
+                    
+                    // Verifica se é um link do Vimeo
+                    const vimeoMatch = url.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/);
+                    if (vimeoMatch) {
+                        const videoId = vimeoMatch[1];
+                        return `</p><div class="video-container"><iframe src="https://player.vimeo.com/video/${videoId}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div><p>`;
+                    }
+                    
+                    // Para outros links de vídeo, podemos tentar detectar por extensão
+                    const videoExtRegex = /\.(mp4|webm|ogg)$/i;
+                    if (videoExtRegex.test(url)) {
+                        return `</p><div class="video-container"><video controls><source src="${url}" type="video/${url.split('.').pop().toLowerCase()}">Seu navegador não suporta o elemento de vídeo.</video></div><p>`;
+                    }
+                    
+                    // Para outras URLs, mantém como link normal
+                    return `<a href="${url}" target="_blank" class="video-link">${url}</a>`;
+                });
+            }
+
+            function showNoAvisos() {
+                avisosGrid.innerHTML = `
+                    <div class="no-avisos">
+                        <i class="material-icons-outlined">notifications_off</i>
+                        <h3>Nenhum aviso disponível</h3>
+                        <p>Volte mais tarde para conferir as novidades.</p>
+                    </div>
+                `;
+            }
+
+            function showNoResults() {
+                avisosGrid.innerHTML = `
+                    <div class="no-results">
+                        <i class="material-icons-outlined">search_off</i>
+                        <h3>Nenhum aviso encontrado</h3>
+                        <p>Tente ajustar os filtros ou termos de busca.</p>
+                    </div>
+                `;
+            }
+
+            function showError(message) {
+                avisosGrid.innerHTML = `
+                    <div class="no-results">
+                        <i class="material-icons-outlined">error_outline</i>
+                        <h3>Erro ao carregar</h3>
+                        <p>${message}</p>
+                    </div>
+                `;
             }
 
             function startTutorial() {
@@ -362,9 +1064,14 @@
                     exitOnOverlayClick: false
                 }).oncomplete(() => {
                     localStorage.setItem('tutorialAvisosCompleto', 'true');
+                }).onexit(() => {
+                    localStorage.setItem('tutorialAvisosCompleto', 'true');
                 }).start();
             }
+
+            // Iniciar tutorial ao clicar no botão
+            tutorialBtn.addEventListener('click', startTutorial);
         });
     </script>
 </body>
-</html>
+    </html>
