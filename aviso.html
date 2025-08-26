@@ -13,559 +13,573 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/6.0.0/introjs.min.css" rel="stylesheet">
 
     <style>
-    
     /* --- ESCONDER BOTÕES DE LIKE --- */
-.like-btn, .modal-like-btn {
-    display: none !important;
-}
+    .like-btn, .modal-like-btn {
+        display: none !important;
+    }
 
-/* --- AJUSTAR LAYOUT SEM OS BOTÕES --- */
-.aviso-actions {
-    justify-content: flex-end;
-}
+    /* --- AJUSTAR LAYOUT SEM OS BOTÕES --- */
+    .aviso-actions {
+        justify-content: flex-end;
+    }
 
-.modal-actions {
-    justify-content: flex-end;
-}
-        /* --- VARIÁVEIS DE DESIGN (CONSISTENTE COM A APLICAÇÃO PRINCIPAL) --- */
-        :root {
-            --cor-primaria: #4A90E2;
-            --cor-secundaria: #6E5DC6;
-            --cor-fundo: #F9F9FB;
-            --cor-surface: #FFFFFF;
-            --cor-texto-principal: #333333;
-            --cor-texto-secundario: #777777;
-            --cor-borda: #EAEAEA;
-            --cor-aviso-urgente: #FF5252;
-            --cor-aviso-normal: #4CAF50;
-            --cor-aviso-informativo: #2196F3;
-            --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --sombra-media: 0 6px 16px rgba(0, 0, 0, 0.12);
-            --fonte-principal: 'Inter', sans-serif;
-            --raio-borda: 8px;
-            --transition: all 0.3s ease;
-        }
+    .modal-actions {
+        justify-content: flex-end;
+    }
+    
+    /* --- VARIÁVEIS DE DESIGN (CONSISTENTE COM A APLICAÇÃO PRINCIPAL) --- */
+    :root {
+        --cor-primaria: #4A90E2;
+        --cor-secundaria: #6E5DC6;
+        --cor-fundo: #F9F9FB;
+        --cor-surface: #FFFFFF;
+        --cor-texto-principal: #333333;
+        --cor-texto-secundario: #777777;
+        --cor-borda: #EAEAEA;
+        --cor-aviso-urgente: #FF5252;
+        --cor-aviso-normal: #4CAF50;
+        --cor-aviso-informativo: #2196F3;
+        --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --sombra-media: 0 6px 16px rgba(0, 0, 0, 0.12);
+        --fonte-principal: 'Inter', sans-serif;
+        --raio-borda: 8px;
+        --transition: all 0.3s ease;
+    }
 
-        /* --- RESET E ESTILOS GERAIS --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    /* --- RESET E ESTILOS GERAIS --- */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: var(--fonte-principal);
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto-principal);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        /* --- CONTAINER E LAYOUT --- */
-        .page-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 24px 16px;
-        }
+    body {
+        font-family: var(--fonte-principal);
+        background-color: var(--cor-fundo);
+        color: var(--cor-texto-principal);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* --- CONTAINER E LAYOUT --- */
+    .page-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 24px 16px;
+    }
 
+    .page-header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .header-content h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: var(--cor-texto-principal);
+    }
+
+    .header-content p {
+        color: var(--cor-texto-secundario);
+        max-width: 500px;
+    }
+
+    /* --- CONTROLES E FILTROS --- */
+    .controls-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+        align-items: center;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 12px 16px 12px 40px;
+        border: 1px solid var(--cor-borda);
+        border-radius: var(--raio-borda);
+        font-family: var(--fonte-principal);
+        font-size: 0.95rem;
+        transition: var(--transition);
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--cor-primaria);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--cor-texto-secundario);
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 8px 16px;
+        background: var(--cor-surface);
+        border: 1px solid var(--cor-borda);
+        border-radius: var(--raio-borda);
+        font-family: var(--fonte-principal);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-btn:hover {
+        background: #f1f1f1;
+    }
+
+    .filter-btn.active {
+        background: var(--cor-primaria);
+        color: white;
+        border-color: var(--cor-primaria);
+    }
+
+    /* --- GRID DE AVISOS --- */
+    .avisos-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* --- CARD DE AVISO (NOVO DESIGN) --- */
+    .aviso-card {
+        background-color: var(--cor-surface);
+        border-radius: var(--raio-borda);
+        box-shadow: var(--sombra-suave);
+        border-left: 4px solid;
+        padding: 20px;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .aviso-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--sombra-media);
+    }
+    
+    .aviso-card.normal { border-color: var(--cor-aviso-normal); }
+    .aviso-card.urgente { border-color: var(--cor-aviso-urgente); }
+    .aviso-card.informativo { border-color: var(--cor-aviso-informativo); }
+    
+    .urgente-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: var(--cor-aviso-urgente);
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 0 var(--raio-borda) 0 var(--raio-borda);
+    }
+
+    .aviso-card h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        padding-right: 60px;
+    }
+
+    .aviso-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 0.85rem;
+        color: var(--cor-texto-secundario);
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .aviso-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .aviso-meta .material-icons-outlined {
+        font-size: 1rem;
+    }
+
+    .aviso-resumo {
+        font-size: 0.95rem;
+        color: var(--cor-texto-secundario);
+        margin-bottom: 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .aviso-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--cor-borda);
+    }
+
+    .like-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: none;
+        border: none;
+        color: var(--cor-texto-secundario);
+        font-family: var(--fonte-principal);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .like-btn:hover {
+        color: var(--cor-aviso-urgente);
+        background: rgba(255, 82, 82, 0.1);
+    }
+
+    .like-btn.liked {
+        color: var(--cor-aviso-urgente);
+    }
+
+    .aviso-tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .aviso-tag {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        background: #f0f0f0;
+        border-radius: 20px;
+        color: var(--cor-texto-secundario);
+    }
+
+    /* --- MODAL DE AVISO (ESTILO DA APLICAÇÃO PRINCIPAL) --- */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0,0,0,0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        padding: 16px;
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    .modal-container {
+        background: var(--cor-surface);
+        border-radius: 12px;
+        max-width: 700px;
+        width: 100%;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        animation: modal-appear 0.3s ease-out forwards;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .modal-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--cor-borda);
+        border-left: 5px solid;
+        position: relative;
+    }
+    .modal-header.normal { border-color: var(--cor-aviso-normal); }
+    .modal-header.urgente { border-color: var(--cor-aviso-urgente); }
+    .modal-header.informativo { border-color: var(--cor-aviso-informativo); }
+    
+    .modal-header h3 { 
+        font-size: 1.25rem; 
+        font-weight: 600; 
+        padding-right: 30px;
+    }
+    
+    .modal-body {
+        padding: 24px;
+        overflow-y: auto;
+        line-height: 1.7;
+        color: var(--cor-texto-secundario);
+    }
+    
+    .modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid var(--cor-borda);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-close-btn {
+        font-family: var(--fonte-principal);
+        background-color: var(--cor-primaria);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: var(--raio-borda);
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    .modal-close-btn:hover { 
+        background-color: #3a7bc8; 
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .modal-like-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #f0f0f0;
+        border: none;
+        color: var(--cor-texto-secundario);
+        font-family: var(--fonte-principal);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+        padding: 8px 16px;
+        border-radius: var(--raio-borda);
+    }
+
+    .modal-like-btn:hover {
+        background: #e0e0e0;
+    }
+
+    .modal-like-btn.liked {
+        color: var(--cor-aviso-urgente);
+        background: rgba(255, 82, 82, 0.1);
+    }
+    
+    /* --- ESTILOS PARA VÍDEOS E IMAGENS --- */
+    .video-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.25%; /* Proporção 16:9 */
+        margin: 16px 0;
+        border-radius: var(--raio-borda);
+        overflow: hidden;
+    }
+    
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    .image-container {
+        width: 100%;
+        margin: 16px 0;
+        border-radius: var(--raio-borda);
+        overflow: hidden;
+        box-shadow: var(--sombra-suave);
+    }
+    
+    .image-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .media-link {
+        display: inline-block;
+        margin: 10px 0;
+        color: var(--cor-primaria);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .media-link:hover {
+        text-decoration: underline;
+    }
+    
+    /* --- ESTADOS DE CARREGAMENTO E VAZIO --- */
+    .loading-container, .no-avisos {
+        text-align: center;
+        padding: 48px 0;
+        color: var(--cor-texto-secundario);
+    }
+
+    .loading-spinner {
+        width: 40px; 
+        height: 40px; 
+        border: 4px solid var(--cor-borda);
+        border-top: 4px solid var(--cor-primaria);
+        border-radius: 50%; 
+        margin: 0 auto;
+        animation: spin 1s linear infinite;
+    }
+
+    .no-avisos .material-icons-outlined {
+        font-size: 48px; 
+        color: var(--cor-borda); 
+        margin-bottom: 16px;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--cor-texto-secundario);
+    }
+
+    .no-results .material-icons-outlined {
+        font-size: 48px;
+        color: var(--cor-borda);
+        margin-bottom: 16px;
+    }
+
+    /* --- PAGINAÇÃO --- */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 32px;
+        gap: 8px;
+    }
+
+    .pagination-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid var(--cor-borda);
+        border-radius: var(--raio-borda);
+        background: var(--cor-surface);
+        color: var(--cor-texto-principal);
+        font-family: var(--fonte-principal);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .pagination-btn:hover {
+        border-color: var(--cor-primaria);
+        color: var(--cor-primaria);
+    }
+
+    .pagination-btn.active {
+        background: var(--cor-primaria);
+        color: white;
+        border-color: var(--cor-primaria);
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* --- ANIMAÇÕES --- */
+    @keyframes spin { 
+        to { transform: rotate(360deg); } 
+    }
+    
+    @keyframes modal-appear { 
+        from { opacity: 0; transform: scale(0.95); } 
+        to { opacity: 1; transform: scale(1); } 
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* --- RESPONSIVIDADE --- */
+    @media (max-width: 768px) {
         .page-header {
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .header-content h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: var(--cor-texto-principal);
-        }
-
-        .header-content p {
-            color: var(--cor-texto-secundario);
-            max-width: 500px;
-        }
-
-        /* --- CONTROLES E FILTROS --- */
-        .controls-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 24px;
-            align-items: center;
-        }
-
-        .search-box {
-            position: relative;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 16px 12px 40px;
-            border: 1px solid var(--cor-borda);
-            border-radius: var(--raio-borda);
-            font-family: var(--fonte-principal);
-            font-size: 0.95rem;
-            transition: var(--transition);
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--cor-primaria);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--cor-texto-secundario);
-        }
-
-        .filter-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            background: var(--cor-surface);
-            border: 1px solid var(--cor-borda);
-            border-radius: var(--raio-borda);
-            font-family: var(--fonte-principal);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .filter-btn:hover {
-            background: #f1f1f1;
-        }
-
-        .filter-btn.active {
-            background: var(--cor-primaria);
-            color: white;
-            border-color: var(--cor-primaria);
-        }
-
-        /* --- GRID DE AVISOS --- */
-        .avisos-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
-        /* --- CARD DE AVISO (NOVO DESIGN) --- */
-        .aviso-card {
-            background-color: var(--cor-surface);
-            border-radius: var(--raio-borda);
-            box-shadow: var(--sombra-suave);
-            border-left: 4px solid;
-            padding: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .aviso-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--sombra-media);
-        }
-        
-        .aviso-card.normal { border-color: var(--cor-aviso-normal); }
-        .aviso-card.urgente { border-color: var(--cor-aviso-urgente); }
-        .aviso-card.informativo { border-color: var(--cor-aviso-informativo); }
-        
-        .urgente-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: var(--cor-aviso-urgente);
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 0 var(--raio-borda) 0 var(--raio-borda);
-        }
-
-        .aviso-card h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            padding-right: 60px;
-        }
-
-        .aviso-meta {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 0.85rem;
-            color: var(--cor-texto-secundario);
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-        
-        .aviso-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .aviso-meta .material-icons-outlined {
-            font-size: 1rem;
-        }
-
-        .aviso-resumo {
-            font-size: 0.95rem;
-            color: var(--cor-texto-secundario);
-            margin-bottom: 12px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .aviso-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 16px;
-            padding-top: 12px;
-            border-top: 1px solid var(--cor-borda);
-        }
-
-        .like-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: none;
-            border: none;
-            color: var(--cor-texto-secundario);
-            font-family: var(--fonte-principal);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .like-btn:hover {
-            color: var(--cor-aviso-urgente);
-            background: rgba(255, 82, 82, 0.1);
-        }
-
-        .like-btn.liked {
-            color: var(--cor-aviso-urgente);
-        }
-
-        .aviso-tags {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .aviso-tag {
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            background: #f0f0f0;
-            border-radius: 20px;
-            color: var(--cor-texto-secundario);
-        }
-
-        /* --- MODAL DE AVISO (ESTILO DA APLICAÇÃO PRINCIPAL) --- */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 16px;
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-        
-        .modal-container {
-            background: var(--cor-surface);
-            border-radius: 12px;
-            max-width: 700px;
-            width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            animation: modal-appear 0.3s ease-out forwards;
-            max-height: 90vh;
-            display: flex;
             flex-direction: column;
         }
         
-        .modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--cor-borda);
-            border-left: 5px solid;
-            position: relative;
-        }
-        .modal-header.normal { border-color: var(--cor-aviso-normal); }
-        .modal-header.urgente { border-color: var(--cor-aviso-urgente); }
-        .modal-header.informativo { border-color: var(--cor-aviso-informativo); }
-        
-        .modal-header h3 { 
-            font-size: 1.25rem; 
-            font-weight: 600; 
-            padding-right: 30px;
+        .controls-container {
+            flex-direction: column;
+            align-items: stretch;
         }
         
-        .modal-body {
-            padding: 24px;
-            overflow-y: auto;
-            line-height: 1.7;
-            color: var(--cor-texto-secundario);
+        .filter-buttons {
+            justify-content: center;
+        }
+        
+        .aviso-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .modal-container {
+            margin: 0 10px;
         }
         
         .modal-footer {
-            padding: 16px 24px;
-            border-top: 1px solid var(--cor-borda);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-end;
         }
         
-        .modal-close-btn {
-            font-family: var(--fonte-principal);
-            background-color: var(--cor-primaria);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--raio-borda);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .modal-close-btn:hover { 
-            background-color: #3a7bc8; 
-        }
-
         .modal-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .modal-like-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #f0f0f0;
-            border: none;
-            color: var(--cor-texto-secundario);
-            font-family: var(--fonte-principal);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 8px 16px;
-            border-radius: var(--raio-borda);
-        }
-
-        .modal-like-btn:hover {
-            background: #e0e0e0;
-        }
-
-        .modal-like-btn.liked {
-            color: var(--cor-aviso-urgente);
-            background: rgba(255, 82, 82, 0.1);
-        }
-        
-        /* --- ESTADOS DE CARREGAMENTO E VAZIO --- */
-        .loading-container, .no-avisos {
-            text-align: center;
-            padding: 48px 0;
-            color: var(--cor-texto-secundario);
-        }
-
-        .loading-spinner {
-            width: 40px; 
-            height: 40px; 
-            border: 4px solid var(--cor-borda);
-            border-top: 4px solid var(--cor-primaria);
-            border-radius: 50%; 
-            margin: 0 auto;
-            animation: spin 1s linear infinite;
-        }
-
-        .no-avisos .material-icons-outlined {
-            font-size: 48px; 
-            color: var(--cor-borda); 
-            margin-bottom: 16px;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--cor-texto-secundario);
-        }
-
-        .no-results .material-icons-outlined {
-            font-size: 48px;
-            color: var(--cor-borda);
-            margin-bottom: 16px;
-        }
-
-        /* --- PAGINAÇÃO --- */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 32px;
-            gap: 8px;
-        }
-
-        .pagination-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--cor-borda);
-            border-radius: var(--raio-borda);
-            background: var(--cor-surface);
-            color: var(--cor-texto-principal);
-            font-family: var(--fonte-principal);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .pagination-btn:hover {
-            border-color: var(--cor-primaria);
-            color: var(--cor-primaria);
-        }
-
-        .pagination-btn.active {
-            background: var(--cor-primaria);
-            color: white;
-            border-color: var(--cor-primaria);
-        }
-
-        .pagination-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* --- ESTILOS PARA VÍDEOS --- */
-        .video-container {
-            position: relative;
             width: 100%;
-            height: 0;
-            padding-bottom: 56.25%; /* Proporção 16:9 */
-            margin: 16px 0;
-            border-radius: var(--raio-borda);
-            overflow: hidden;
+            justify-content: space-between;
         }
-        
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .video-link {
-            display: inline-block;
-            margin: 10px 0;
-            color: var(--cor-primaria);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .video-link:hover {
-            text-decoration: underline;
-        }
+    }
 
-        /* --- ANIMAÇÕES --- */
-        @keyframes spin { 
-            to { transform: rotate(360deg); } 
+    @media (max-width: 480px) {
+        .aviso-card {
+            padding: 16px;
         }
         
-        @keyframes modal-appear { 
-            from { opacity: 0; transform: scale(0.95); } 
-            to { opacity: 1; transform: scale(1); } 
+        .aviso-card h2 {
+            font-size: 1rem;
+            padding-right: 50px;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .modal-body {
+            padding: 16px;
         }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
+        
+        .modal-header, .modal-footer {
+            padding: 16px;
         }
-
-        /* --- RESPONSIVIDADE --- */
-        @media (max-width: 768px) {
-            .page-header {
-                flex-direction: column;
-            }
-            
-            .controls-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .filter-buttons {
-                justify-content: center;
-            }
-            
-            .aviso-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
-            
-            .modal-container {
-                margin: 0 10px;
-            }
-            
-            .modal-footer {
-                flex-direction: column;
-                gap: 16px;
-                align-items: flex-end;
-            }
-            
-            .modal-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .aviso-card {
-                padding: 16px;
-            }
-            
-            .aviso-card h2 {
-                font-size: 1rem;
-                padding-right: 50px;
-            }
-            
-            .modal-body {
-                padding: 16px;
-            }
-            
-            .modal-header, .modal-footer {
-                padding: 16px;
-            }
-        }
+    }
     </style>
 </head>
 <body>
@@ -910,6 +924,9 @@
                 
                 const data = new Date(aviso.data);
                 const dataFormatada = data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+                
+                // Processar a mensagem para exibir mídia incorporada
+                const mensagemProcessada = processMediaLinks(aviso.mensagem);
                 const resumo = aviso.mensagem.length > 120 ? aviso.mensagem.substring(0, 120) + '...' : aviso.mensagem;
                 
                 const isLiked = userLikes[aviso.id] || false;
@@ -928,7 +945,7 @@
                             <span>${aviso.autor || 'Administração'}</span>
                         </div>
                     </div>
-                    <p class="aviso-resumo">${resumo}</p>
+                    <div class="aviso-resumo">${mensagemProcessada}</div>
                     <div class="aviso-actions">
                         <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${aviso.id}">
                             <i class="material-icons-outlined">thumb_up</i>
@@ -986,42 +1003,74 @@
             function formatContent(text) {
                 if (!text) return '';
                 
-                // Processa URLs de vídeo
-                const processedText = processVideoLinks(text);
-                
-                // Converte quebras de linha em parágrafos
-                return `<p>${processedText.replace(/\n/g, '</p><p>')}</p>`;
+                // Processa URLs de mídia (vídeos e imagens)
+                return processMediaLinks(text);
             }
 
-            function processVideoLinks(text) {
+            function processMediaLinks(text) {
+                if (!text) return '';
+                
                 // Expressão regular para encontrar URLs
                 const urlRegex = /(https?:\/\/[^\s]+)/g;
+                let processedText = text;
                 
-                return text.replace(urlRegex, (url) => {
-                    // Verifica se é um link do YouTube
-                    const youtubeMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-                    
-                    if (youtubeMatch) {
-                        const videoId = youtubeMatch[1];
-                        return `</p><div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><p>`;
+                // Encontrar todas as URLs no texto
+                const urls = text.match(urlRegex);
+                
+                if (urls) {
+                    urls.forEach(url => {
+                        // Verifica se é um link do YouTube
+                        const youtubeMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+                        
+                        if (youtubeMatch) {
+                            const videoId = youtubeMatch[1];
+                            processedText = processedText.replace(url, `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`);
+                            return;
+                        }
+                        
+                        // Verifica se é um link do Vimeo
+                        const vimeoMatch = url.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/);
+                        if (vimeoMatch) {
+                            const videoId = vimeoMatch[1];
+                            processedText = processedText.replace(url, `<div class="video-container"><iframe src="https://player.vimeo.com/video/${videoId}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div>`);
+                            return;
+                        }
+                        
+                        // Para outros links de vídeo, podemos tentar detectar por extensão
+                        const videoExtRegex = /\.(mp4|webm|ogg)$/i;
+                        if (videoExtRegex.test(url)) {
+                            processedText = processedText.replace(url, `<div class="video-container"><video controls><source src="${url}" type="video/${url.split('.').pop().toLowerCase()}">Seu navegador não suporta o elemento de vídeo.</video></div>`);
+                            return;
+                        }
+                        
+                        // Verifica se é uma imagem (por extensão de arquivo)
+                        const imageExtRegex = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i;
+                        if (imageExtRegex.test(url)) {
+                            processedText = processedText.replace(url, `<div class="image-container"><img src="${url}" alt="Imagem anexada"></div>`);
+                            return;
+                        }
+                        
+                        // Para outras URLs, mantém como link normal
+                        processedText = processedText.replace(url, `<a href="${url}" target="_blank" class="media-link">${url}</a>`);
+                    });
+                }
+                
+                // Converter quebras de linha em parágrafos
+                const paragraphs = processedText.split('\n');
+                let htmlContent = '';
+                
+                paragraphs.forEach(paragraph => {
+                    if (paragraph.trim() !== '') {
+                        // Verificar se o parágrafo já contém um elemento de mídia
+                        if (paragraph.includes('video-container') || paragraph.includes('image-container')) {
+                            htmlContent += paragraph;
+                        } else {
+                            htmlContent += `<p>${paragraph}</p>`;
+                        }
                     }
-                    
-                    // Verifica se é um link do Vimeo
-                    const vimeoMatch = url.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/);
-                    if (vimeoMatch) {
-                        const videoId = vimeoMatch[1];
-                        return `</p><div class="video-container"><iframe src="https://player.vimeo.com/video/${videoId}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div><p>`;
-                    }
-                    
-                    // Para outros links de vídeo, podemos tentar detectar por extensão
-                    const videoExtRegex = /\.(mp4|webm|ogg)$/i;
-                    if (videoExtRegex.test(url)) {
-                        return `</p><div class="video-container"><video controls><source src="${url}" type="video/${url.split('.').pop().toLowerCase()}">Seu navegador não suporta o elemento de vídeo.</video></div><p>`;
-                    }
-                    
-                    // Para outras URLs, mantém como link normal
-                    return `<a href="${url}" target="_blank" class="video-link">${url}</a>`;
                 });
+                
+                return htmlContent;
             }
 
             function showNoAvisos() {
@@ -1074,4 +1123,4 @@
         });
     </script>
 </body>
-    </html>
+</html>
