@@ -33,7 +33,15 @@
             color: var(--md-sys-color-on-background);
             -webkit-font-smoothing: antialiased;
         }
-        
+        body {
+  margin: 0;
+  padding: 0;
+  background: url("fundo.png") no-repeat center center;
+  background-size: contain; /* Ajusta sem cortar */
+  background-color: #000;   /* Cor de fundo para áreas que sobrarem */
+  height: 100vh;
+  width: 100vw;
+        }
         /* --- NOVO LAYOUT DO HEADER --- */
         .page-header {
             background-color: var(--md-sys-color-surface);
