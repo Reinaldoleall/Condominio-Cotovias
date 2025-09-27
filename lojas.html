@@ -2,51 +2,409 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-  <meta name="viewport" content="width=1280">
-    <title>Lojas Disponíveis</title>
-    
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/lojas.css">
-  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Portal de Lojas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --md-sys-color-primary: #6750A4;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-on-primary-container: #21005D;
+            --md-sys-color-secondary: #625B71;
+            --md-sys-color-on-secondary-container: #1D192B;
+            --md-sys-color-background: #F4F5F7;
+            --md-sys-color-surface: #FFFFFF;
+            --md-sys-color-on-surface: #1C1B1F;
+            --md-sys-color-on-surface-variant: #49454F;
+            --md-sys-color-outline: #CAC4D0;
+            --md-sys-font-family: 'Inter', sans-serif;
+            --md-sys-border-radius: 16px;
+            --md-sys-elevation-1: 0 1px 2px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.12);
+            --md-sys-elevation-2: 0 3px 6px rgba(0,0,0,0.10), 0 3px 6px rgba(0,0,0,0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--md-sys-font-family);
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* --- NOVO LAYOUT DO HEADER --- */
+        .page-header {
+            background-color: var(--md-sys-color-surface);
+            padding: 16px;
+            border-bottom: 1px solid #E0E0E0;
+            position: sticky; /* <-- A MÁGICA ACONTECE AQUI */
+            top: 0;
+            z-index: 100;
+            width: 100%;
+        }
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header-content h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--md-sys-color-primary);
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .controls-wrapper {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .search-container {
+            position: relative;
+            flex-grow: 1;
+        }
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            font-size: 1rem;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 28px;
+            background-color: var(--md-sys-color-background);
+            transition: all 0.2s ease;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 3px var(--md-sys-color-primary-container);
+        }
+        .search-container .material-icons-outlined {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--md-sys-color-on-surface-variant);
+        }
+.sort-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;   /* tamanho fixo */
+    height: 36px;
+    background: none;
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: 50%; /* botão circular */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.sort-button:hover {
+    background-color: #f0f0f0;
+}
+
+.sort-button span {
+    display: none; /* esconde texto */
+}
+
+.sort-button i {
+    font-size: 20px; /* ícone em destaque */
+}
+
+        /* --- Conteúdo Principal --- */
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        /* --- Grid de Resultados --- */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .store-card, .product-card {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--md-sys-border-radius);
+            box-shadow: var(--md-sys-elevation-1);
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+        }
+        .store-card:hover, .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--md-sys-elevation-2);
+        }
+        .store-card__banner, .product-card__banner {
+            height: 0;
+            padding-top: 60%;
+            background-size: cover;
+            background-position: center;
+            background-color: #f0f0f0;
+        }
+        .store-card__content, .product-card__content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .store-card__title, .product-card__title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .store-card__description {
+            font-size: 0.95rem;
+            color: var(--md-sys-color-on-surface-variant);
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        .product-card__store-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--md-sys-color-secondary);
+            margin-bottom: 4px;
+        }
+        .product-card__price {
+            font-size: 1.1rem;
+            color: var(--md-sys-color-primary);
+            font-weight: 700;
+            margin-top: auto;
+        }
+        .store-card__footer {
+            margin-top: 16px;
+            text-align: right;
+        }
+        .store-card__button {
+            color: var(--md-sys-color-primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px;
+            color: var(--md-sys-color-on-surface-variant);
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            .store-card__content, .product-card__content {
+                padding: 12px;
+            }
+            .store-card__title, .product-card__title {
+                font-size: 1rem;
+            }
+            .store-card__description, .product-card__store-name {
+                font-size: 0.85rem;
+            }
+             .product-card__price {
+                font-size: 1rem;
+            }
+        }
+@media (max-width: 480px) {
+    .controls-wrapper {
+        flex-direction: row; /* mantém lado a lado */
+        gap: 8px;
+    }
+    .sort-button {
+        width: 36px; /* mantém pequeno */
+        flex-shrink: 0;
+    }
+}
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>Nossas Lojas Parceiras</h1>
-            <p>Descubra as melhores lojas disponíveis em nossa plataforma</p>
-        </header>
-
-        <div class="search-container">
-            <div class="search-input-container">
-                <i class="material-icons search-icon">search</i>
-                <input type="text" class="search-input" id="searchInput" placeholder="Pesquisar lojas...">
-                <div class="suggestions-container" id="suggestionsContainer"></div>
-            </div>
-            <div class="search-results" id="searchResults">
-                Mostrando resultados para: <strong id="searchTerm"></strong>
+    <header class="page-header">
+        <div class="header-content">
+            <h1></h1>
+            <div class="controls-wrapper">
+                <div class="search-container">
+                    <i class="material-icons-outlined">search</i>
+                    <input type="search" id="searchInput" class="search-input" placeholder="Buscar por loja ou produto...">
+                </div>
+                 <button class="sort-button" id="sortButton">
+                    <i class="material-icons-outlined">sort_by_alpha</i>
+                    <span>Ordenar A-Z</span>
+                </button>
             </div>
         </div>
+    </header>
 
-        <div id="stores-list" class="stores-grid">
-            <div class="loading">
-                <div class="loading-spinner"></div>
+    <main class="page-container">
+        <div class="results-grid" id="resultsGrid">
             </div>
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <h2>Nenhum resultado encontrado</h2>
+            <p>Tente ajustar sua busca ou explore todas as nossas lojas.</p>
         </div>
+    </main>
 
-        <div class="no-results" id="noResults">
-            <i class="material-icons">search_off</i>
-            <h3>Nenhuma loja encontrada</h3>
-            <p>Não encontramos lojas correspondentes à sua pesquisa. Tente outros termos.</p>
-        </div>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
-    <script src= "js/lojas.js"></script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const firebaseConfig = {
+                apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
+                authDomain: "rifalidiane-fde3b.firebaseapp.com",
+                databaseURL: "https://rifalidiane-fde3b-default-rtdb.firebaseio.com",
+                projectId: "rifalidiane-fde3b",
+                storageBucket: "rifalidiane-fde3b.appspot.com",
+                messagingSenderId: "649359518677",
+                appId: "1:649359518677:web:879b4ed9fa5150d24d2b5c"
+            };
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+
+            const resultsGrid = document.getElementById('resultsGrid');
+            const searchInput = document.getElementById('searchInput');
+            const sortButton = document.getElementById('sortButton');
+            const emptyState = document.getElementById('emptyState');
+            
+            let allStores = [];
+            let sortOrder = 'asc'; // 'asc' for A-Z, 'desc' for Z-A
+
+            // Função debounce para otimizar a busca
+            const debounce = (func, delay) => {
+                let timeout;
+                return (...args) => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), delay);
+                };
+            };
+
+            async function fetchStores() {
+                try {
+                    const storesRef = ref(db, 'stores/');
+                    const snapshot = await get(storesRef);
+                    if (snapshot.exists()) {
+                        const storesData = snapshot.val();
+                        allStores = Object.entries(storesData).map(([id, store]) => ({
+                            id,
+                            ...store,
+                            products: store.products ? Object.entries(store.products).map(([pId, pData]) => ({ id: pId, ...pData })) : []
+                        }));
+                        sortAndFilter();
+                    } else {
+                        showEmptyState(true, 'Nenhuma loja encontrada.');
+                    }
+                } catch (error) {
+                    console.error("Erro ao buscar lojas:", error);
+                    showEmptyState(true, 'Ocorreu um erro ao carregar as lojas.');
+                }
+            }
+
+            function renderResults(itemsToRender) {
+                resultsGrid.innerHTML = '';
+                if (itemsToRender.length === 0) {
+                    showEmptyState(true);
+                    return;
+                }
+                
+                showEmptyState(false);
+                itemsToRender.forEach(item => {
+                    const card = document.createElement('a');
+                    
+                    if (item.type === 'store') {
+                        card.href = `loja.html?userId=${item.id}`;
+                        card.className = 'store-card';
+                        card.innerHTML = `
+                            <div class="store-card__banner" style="background-image: url('${item.logo || 'https://placehold.co/600x300/EADDFF/21005D?text=Loja'}')"></div>
+                            <div class="store-card__content">
+                                <h3 class="store-card__title">${item.name}</h3>
+                                <p class="store-card__description">${item.description || 'Visite nossa loja para ver os produtos.'}</p>
+                                <div class="store-card__footer">
+                                    <span class="store-card__button">Ver Loja →</span>
+                                </div>
+                            </div>
+                        `;
+                    } else { // type === 'product'
+                        card.href = `loja.html?userId=${item.storeId}#product-${item.id}`;
+                        card.className = 'product-card';
+                        card.innerHTML = `
+                             <div class="product-card__banner" style="background-image: url('${item.image || 'https://placehold.co/600x300/EADDFF/21005D?text=Produto'}')"></div>
+                            <div class="product-card__content">
+                                <span class="product-card__store-name">${item.storeName}</span>
+                                <h3 class="product-card__title">${item.name}</h3>
+                                <p class="product-card__price">R$ ${(item.price || 0).toFixed(2).replace('.',',')}</p>
+                            </div>
+                        `;
+                    }
+                    resultsGrid.appendChild(card);
+                });
+            }
+
+            function sortAndFilter() {
+                allStores.sort((a, b) => {
+                    if (sortOrder === 'asc') {
+                        return a.name.localeCompare(b.name);
+                    } else {
+                        return b.name.localeCompare(a.name);
+                    }
+                });
+
+                const query = searchInput.value.toLowerCase().trim();
+                if (!query) {
+                    renderResults(allStores.map(s => ({ type: 'store', ...s })));
+                    return;
+                }
+
+                const foundItems = [];
+                allStores.forEach(store => {
+                    const storeNameMatch = store.name.toLowerCase().includes(query);
+                    if (storeNameMatch) {
+                        foundItems.push({ type: 'store', ...store });
+                    }
+
+                    store.products.forEach(product => {
+                        if (product.name.toLowerCase().includes(query)) {
+                            // Evita duplicar se a loja já foi adicionada
+                            if (!foundItems.some(item => item.type === 'store' && item.id === store.id)) {
+                                const existingProduct = foundItems.find(item => item.type === 'product' && item.id === product.id && item.storeId === store.id);
+                                if (!existingProduct) {
+                                     foundItems.push({
+                                        type: 'product',
+                                        ...product,
+                                        storeId: store.id,
+                                        storeName: store.name
+                                    });
+                                }
+                            }
+                        }
+                    });
+                });
+                renderResults(foundItems);
+            }
+
+            function toggleSortOrder() {
+                sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+                const text = sortButton.querySelector('span');
+                text.textContent = sortOrder === 'asc' ? 'Ordenar A-Z' : 'Ordenar Z-A';
+                sortAndFilter();
+            }
+
+            function showEmptyState(show, message = 'Nenhum resultado encontrado') {
+                 if (show) {
+                    emptyState.style.display = 'block';
+                    emptyState.querySelector('h2').textContent = message;
+                } else {
+                    emptyState.style.display = 'none';
+                }
+            }
+            
+            searchInput.addEventListener('input', debounce(sortAndFilter, 300));
+            sortButton.addEventListener('click', toggleSortOrder);
+
+            fetchStores();
+        });
+    </script>
 </body>
 </html>
