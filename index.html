@@ -25,20 +25,11 @@
             --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
             --fonte-principal: 'Inter', sans-serif;
             --raio-borda: 8px;
+            --bottom-nav-height: 65px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html {
-            height: 100%;
-            overflow: hidden;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { height: 100%; overflow: hidden; }
         body {
             font-family: var(--fonte-principal);
             background-color: var(--cor-fundo);
@@ -51,13 +42,10 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        
-        ::-webkit-scrollbar {
-            display: none;
-        }
+        ::-webkit-scrollbar { display: none; }
 
         /* --- ESTRUTURA PRINCIPAL --- */
-        .drawer-container {
+        .container {
             display: flex;
             height: 100vh;
         }
@@ -67,12 +55,13 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
+            /* Garante que o conteúdo não fique embaixo do menu inferior */
+            padding-bottom: var(--bottom-nav-height);
         }
 
         .main-content {
             flex: 1;
-            overflow: hidden;
+            overflow: auto; /* Permite scroll dentro do iframe se necessário */
             position: relative;
         }
 
@@ -82,46 +71,34 @@
             border: none;
             background-color: var(--cor-fundo);
         }
+        
+        /* --- BARRA SUPERIOR (APENAS DESKTOP) --- */
+        .top-app-bar {
+            display: none; /* OCULTO POR PADRÃO (MOBILE FIRST) */
+            height: 64px;
+            background-color: var(--cor-surface);
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--cor-borda);
+            z-index: 100;
+        }
 
-        /* --- MENU LATERAL (DRAWER) --- */
-        .mdc-drawer {
+        .page-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* --- MENU LATERAL (APENAS DESKTOP) --- */
+        .side-drawer {
+            display: none; /* OCULTO POR PADRÃO (MOBILE FIRST) */
             width: 260px;
             height: 100vh;
             background-color: var(--cor-surface);
             border-right: 1px solid var(--cor-borda);
             padding: 16px 8px;
-            position: fixed;
-            left: -260px;
-            top: 0;
-            z-index: 200;
-            transition: transform 0.3s ease;
         }
-
-        .mdc-drawer--open {
-            transform: translateX(260px);
-            box-shadow: 10px 0 30px -15px rgba(0,0,0,0.2);
-        }
-        
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.4);
-            z-index: 199;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease;
-        }
-
-        .overlay--visible {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .mdc-list {
-            list-style: none;
-        }
-        
-        .mdc-list-item {
+        .side-drawer-list { list-style: none; }
+        .side-drawer-item {
             display: flex;
             align-items: center;
             padding: 12px 16px;
@@ -132,227 +109,70 @@
             font-weight: 500;
             transition: all 0.2s ease-in-out;
         }
-        
-        .mdc-list-item:hover {
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto-principal);
-        }
+        .side-drawer-item:hover { background-color: var(--cor-fundo); color: var(--cor-texto-principal); }
+        .side-drawer-item.active { background-color: var(--cor-primaria); color: white; font-weight: 600; }
+        .side-drawer-item .material-icons-outlined { margin-right: 16px; font-size: 22px; }
 
-        .mdc-list-item.active {
-            background-color: var(--cor-primaria);
-            color: white;
-            font-weight: 600;
-        }
-
-        .mdc-list-item .material-icons-outlined {
-            margin-right: 16px;
-            font-size: 22px;
-        }
-
-        /* --- BARRA SUPERIOR E BOTÃO DE MENU --- */
-        .top-app-bar {
-            height: 64px;
+        /* --- NAVEGAÇÃO INFERIOR (APENAS MOBILE) --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-height);
             background-color: var(--cor-surface);
+            border-top: 1px solid var(--cor-borda);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             display: flex;
-            align-items: center;
-            padding: 0 16px;
-            border-bottom: 1px solid var(--cor-borda);
-            z-index: 100;
+            justify-content: space-around;
+            z-index: 150;
+            /* Espaçamento de segurança para iPhones com notch */
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        .menu-button {
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding-top: 8px;
+            color: var(--cor-texto-secundario);
+            font-size: 0.7rem;
+            font-weight: 500;
             background: none;
             border: none;
             cursor: pointer;
-            padding: 8px;
-            margin-right: 12px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--cor-texto-principal);
-            transition: background-color 0.2s;
+            transition: color 0.2s ease;
+            text-align: center;
         }
+        .nav-item .material-icons-outlined { font-size: 24px; margin-bottom: 2px; }
+        .nav-item:hover { color: var(--cor-texto-principal); }
+        .nav-item.active { color: var(--cor-primaria); }
 
-        .menu-button:hover {
-            background-color: var(--cor-fundo);
-        }
-
-        .page-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        /* --- MODAL DE SENHA --- */
-        .password-modal {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0,0,0,0.4);
-            z-index: 300;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-        }
-
-        .password-modal-content {
-            background: var(--cor-surface);
-            border-radius: 12px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            animation: modal-appear 0.3s ease-out forwards;
-        }
-        
-        .password-modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--cor-borda);
-        }
-
-        .password-modal-header h2 {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .password-modal-body {
-            padding: 24px;
-        }
-
-        .password-input-container {
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--cor-borda);
-            border-radius: var(--raio-borda);
-            padding: 12px;
-            margin-top: 16px;
-            transition: all 0.2s ease;
-        }
-        
-        .password-input-container:focus-within {
-            border-color: var(--cor-primaria);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
-        }
-
-        .password-input-container .material-icons-outlined {
-            margin-right: 10px;
-            color: var(--cor-texto-secundario);
-        }
-
-        .password-input {
-            flex: 1;
-            border: none;
-            outline: none;
-            font-size: 1rem;
-            background: transparent;
-        }
-
-        .password-error {
-            display: none;
-            align-items: center;
-            color: var(--cor-erro);
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-        
-        .password-error .material-icons-outlined {
-             font-size: 1.1rem;
-             margin-right: 6px;
-        }
-
-        .password-modal-footer {
-            padding: 16px 24px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-
-        .password-button {
-            font-family: var(--fonte-principal);
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 10px 20px;
-            border: none;
-            border-radius: var(--raio-borda);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .password-button.cancel {
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto-principal);
-        }
-        
-        .password-button.cancel:hover {
-            background-color: #e0e0e0;
-        }
-
-        .password-button.submit {
-            background-color: var(--cor-primaria);
-            color: white;
-        }
-
-        .password-button.submit:hover {
-            background-color: var(--cor-primaria-hover);
-        }
-        
-        /* --- SPINNER DE CARREGAMENTO --- */
-        .loading {
-            position: fixed;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--cor-primaria);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        /* --- ANIMAÇÕES --- */
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes modal-appear {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* --- RESPONSIVIDADE --- */
+        /* --- RESPONSIVIDADE PARA DESKTOP --- */
         @media (min-width: 1024px) {
-            .mdc-drawer {
-                position: relative;
-                left: 0;
-                transform: none;
-                box-shadow: none;
+            .bottom-nav {
+                display: none; /* Esconde o menu inferior no desktop */
             }
             .app-content {
-                margin-left: 0;
+                padding-bottom: 0; /* Remove o padding extra no desktop */
             }
-            .menu-button, .overlay {
-                display: none;
+            .top-app-bar {
+                display: flex; /* Mostra o header no desktop */
+            }
+            .side-drawer {
+                display: block; /* Mostra o menu lateral no desktop */
             }
         }
+
+        /* --- ESTILOS DE MODAIS E SPINNERS (sem alterações) --- */
+        .password-modal{position:fixed;inset:0;background-color:rgba(0,0,0,.4);z-index:300;display:none;justify-content:center;align-items:center;padding:16px}.password-modal-content{background:var(--cor-surface);border-radius:12px;max-width:400px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.1);animation:modal-appear .3s ease-out forwards}.password-modal-header{padding:20px 24px;border-bottom:1px solid var(--cor-borda)}.password-modal-header h2{font-size:1.2rem;font-weight:600}.password-modal-body{padding:24px}.password-input-container{display:flex;align-items:center;border:1px solid var(--cor-borda);border-radius:var(--raio-borda);padding:12px;margin-top:16px;transition:all .2s ease}.password-input-container:focus-within{border-color:var(--cor-primaria);box-shadow:0 0 0 3px rgba(74,144,226,.2)}.password-input-container .material-icons-outlined{margin-right:10px;color:var(--cor-texto-secundario)}.password-input{flex:1;border:none;outline:none;font-size:1rem;background:transparent}.password-error{display:none;align-items:center;color:var(--cor-erro);margin-top:10px;font-size:.9rem}.password-error .material-icons-outlined{font-size:1.1rem;margin-right:6px}.password-modal-footer{padding:16px 24px;display:flex;justify-content:flex-end;gap:8px}.password-button{font-family:var(--fonte-principal);font-size:.9rem;font-weight:500;padding:10px 20px;border:none;border-radius:var(--raio-borda);cursor:pointer;transition:all .2s ease}.password-button.cancel{background-color:var(--cor-fundo);color:var(--cor-texto-principal)}.password-button.cancel:hover{background-color:#e0e0e0}.password-button.submit{background-color:var(--cor-primaria);color:white}.password-button.submit:hover{background-color:var(--cor-primaria-hover)}.loading{position:fixed;inset:0;background:rgba(255,255,255,.8);display:none;justify-content:center;align-items:center;z-index:1000}.loading-spinner{width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid var(--cor-primaria);border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}@keyframes modal-appear{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
     </style>
 </head>
 <body>
 
-    <div class="drawer-container">
-        
-        <div class="overlay" id="overlay"></div>
+    <div class="container">
 
         <div class="loading" id="loading">
             <div class="loading-spinner"></div>
@@ -360,9 +180,7 @@
 
         <div class="password-modal" id="passwordModal">
             <div class="password-modal-content">
-                <div class="password-modal-header">
-                    <h2>Acesso Administrativo</h2>
-                </div>
+                <div class="password-modal-header"><h2>Acesso Administrativo</h2></div>
                 <div class="password-modal-body">
                     <p>Esta área é restrita. Por favor, digite a senha para continuar.</p>
                     <div class="password-input-container">
@@ -381,36 +199,28 @@
             </div>
         </div>
 
-        <aside class="mdc-drawer" id="drawer">
-            <nav class="mdc-list">
-                <div class="mdc-list-item" data-page="aviso.html">
-                    <i class="material-icons-outlined">campaign</i>
-                    <span>Avisos</span>
+        <aside class="side-drawer">
+            <nav class="side-drawer-list">
+                <div class="side-drawer-item" data-page="aviso.html" data-title="Avisos">
+                    <i class="material-icons-outlined">campaign</i><span>Avisos</span>
                 </div>
-                <div class="mdc-list-item" data-page="lojas.html">
-                    <i class="material-icons-outlined">storefront</i>
-                    <span>Estabelecimentos</span>
+                <div class="side-drawer-item" data-page="lojas.html" data-title="Estabelecimentos">
+                    <i class="material-icons-outlined">storefront</i><span>Estabelecimentos</span>
                 </div>
-                <div class="mdc-list-item" data-page="criarlojas.html">
-                    <i class="material-icons-outlined">add_business</i>
-                    <span>Crie sua loja</span>
+                <div class="side-drawer-item" data-page="criarlojas.html" data-title="Crie sua Loja">
+                    <i class="material-icons-outlined">add_business</i><span>Crie sua loja</span>
                 </div>
-                <div class="mdc-list-item" data-page="login.html">
-                    <i class="material-icons-outlined">people_alt</i>
-                    <span>Usuários</span>
+                <div class="side-drawer-item" data-page="login.html" data-title="Usuários">
+                    <i class="material-icons-outlined">people_alt</i><span>Usuários</span>
                 </div>
-                <div class="mdc-list-item" id="adminMenuItem">
-                    <i class="material-icons-outlined">admin_panel_settings</i>
-                    <span>Publique Avisos (ADM)</span>
+                <div class="side-drawer-item" id="adminMenuItem" data-page="admin.html" data-title="Administração">
+                    <i class="material-icons-outlined">admin_panel_settings</i><span>Publique Avisos (ADM)</span>
                 </div>
             </nav>
         </aside>
 
         <div class="app-content">
             <header class="top-app-bar">
-                <button class="menu-button" id="menuButton">
-                    <i class="material-icons-outlined">menu</i>
-                </button>
                 <h1 class="page-title" id="pageTitle">Avisos</h1>
             </header>
             <main class="main-content">
@@ -418,14 +228,34 @@
             </main>
         </div>
     </div>
+    
+    <nav class="bottom-nav">
+        <button class="nav-item" data-page="aviso.html" data-title="Avisos">
+            <i class="material-icons-outlined">campaign</i>
+            <span>Avisos</span>
+        </button>
+        <button class="nav-item" data-page="lojas.html" data-title="Lojas">
+            <i class="material-icons-outlined">storefront</i>
+            <span>Lojas</span>
+        </button>
+        <button class="nav-item" data-page="criarlojas.html" data-title="Criar Loja">
+            <i class="material-icons-outlined">add_business</i>
+            <span>Criar Loja</span>
+        </button>
+        <button class="nav-item" data-page="login.html" data-title="Usuários">
+            <i class="material-icons-outlined">people_alt</i>
+            <span>Usuários</span>
+        </button>
+        <button class="nav-item" id="adminNavItem" data-page="admin.html" data-title="Admin">
+            <i class="material-icons-outlined">admin_panel_settings</i>
+            <span>Admin</span>
+        </button>
+    </nav>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- SELEÇÃO DE ELEMENTOS ---
             const ui = {
-                menuButton: document.getElementById('menuButton'),
-                drawer: document.getElementById('drawer'),
-                overlay: document.getElementById('overlay'),
                 loading: document.getElementById('loading'),
                 contentFrame: document.getElementById('contentFrame'),
                 pageTitle: document.getElementById('pageTitle'),
@@ -434,51 +264,38 @@
                 submitPasswordBtn: document.getElementById('submitPassword'),
                 cancelPasswordBtn: document.getElementById('cancelPassword'),
                 passwordError: document.getElementById('passwordError'),
-                adminMenuItem: document.getElementById('adminMenuItem'),
-                menuItems: document.querySelectorAll('.mdc-list-item')
+                // Seleciona todos os itens clicáveis de ambos os menus
+                menuItems: document.querySelectorAll('.side-drawer-item, .nav-item')
             };
 
-            let isMenuOpen = false;
-
-            // --- FUNÇÕES PRINCIPAIS ---
-
-            const toggleMenu = () => {
-                isMenuOpen = !isMenuOpen;
-                ui.drawer.classList.toggle('mdc-drawer--open', isMenuOpen);
-                ui.overlay.classList.toggle('overlay--visible', isMenuOpen);
-            };
-
-            const setActiveMenuItem = (selectedItem) => {
-                ui.menuItems.forEach(item => item.classList.remove('active'));
-                if (selectedItem) {
-                    selectedItem.classList.add('active');
-                }
+            const setActiveMenuItem = (pageUrl) => {
+                ui.menuItems.forEach(item => {
+                    item.classList.toggle('active', item.dataset.page === pageUrl);
+                });
             };
             
-            const loadPage = (pageUrl, title, activeItem) => {
+            const loadPage = (pageUrl, title) => {
                 ui.loading.style.display = 'flex';
-                ui.pageTitle.textContent = title;
+                // Atualiza o título apenas no header do desktop
+                if (window.innerWidth >= 1024) {
+                    ui.pageTitle.textContent = title;
+                }
                 document.title = `${title} | Condomínio Cotovias`;
                 
-                ui.contentFrame.src = pageUrl;
+                if (ui.contentFrame.src !== pageUrl) {
+                    ui.contentFrame.src = pageUrl;
+                }
 
                 ui.contentFrame.onload = () => {
                     ui.loading.style.display = 'none';
                 };
-
-                setActiveMenuItem(activeItem);
-
-                if (isMenuOpen && window.innerWidth < 1024) {
-                    toggleMenu();
-                }
+                
+                setActiveMenuItem(pageUrl);
             };
 
             const showPasswordModal = () => {
                 ui.passwordModal.style.display = 'flex';
                 ui.adminPasswordInput.focus();
-                if (isMenuOpen && window.innerWidth < 1024) {
-                    toggleMenu();
-                }
             };
             
             const closePasswordModal = () => {
@@ -488,51 +305,36 @@
             };
 
             // --- EVENT LISTENERS ---
-
-            ui.menuButton.addEventListener('click', toggleMenu);
-            ui.overlay.addEventListener('click', toggleMenu);
-
             ui.menuItems.forEach(item => {
-                if (item.id !== 'adminMenuItem') {
+                const isAdmItem = item.id === 'adminMenuItem' || item.id === 'adminNavItem';
+                if (isAdmItem) {
+                    item.addEventListener('click', showPasswordModal);
+                } else {
                     item.addEventListener('click', () => {
-                        const pageUrl = item.getAttribute('data-page');
-                        const title = item.querySelector('span').textContent.trim();
-                        loadPage(pageUrl, title, item);
+                        const pageUrl = item.dataset.page;
+                        const title = item.dataset.title;
+                        loadPage(pageUrl, title);
                     });
                 }
             });
 
-            ui.adminMenuItem.addEventListener('click', showPasswordModal);
-            
             ui.cancelPasswordBtn.addEventListener('click', closePasswordModal);
-
             ui.submitPasswordBtn.addEventListener('click', () => {
-                // ⚠️ ATENÇÃO: A senha diretamente no código é uma falha de segurança.
-                // Isto é apenas para fins de demonstração.
                 if (ui.adminPasswordInput.value === 'ADM12345') {
                     closePasswordModal();
-                    loadPage('admin.html', 'Administração', ui.adminMenuItem);
+                    loadPage('admin.html', 'Administração');
                 } else {
                     ui.passwordError.style.display = 'flex';
                     ui.adminPasswordInput.focus();
                 }
             });
-            
             ui.adminPasswordInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    ui.submitPasswordBtn.click();
-                }
+                if (e.key === 'Enter') ui.submitPasswordBtn.click();
             });
 
-            window.addEventListener('resize', () => {
-                if (window.innerWidth >= 1024 && isMenuOpen) {
-                    toggleMenu();
-                }
-            });
-            
             // --- INICIALIZAÇÃO ---
-            // Define o primeiro item do menu como ativo ao carregar a página
-            setActiveMenuItem(document.querySelector('.mdc-list-item'));
+            const initialItem = document.querySelector('.nav-item'); // Carrega a primeira página definida no menu
+            loadPage(initialItem.dataset.page, initialItem.dataset.title);
         });
     </script>
 
