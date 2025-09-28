@@ -61,7 +61,7 @@
 
         .main-content {
             flex: 1;
-            overflow: auto; /* Permite scroll dentro do iframe se necessário */
+            overflow: auto;
             position: relative;
         }
 
@@ -72,48 +72,7 @@
             background-color: var(--cor-fundo);
         }
         
-        /* --- BARRA SUPERIOR (APENAS DESKTOP) --- */
-        .top-app-bar {
-            display: none; /* OCULTO POR PADRÃO (MOBILE FIRST) */
-            height: 64px;
-            background-color: var(--cor-surface);
-            align-items: center;
-            padding: 0 24px;
-            border-bottom: 1px solid var(--cor-borda);
-            z-index: 100;
-        }
-
-        .page-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        /* --- MENU LATERAL (APENAS DESKTOP) --- */
-        .side-drawer {
-            display: none; /* OCULTO POR PADRÃO (MOBILE FIRST) */
-            width: 260px;
-            height: 100vh;
-            background-color: var(--cor-surface);
-            border-right: 1px solid var(--cor-borda);
-            padding: 16px 8px;
-        }
-        .side-drawer-list { list-style: none; }
-        .side-drawer-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            margin-bottom: 4px;
-            border-radius: var(--raio-borda);
-            cursor: pointer;
-            color: var(--cor-texto-secundario);
-            font-weight: 500;
-            transition: all 0.2s ease-in-out;
-        }
-        .side-drawer-item:hover { background-color: var(--cor-fundo); color: var(--cor-texto-principal); }
-        .side-drawer-item.active { background-color: var(--cor-primaria); color: white; font-weight: 600; }
-        .side-drawer-item .material-icons-outlined { margin-right: 16px; font-size: 22px; }
-
-        /* --- NAVEGAÇÃO INFERIOR (APENAS MOBILE) --- */
+        /* --- NAVEGAÇÃO INFERIOR (SEMPRE VISÍVEL) --- */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -150,22 +109,6 @@
         .nav-item:hover { color: var(--cor-texto-principal); }
         .nav-item.active { color: var(--cor-primaria); }
 
-        /* --- RESPONSIVIDADE PARA DESKTOP --- */
-        @media (min-width: 1024px) {
-            .bottom-nav {
-                display: none; /* Esconde o menu inferior no desktop */
-            }
-            .app-content {
-                padding-bottom: 0; /* Remove o padding extra no desktop */
-            }
-            .top-app-bar {
-                display: flex; /* Mostra o header no desktop */
-            }
-            .side-drawer {
-                display: block; /* Mostra o menu lateral no desktop */
-            }
-        }
-
         /* --- ESTILOS DE MODAIS E SPINNERS (sem alterações) --- */
         .password-modal{position:fixed;inset:0;background-color:rgba(0,0,0,.4);z-index:300;display:none;justify-content:center;align-items:center;padding:16px}.password-modal-content{background:var(--cor-surface);border-radius:12px;max-width:400px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.1);animation:modal-appear .3s ease-out forwards}.password-modal-header{padding:20px 24px;border-bottom:1px solid var(--cor-borda)}.password-modal-header h2{font-size:1.2rem;font-weight:600}.password-modal-body{padding:24px}.password-input-container{display:flex;align-items:center;border:1px solid var(--cor-borda);border-radius:var(--raio-borda);padding:12px;margin-top:16px;transition:all .2s ease}.password-input-container:focus-within{border-color:var(--cor-primaria);box-shadow:0 0 0 3px rgba(74,144,226,.2)}.password-input-container .material-icons-outlined{margin-right:10px;color:var(--cor-texto-secundario)}.password-input{flex:1;border:none;outline:none;font-size:1rem;background:transparent}.password-error{display:none;align-items:center;color:var(--cor-erro);margin-top:10px;font-size:.9rem}.password-error .material-icons-outlined{font-size:1.1rem;margin-right:6px}.password-modal-footer{padding:16px 24px;display:flex;justify-content:flex-end;gap:8px}.password-button{font-family:var(--fonte-principal);font-size:.9rem;font-weight:500;padding:10px 20px;border:none;border-radius:var(--raio-borda);cursor:pointer;transition:all .2s ease}.password-button.cancel{background-color:var(--cor-fundo);color:var(--cor-texto-principal)}.password-button.cancel:hover{background-color:#e0e0e0}.password-button.submit{background-color:var(--cor-primaria);color:white}.password-button.submit:hover{background-color:var(--cor-primaria-hover)}.loading{position:fixed;inset:0;background:rgba(255,255,255,.8);display:none;justify-content:center;align-items:center;z-index:1000}.loading-spinner{width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid var(--cor-primaria);border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}@keyframes modal-appear{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
     </style>
@@ -199,30 +142,7 @@
             </div>
         </div>
 
-        <aside class="side-drawer">
-            <nav class="side-drawer-list">
-                <div class="side-drawer-item" data-page="aviso.html" data-title="Avisos">
-                    <i class="material-icons-outlined">campaign</i><span>Avisos</span>
-                </div>
-                <div class="side-drawer-item" data-page="lojas.html" data-title="Estabelecimentos">
-                    <i class="material-icons-outlined">storefront</i><span>Estabelecimentos</span>
-                </div>
-                <div class="side-drawer-item" data-page="criarlojas.html" data-title="Crie sua Loja">
-                    <i class="material-icons-outlined">add_business</i><span>Crie sua loja</span>
-                </div>
-                <div class="side-drawer-item" data-page="login.html" data-title="Usuários">
-                    <i class="material-icons-outlined">people_alt</i><span>Usuários</span>
-                </div>
-                <div class="side-drawer-item" id="adminMenuItem" data-page="admin.html" data-title="Administração">
-                    <i class="material-icons-outlined">admin_panel_settings</i><span>Publique Avisos (ADM)</span>
-                </div>
-            </nav>
-        </aside>
-
         <div class="app-content">
-            <header class="top-app-bar">
-                <h1 class="page-title" id="pageTitle">Avisos</h1>
-            </header>
             <main class="main-content">
                 <iframe class="content-frame" id="contentFrame" src="aviso.html"></iframe>
             </main>
@@ -230,7 +150,7 @@
     </div>
     
     <nav class="bottom-nav">
-        <button class="nav-item" data-page="aviso.html" data-title="Avisos">
+        <button class="nav-item active" data-page="aviso.html" data-title="Avisos">
             <i class="material-icons-outlined">campaign</i>
             <span>Avisos</span>
         </button>
@@ -258,14 +178,12 @@
             const ui = {
                 loading: document.getElementById('loading'),
                 contentFrame: document.getElementById('contentFrame'),
-                pageTitle: document.getElementById('pageTitle'),
                 passwordModal: document.getElementById('passwordModal'),
                 adminPasswordInput: document.getElementById('adminPassword'),
                 submitPasswordBtn: document.getElementById('submitPassword'),
                 cancelPasswordBtn: document.getElementById('cancelPassword'),
                 passwordError: document.getElementById('passwordError'),
-                // Seleciona todos os itens clicáveis de ambos os menus
-                menuItems: document.querySelectorAll('.side-drawer-item, .nav-item')
+                menuItems: document.querySelectorAll('.nav-item') // Apenas o menu da base
             };
 
             const setActiveMenuItem = (pageUrl) => {
@@ -276,14 +194,13 @@
             
             const loadPage = (pageUrl, title) => {
                 ui.loading.style.display = 'flex';
-                // Atualiza o título apenas no header do desktop
-                if (window.innerWidth >= 1024) {
-                    ui.pageTitle.textContent = title;
-                }
                 document.title = `${title} | Condomínio Cotovias`;
                 
-                if (ui.contentFrame.src !== pageUrl) {
+                const currentSrc = ui.contentFrame.src.split('/').pop();
+                if (currentSrc !== pageUrl) {
                     ui.contentFrame.src = pageUrl;
+                } else {
+                     ui.loading.style.display = 'none';
                 }
 
                 ui.contentFrame.onload = () => {
@@ -306,8 +223,7 @@
 
             // --- EVENT LISTENERS ---
             ui.menuItems.forEach(item => {
-                const isAdmItem = item.id === 'adminMenuItem' || item.id === 'adminNavItem';
-                if (isAdmItem) {
+                if (item.id === 'adminNavItem') {
                     item.addEventListener('click', showPasswordModal);
                 } else {
                     item.addEventListener('click', () => {
@@ -333,8 +249,10 @@
             });
 
             // --- INICIALIZAÇÃO ---
-            const initialItem = document.querySelector('.nav-item'); // Carrega a primeira página definida no menu
-            loadPage(initialItem.dataset.page, initialItem.dataset.title);
+            const initialItem = document.querySelector('.nav-item');
+            if (initialItem) {
+                 loadPage(initialItem.dataset.page, initialItem.dataset.title);
+            }
         });
     </script>
 
