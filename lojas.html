@@ -15,52 +15,44 @@
             --md-sys-color-primary-container: #EADDFF;
             --md-sys-color-on-primary-container: #21005D;
             --md-sys-color-secondary: #625B71;
-            --md-sys-color-on-secondary-container: #1D192B;
-            --md-sys-color-background: #F4F5F7;
+            --md-sys-color-background: #F8F9FA;
             --md-sys-color-surface: #FFFFFF;
             --md-sys-color-on-surface: #1C1B1F;
             --md-sys-color-on-surface-variant: #49454F;
             --md-sys-color-outline: #CAC4D0;
             --md-sys-font-family: 'Inter', sans-serif;
             --md-sys-border-radius: 16px;
-            --md-sys-elevation-1: 0 1px 2px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.12);
-            --md-sys-elevation-2: 0 3px 6px rgba(0,0,0,0.10), 0 3px 6px rgba(0,0,0,0.15);
+            --md-sys-elevation-1: 0 2px 4px rgba(0,0,0,0.05);
+            --md-sys-elevation-2: 0 4px 12px rgba(0,0,0,0.1);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: var(--md-sys-font-family);
             background-color: var(--md-sys-color-background);
-            color: var(--md-sys-color-on-background);
+            color: var(--md-sys-color-on-surface);
             -webkit-font-smoothing: antialiased;
         }
-        body {
-  margin: 0;
-  padding: 0;
-  background: url("fundo.png") no-repeat center center;
-  background-size: contain; /* Ajusta sem cortar */
-  
-  height: 100vh;
-  width: 100vw;
-        }
-        /* --- NOVO LAYOUT DO HEADER --- */
+        
+        /* --- HEADER FIXO E PROFISSIONAL --- */
         .page-header {
             background-color: var(--md-sys-color-surface);
             padding: 16px;
             border-bottom: 1px solid #E0E0E0;
-            position: sticky; /* <-- A MÁGICA ACONTECE AQUI */
+            position: sticky;
             top: 0;
             z-index: 100;
             width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
         }
         .header-content {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         .header-content h1 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: var(--md-sys-color-primary);
-            text-align: center;
+            color: var(--md-sys-color-on-surface);
+            text-align: left;
             margin-bottom: 16px;
         }
         .controls-wrapper {
@@ -93,39 +85,37 @@
             transform: translateY(-50%);
             color: var(--md-sys-color-on-surface-variant);
         }
-.sort-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;   /* tamanho fixo */
-    height: 36px;
-    background: none;
-    border: 1px solid var(--md-sys-color-outline);
-    border-radius: 50%; /* botão circular */
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
+        .sort-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: none;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .sort-button:hover {
+            background-color: #f0f0f0;
+            border-color: var(--md-sys-color-primary);
+        }
+        .sort-button .material-icons-outlined {
+            font-size: 24px;
+            color: var(--md-sys-color-on-surface-variant);
+            transition: transform 0.3s ease;
+        }
 
-.sort-button:hover {
-    background-color: #f0f0f0;
-}
-
-.sort-button span {
-    display: none; /* esconde texto */
-}
-
-.sort-button i {
-    font-size: 20px; /* ícone em destaque */
-}
-
-        /* --- Conteúdo Principal --- */
+        /* --- CONTEÚDO PRINCIPAL --- */
         .page-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 24px;
+            padding: 32px 16px;
         }
         
-        /* --- Grid de Resultados --- */
+        /* --- GRID DE RESULTADOS --- */
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -141,34 +131,37 @@
             display: flex;
             flex-direction: column;
             transition: all 0.2s ease;
+            border: 1px solid #E0E0E0;
         }
         .store-card:hover, .product-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-5px);
             box-shadow: var(--md-sys-elevation-2);
         }
-        .store-card__banner, .product-card__banner {
+        .card-banner {
             height: 0;
-            padding-top: 60%;
+            padding-top: 56.25%; /* Proporção 16:9 */
             background-size: cover;
             background-position: center;
             background-color: #f0f0f0;
         }
-        .store-card__content, .product-card__content {
+        .card-content {
             padding: 20px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
         .store-card__title, .product-card__title {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 8px;
+            line-height: 1.3;
         }
         .store-card__description {
             font-size: 0.95rem;
             color: var(--md-sys-color-on-surface-variant);
             line-height: 1.5;
             flex-grow: 1;
+            margin-bottom: 16px;
         }
         .product-card__store-name {
             font-size: 0.85rem;
@@ -177,70 +170,78 @@
             margin-bottom: 4px;
         }
         .product-card__price {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: var(--md-sys-color-primary);
             font-weight: 700;
-            margin-top: auto;
-        }
-        .store-card__footer {
-            margin-top: 16px;
-            text-align: right;
+            margin-top: auto; /* Alinha o preço na base */
         }
         .store-card__button {
+            margin-top: auto; /* Alinha o botão na base */
             color: var(--md-sys-color-primary);
             font-weight: 700;
             text-decoration: none;
+            align-self: flex-end;
         }
 
+        /* --- SKELETON LOADER --- */
+        .skeleton-card {
+             background-color: var(--md-sys-color-surface);
+             border-radius: var(--md-sys-border-radius);
+             overflow: hidden;
+             border: 1px solid #E0E0E0;
+        }
+        .skeleton-banner {
+            padding-top: 56.25%;
+            background: #f0f0f0;
+        }
+        .skeleton-content { padding: 20px; }
+        .skeleton-line {
+            height: 16px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-shine 1.5s linear infinite;
+        }
+        .skeleton-line.title { height: 22px; width: 70%; margin-bottom: 12px; }
+        .skeleton-line.text { width: 100%; margin-bottom: 8px; }
+        .skeleton-line.text-short { width: 85%; }
+        @keyframes skeleton-shine {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* --- ESTADO VAZIO --- */
         .empty-state {
             text-align: center;
-            padding: 48px;
+            padding: 64px 24px;
             color: var(--md-sys-color-on-surface-variant);
             grid-column: 1 / -1;
         }
+        .empty-state .material-icons-outlined { font-size: 4rem; margin-bottom: 16px; }
 
+        /* --- RESPONSIVIDADE --- */
         @media (max-width: 768px) {
-            .results-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
-            }
-            .store-card__content, .product-card__content {
-                padding: 12px;
-            }
-            .store-card__title, .product-card__title {
-                font-size: 1rem;
-            }
-            .store-card__description, .product-card__store-name {
-                font-size: 0.85rem;
-            }
-             .product-card__price {
-                font-size: 1rem;
+            .page-container { padding: 24px 16px; }
+            .results-grid { gap: 16px; }
+        }
+        @media (max-width: 480px) {
+             .results-grid {
+                grid-template-columns: 1fr; /* Uma coluna em telas muito pequenas */
             }
         }
-@media (max-width: 480px) {
-    .controls-wrapper {
-        flex-direction: row; /* mantém lado a lado */
-        gap: 8px;
-    }
-    .sort-button {
-        width: 36px; /* mantém pequeno */
-        flex-shrink: 0;
-    }
-}
     </style>
 </head>
 <body>
     <header class="page-header">
         <div class="header-content">
-            <h1></h1>
+            <h1 id="pageTitle">Explorar Lojas</h1>
             <div class="controls-wrapper">
                 <div class="search-container">
                     <i class="material-icons-outlined">search</i>
                     <input type="search" id="searchInput" class="search-input" placeholder="Buscar por loja ou produto...">
                 </div>
-                 <button class="sort-button" id="sortButton">
-                    <i class="material-icons-outlined">sort_by_alpha</i>
-                    <span>Ordenar A-Z</span>
+                <button class="sort-button" id="sortButton" aria-label="Ordenar resultados">
+                    <i class="material-icons-outlined">arrow_downward</i>
                 </button>
             </div>
         </div>
@@ -250,6 +251,7 @@
         <div class="results-grid" id="resultsGrid">
             </div>
         <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="material-icons-outlined">search_off</i>
             <h2>Nenhum resultado encontrado</h2>
             <p>Tente ajustar sua busca ou explore todas as nossas lojas.</p>
         </div>
@@ -259,7 +261,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const firebaseConfig = {
                 apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
                 authDomain: "rifalidiane-fde3b.firebaseapp.com",
@@ -278,15 +280,34 @@
             const emptyState = document.getElementById('emptyState');
             
             let allStores = [];
-            let sortOrder = 'asc'; // 'asc' for A-Z, 'desc' for Z-A
+            let sortOrder = 'asc'; // 'asc' para A-Z
 
-            // Função debounce para otimizar a busca
             const debounce = (func, delay) => {
                 let timeout;
                 return (...args) => {
                     clearTimeout(timeout);
                     timeout = setTimeout(() => func.apply(this, args), delay);
                 };
+            };
+
+            const showSkeletons = (count = 6) => {
+                resultsGrid.innerHTML = '';
+                emptyState.style.display = 'none';
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < count; i++) {
+                    const card = document.createElement('div');
+                    card.className = 'skeleton-card';
+                    card.innerHTML = `
+                        <div class="skeleton-banner"></div>
+                        <div class="skeleton-content">
+                            <div class="skeleton-line title"></div>
+                            <div class="skeleton-line text"></div>
+                            <div class="skeleton-line text-short"></div>
+                        </div>
+                    `;
+                    fragment.appendChild(card);
+                }
+                resultsGrid.appendChild(fragment);
             };
 
             async function fetchStores() {
@@ -298,7 +319,7 @@
                         allStores = Object.entries(storesData).map(([id, store]) => ({
                             id,
                             ...store,
-                            products: store.products ? Object.entries(store.products).map(([pId, pData]) => ({ id: pId, ...pData })) : []
+                            products: store.products ? Object.values(store.products) : []
                         }));
                         sortAndFilter();
                     } else {
@@ -318,89 +339,88 @@
                 }
                 
                 showEmptyState(false);
+                const fragment = document.createDocumentFragment();
                 itemsToRender.forEach(item => {
                     const card = document.createElement('a');
-                    
+                    card.target = "_blank"; // Abrir em nova aba
+
                     if (item.type === 'store') {
                         card.href = `loja.html?userId=${item.id}`;
                         card.className = 'store-card';
                         card.innerHTML = `
-                            <div class="store-card__banner" style="background-image: url('${item.logo || 'https://placehold.co/600x300/EADDFF/21005D?text=Loja'}')"></div>
-                            <div class="store-card__content">
+                            <div class="card-banner" style="background-image: url('${item.logo || 'https://placehold.co/600x340/EADDFF/21005D?text=Loja'}')"></div>
+                            <div class="card-content">
                                 <h3 class="store-card__title">${item.name}</h3>
                                 <p class="store-card__description">${item.description || 'Visite nossa loja para ver os produtos.'}</p>
-                                <div class="store-card__footer">
-                                    <span class="store-card__button">Ver Loja →</span>
-                                </div>
+                                <span class="store-card__button">Ver Loja →</span>
                             </div>
                         `;
                     } else { // type === 'product'
-                        card.href = `loja.html?userId=${item.storeId}#product-${item.id}`;
+                        card.href = `loja.html?userId=${item.storeId}`;
                         card.className = 'product-card';
                         card.innerHTML = `
-                             <div class="product-card__banner" style="background-image: url('${item.image || 'https://placehold.co/600x300/EADDFF/21005D?text=Produto'}')"></div>
-                            <div class="product-card__content">
+                            <div class="card-banner" style="background-image: url('${item.image || 'https://placehold.co/600x340/EADDFF/21005D?text=Produto'}')"></div>
+                            <div class="card-content">
                                 <span class="product-card__store-name">${item.storeName}</span>
                                 <h3 class="product-card__title">${item.name}</h3>
                                 <p class="product-card__price">R$ ${(item.price || 0).toFixed(2).replace('.',',')}</p>
                             </div>
                         `;
                     }
-                    resultsGrid.appendChild(card);
+                    fragment.appendChild(card);
                 });
+                resultsGrid.appendChild(fragment);
             }
 
             function sortAndFilter() {
-                allStores.sort((a, b) => {
-                    if (sortOrder === 'asc') {
-                        return a.name.localeCompare(b.name);
-                    } else {
-                        return b.name.localeCompare(a.name);
-                    }
-                });
+                const sortByName = (a, b) => {
+                    const nameA = a.name || '';
+                    const nameB = b.name || '';
+                    if (sortOrder === 'asc') return nameA.localeCompare(nameB);
+                    return nameB.localeCompare(nameA);
+                };
 
                 const query = searchInput.value.toLowerCase().trim();
                 if (!query) {
-                    renderResults(allStores.map(s => ({ type: 'store', ...s })));
+                    const sortedStores = [...allStores].sort(sortByName);
+                    renderResults(sortedStores.map(s => ({ type: 'store', ...s })));
                     return;
                 }
 
-                const foundItems = [];
+                const foundItems = new Map();
                 allStores.forEach(store => {
-                    const storeNameMatch = store.name.toLowerCase().includes(query);
-                    if (storeNameMatch) {
-                        foundItems.push({ type: 'store', ...store });
+                    if (store.name && store.name.toLowerCase().includes(query)) {
+                        foundItems.set(`store-${store.id}`, { type: 'store', ...store });
                     }
-
-                    store.products.forEach(product => {
-                        if (product.name.toLowerCase().includes(query)) {
-                            // Evita duplicar se a loja já foi adicionada
-                            if (!foundItems.some(item => item.type === 'store' && item.id === store.id)) {
-                                const existingProduct = foundItems.find(item => item.type === 'product' && item.id === product.id && item.storeId === store.id);
-                                if (!existingProduct) {
-                                     foundItems.push({
-                                        type: 'product',
-                                        ...product,
-                                        storeId: store.id,
-                                        storeName: store.name
-                                    });
-                                }
+                    if (store.products) {
+                        store.products.forEach(product => {
+                             if (product.name && product.name.toLowerCase().includes(query)) {
+                                foundItems.set(`product-${store.id}-${product.id}`, {
+                                    type: 'product',
+                                    ...product,
+                                    storeId: store.id,
+                                    storeName: store.name
+                                });
                             }
-                        }
-                    });
+                        });
+                    }
                 });
-                renderResults(foundItems);
+                
+                const sortedItems = Array.from(foundItems.values()).sort(sortByName);
+                renderResults(sortedItems);
             }
 
             function toggleSortOrder() {
                 sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-                const text = sortButton.querySelector('span');
-                text.textContent = sortOrder === 'asc' ? 'Ordenar A-Z' : 'Ordenar Z-A';
+                const icon = sortButton.querySelector('i');
+                icon.textContent = sortOrder === 'asc' ? 'arrow_downward' : 'arrow_upward';
+                icon.style.transform = sortOrder === 'asc' ? 'rotate(0deg)' : 'rotate(180deg)';
                 sortAndFilter();
             }
 
-            function showEmptyState(show, message = 'Nenhum resultado encontrado') {
-                 if (show) {
+            function showEmptyState(show, message = 'Nenhum resultado para sua busca') {
+                if (show) {
+                    resultsGrid.innerHTML = '';
                     emptyState.style.display = 'block';
                     emptyState.querySelector('h2').textContent = message;
                 } else {
@@ -411,6 +431,7 @@
             searchInput.addEventListener('input', debounce(sortAndFilter, 300));
             sortButton.addEventListener('click', toggleSortOrder);
 
+            showSkeletons();
             fetchStores();
         });
     </script>
