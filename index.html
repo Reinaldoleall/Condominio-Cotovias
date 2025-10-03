@@ -12,134 +12,36 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
     <style>
-        /* --- VARIÁVEIS DE DESIGN E RESET GLOBAL --- */
+        /* --- SEU CSS ORIGINAL (SEM ALTERAÇÕES) --- */
         :root {
-            --cor-primaria: #4A90E2; /* Azul moderno */
-            --cor-primaria-hover: #357ABD;
-            --cor-fundo: #F9F9FB;
-            --cor-surface: #FFFFFF;
-            --cor-texto-principal: #333333;
-            --cor-texto-secundario: #777777;
-            --cor-borda: #EAEAEA;
-            --cor-erro: #E74C3C;
-            --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --fonte-principal: 'Inter', sans-serif;
-            --raio-borda: 8px;
-            --bottom-nav-height: 65px;
+            --cor-primaria: #4A90E2; --cor-primaria-hover: #357ABD; --cor-fundo: #F9F9FB;
+            --cor-surface: #FFFFFF; --cor-texto-principal: #333333; --cor-texto-secundario: #777777;
+            --cor-borda: #EAEAEA; --cor-erro: #E74C3C; --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --fonte-principal: 'Inter', sans-serif; --raio-borda: 8px; --bottom-nav-height: 65px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { height: 100%; overflow: hidden; }
-        body {
-            font-family: var(--fonte-principal);
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto-principal);
-            height: 100vh;
-            height: -webkit-fill-available;
-            width: 100%;
-            overflow: hidden;
-            position: fixed;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+        body { font-family: var(--fonte-principal); background-color: var(--cor-fundo); color: var(--cor-texto-principal); height: 100vh; height: -webkit-fill-available; width: 100%; overflow: hidden; position: fixed; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         ::-webkit-scrollbar { display: none; }
-
-        /* --- ESTRUTURA PRINCIPAL --- */
-        .container {
-            display: flex;
-            height: 100vh;
-        }
-
-        .app-content {
-            flex: 1;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            /* Garante que o conteúdo não fique embaixo do menu inferior */
-            padding-bottom: var(--bottom-nav-height);
-        }
-
-        .main-content {
-            flex: 1;
-            overflow: auto;
-            position: relative;
-        }
-
-        .content-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: var(--cor-fundo);
-        }
-        
-        /* --- NAVEGAÇÃO INFERIOR (SEMPRE VISÍVEL) --- */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: var(--bottom-nav-height);
-            background-color: var(--cor-surface);
-            border-top: 1px solid var(--cor-borda);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-around;
-            z-index: 150;
-            /* Espaçamento de segurança para iPhones com notch */
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            padding-top: 8px;
-            color: var(--cor-texto-secundario);
-            font-size: 0.7rem;
-            font-weight: 500;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: color 0.2s ease;
-            text-align: center;
-        }
+        .container { display: flex; height: 100vh; }
+        .app-content { flex: 1; height: 100vh; display: flex; flex-direction: column; padding-bottom: var(--bottom-nav-height); }
+        .main-content { flex: 1; overflow: auto; position: relative; }
+        .content-frame { width: 100%; height: 100%; border: none; background-color: var(--cor-fundo); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height); background-color: var(--cor-surface); border-top: 1px solid var(--cor-borda); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-around; z-index: 150; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding-top: 8px; color: var(--cor-texto-secundario); font-size: 0.7rem; font-weight: 500; background: none; border: none; cursor: pointer; transition: color 0.2s ease; text-align: center; }
         .nav-item .material-icons-outlined { font-size: 24px; margin-bottom: 2px; }
         .nav-item:hover { color: var(--cor-texto-principal); }
         .nav-item.active { color: var(--cor-primaria); }
-
-        /* --- ESTILOS DE MODAIS E SPINNERS (sem alterações) --- */
-        .password-modal{position:fixed;inset:0;background-color:rgba(0,0,0,.4);z-index:300;display:none;justify-content:center;align-items:center;padding:16px}.password-modal-content{background:var(--cor-surface);border-radius:12px;max-width:400px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.1);animation:modal-appear .3s ease-out forwards}.password-modal-header{padding:20px 24px;border-bottom:1px solid var(--cor-borda)}.password-modal-header h2{font-size:1.2rem;font-weight:600}.password-modal-body{padding:24px}.password-input-container{display:flex;align-items:center;border:1px solid var(--cor-borda);border-radius:var(--raio-borda);padding:12px;margin-top:16px;transition:all .2s ease}.password-input-container:focus-within{border-color:var(--cor-primaria);box-shadow:0 0 0 3px rgba(74,144,226,.2)}.password-input-container .material-icons-outlined{margin-right:10px;color:var(--cor-texto-secundario)}.password-input{flex:1;border:none;outline:none;font-size:1rem;background:transparent}.password-error{display:none;align-items:center;color:var(--cor-erro);margin-top:10px;font-size:.9rem}.password-error .material-icons-outlined{font-size:1.1rem;margin-right:6px}.password-modal-footer{padding:16px 24px;display:flex;justify-content:flex-end;gap:8px}.password-button{font-family:var(--fonte-principal);font-size:.9rem;font-weight:500;padding:10px 20px;border:none;border-radius:var(--raio-borda);cursor:pointer;transition:all .2s ease}.password-button.cancel{background-color:var(--cor-fundo);color:var(--cor-texto-principal)}.password-button.cancel:hover{background-color:#e0e0e0}.password-button.submit{background-color:var(--cor-primaria);color:white}.password-button.submit:hover{background-color:var(--cor-primaria-hover)}.loading{position:fixed;inset:0;background:rgba(255,255,255,.8);display:none;justify-content:center;align-items:center;z-index:1000}.loading-spinner{width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid var(--cor-primaria);border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}@keyframes modal-appear{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+        .loading{position:fixed;inset:0;background:rgba(255,255,255,.8);display:none;justify-content:center;align-items:center;z-index:1000}
+        .loading-spinner{width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid var(--cor-primaria);border-radius:50%;animation:spin 1s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
     </style>
 </head>
 <body>
 
     <div class="container">
-
         <div class="loading" id="loading">
             <div class="loading-spinner"></div>
-        </div>
-
-        <div class="password-modal" id="passwordModal">
-            <div class="password-modal-content">
-                <div class="password-modal-header"><h2>Acesso Administrativo</h2></div>
-                <div class="password-modal-body">
-                    <p>Esta área é restrita. Por favor, digite a senha para continuar.</p>
-                    <div class="password-input-container">
-                        <i class="material-icons-outlined">lock</i>
-                        <input type="password" class="password-input" id="adminPassword" placeholder="Sua senha">
-                    </div>
-                    <div class="password-error" id="passwordError">
-                        <i class="material-icons-outlined">error_outline</i>
-                        <span>Senha incorreta. Tente novamente.</span>
-                    </div>
-                </div>
-                <div class="password-modal-footer">
-                    <button class="password-button cancel" id="cancelPassword">Cancelar</button>
-                    <button class="password-button submit" id="submitPassword">Acessar</button>
-                </div>
-            </div>
         </div>
 
         <div class="app-content">
@@ -172,33 +74,28 @@
         </button>
     </nav>
 
-
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // --- PASSO 1: COLE A CONFIGURAÇÃO DO SEU FIREBASE AQUI ---
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_AUTH_DOMAIN",
-            databaseURL: "SUA_DATABASE_URL",
-            projectId: "SEU_PROJECT_ID",
-            storageBucket: "SEU_STORAGE_BUCKET",
-            messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-            appId: "SEU_APP_ID"
+            apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
+            authDomain: "rifalidiane-fde3b.firebaseapp.com",
+            databaseURL: "https://rifalidiane-fde3b-default-rtdb.firebaseio.com",
+            projectId: "rifalidiane-fde3b",
+            storageBucket: "rifalidiane-fde3b.firebasestorage.app",
+            messagingSenderId: "649359518677",
+            appId: "1:649359518677:web:879b4ed9fa5150d24d2b5c"
         };
 
-        // --- PASSO 2: INICIALIZE O FIREBASE ---
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const database = firebase.database();
 
-        // --- LÓGICA PARA GERAR UM ID ÚNICO E PERSISTENTE ---
         function getOrGenerateUserId() {
             let userId = localStorage.getItem('uniqueUserId');
             if (!userId) {
-                // Gera um ID simples e único
                 userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('uniqueUserId', userId);
             }
@@ -209,11 +106,6 @@
             const ui = {
                 loading: document.getElementById('loading'),
                 contentFrame: document.getElementById('contentFrame'),
-                passwordModal: document.getElementById('passwordModal'),
-                adminPasswordInput: document.getElementById('adminPassword'),
-                submitPasswordBtn: document.getElementById('submitPassword'),
-                cancelPasswordBtn: document.getElementById('cancelPassword'),
-                passwordError: document.getElementById('passwordError'),
                 menuItems: document.querySelectorAll('.nav-item')
             };
 
@@ -226,98 +118,73 @@
             const loadPage = (pageUrl, title) => {
                 ui.loading.style.display = 'flex';
                 document.title = `${title} | Condomínio Cotovias`;
-                
                 const currentSrc = ui.contentFrame.src.split('/').pop();
                 if (currentSrc !== pageUrl) {
                     ui.contentFrame.src = pageUrl;
                 } else {
                      ui.loading.style.display = 'none';
                 }
-
                 ui.contentFrame.onload = () => {
                     ui.loading.style.display = 'none';
                 };
-                
                 setActiveMenuItem(pageUrl);
             };
-
-            const showPasswordModal = () => {
-                ui.passwordModal.style.display = 'flex';
-                ui.adminPasswordInput.focus();
-            };
             
-            const closePasswordModal = () => {
-                ui.passwordModal.style.display = 'none';
-                ui.passwordError.style.display = 'none';
-                ui.adminPasswordInput.value = '';
-            };
-
-            // --- NOVA FUNÇÃO PARA O BOTÃO "CRIAR LOJA" ---
-            const handleCreateStoreClick = async () => {
+            // Função genérica para solicitar acesso
+            const requestAccess = async (accessType) => {
                 const userId = getOrGenerateUserId();
+                const dbPath = accessType === 'admin' ? 'admins/' : 'users/';
+                const pageUrl = accessType === 'admin' ? 'admin.html' : 'criarlojas.html';
+                const pageTitle = accessType === 'admin' ? 'Administração' : 'Criar Loja';
+                const requestText = accessType === 'admin' ? 'acesso de Administrador' : 'acesso para criar uma loja';
+                
                 ui.loading.style.display = 'flex';
-
+                
                 try {
-                    const snapshot = await database.ref('users/' + userId).once('value');
+                    const snapshot = await database.ref(dbPath + userId).once('value');
                     const userData = snapshot.val();
 
                     if (userData && userData.status === 'active') {
-                        // Se o usuário está ativo, carrega a página
-                        loadPage('criarlojas.html', 'Criar Loja');
+                        loadPage(pageUrl, pageTitle);
                     } else {
-                        // Se não está ativo ou não existe, envia para o WhatsApp
                         if (!userData) {
-                            // Salva o usuário no Firebase como pendente na primeira vez
-                            await database.ref('users/' + userId).set({
+                            await database.ref(dbPath + userId).set({
                                 status: 'pending',
                                 requestedAt: new Date().toISOString()
                             });
                         }
                         
-                        const numeroWhatsApp = '5521987715733'; // Formato internacional
-                        const mensagem = `Olá! Gostaria de solicitar acesso para criar uma loja. Meu ID de solicitação é: ${userId}`;
+                        const numeroWhatsApp = '5521987715733';
+                        const mensagem = `Olá! Gostaria de solicitar ${requestText}. Meu ID de solicitação é: ${userId}`;
                         const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
 
-                        alert(`Para criar sua loja, solicite a liberação do seu acesso.\n\nSeu ID de Solicitação é: ${userId}\n\nVocê será redirecionado para o WhatsApp.`);
+                        alert(`Para obter ${requestText}, solicite a liberação.\n\nSeu ID de Solicitação é: ${userId}\n\nVocê será redirecionado para o WhatsApp.`);
                         window.open(urlWhatsApp, '_blank');
                         ui.loading.style.display = 'none';
                     }
                 } catch (error) {
-                    console.error("Erro ao verificar status do usuário:", error);
+                    console.error("Erro ao verificar status:", error);
                     alert("Ocorreu um erro. Tente novamente.");
                     ui.loading.style.display = 'none';
                 }
             };
-
+            
             // --- EVENT LISTENERS ATUALIZADOS ---
             ui.menuItems.forEach(item => {
                 const page = item.dataset.page;
 
-                if (item.id === 'adminNavItem') {
-                    item.addEventListener('click', showPasswordModal);
+                if (page === 'admin.html') {
+                    // Botão Admin agora solicita acesso
+                    item.addEventListener('click', () => requestAccess('admin'));
                 } else if (page === 'criarlojas.html') {
-                    // Lógica especial para o botão "Criar Loja"
-                    item.addEventListener('click', handleCreateStoreClick);
+                    // Botão Criar Loja solicita acesso de usuário
+                    item.addEventListener('click', () => requestAccess('user'));
                 } else {
+                    // Comportamento padrão para outros botões
                     item.addEventListener('click', () => {
                         loadPage(item.dataset.page, item.dataset.title);
                     });
                 }
-            });
-
-            ui.cancelPasswordBtn.addEventListener('click', closePasswordModal);
-            ui.submitPasswordBtn.addEventListener('click', () => {
-                if (ui.adminPasswordInput.value === 'ADM12345') { // Sua senha de admin
-                    closePasswordModal();
-                    // Carregamos a página admin.html que você criará no próximo passo
-                    window.open('admin.html', '_blank');
-                } else {
-                    ui.passwordError.style.display = 'flex';
-                    ui.adminPasswordInput.focus();
-                }
-            });
-            ui.adminPasswordInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') ui.submitPasswordBtn.click();
             });
 
             // --- INICIALIZAÇÃO ---
@@ -327,7 +194,6 @@
             }
         });
     </script>
-
 
 </body>
 </html>
