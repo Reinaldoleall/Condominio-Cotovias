@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Administração</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 40px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #1c1e21; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        .section { margin-top: 30px; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        input[type="text"] { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: background-color 0.2s; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        .message { margin-top: 15px; font-weight: bold; }
+        .message.success { color: green; }
+        .message.error { color: red; }
+        .pending-list { list-style: none; padding: 0; margin-top: 15px; max-height: 200px; overflow-y: auto; border-top: 1px solid #eee; }
+        .pending-list li { background: #f9f9f9; padding: 12px; border-bottom: 1px solid #eee; font-family: 'Courier New', Courier, monospace; cursor: pointer; transition: background-color 0.2s; }
+        .pending-list li:hover { background-color: #e9ecef; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Painel de Administração Geral</h1>
+
+        <div class="section">
+            <h2>Ativar Lojistas (Criar Loja)</h2>
+            <p>Ative usuários que solicitaram acesso para criar lojas.</p>
+            <input type="text" id="userInput" placeholder="Cole o ID do Lojista aqui">
+            <button id="activateUserBtn">Ativar Lojista</button>
+            <div id="userMessage" class="message"></div>
+            <h3>Solicitações Pendentes de Lojistas</h3>
+            <ul id="pendingUsersList" class="pending-list"><li>Carregando...</li></ul>
+        </div>
+
+        <div class="section">
+            <h2>Ativar Administradores (Acesso ao Painel)</h2>
+            <p>Ative usuários que solicitaram acesso a este painel de administração.</p>
+            <input type="text" id="adminInput" placeholder="Cole o ID do Admin aqui">
+            <button id="activateAdminBtn">Ativar Admin</button>
+            <div id="adminMessage" class="message"></div>
+            <h3>Solicitações Pendentes de Admins</h3>
+            <ul id="pendingAdminsList" class="pending-list"><li>Carregando...</li></ul>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
+            authDomain: "rifalidiane-fde3b.firebaseapp.com",
+            databaseURL: "https://rifalidiane-fde3b-default-rtdb.firebaseio.com",
+            projectId: "rifalidiane-fde3b",
+            storageBucket: "rifalidiane-fde3b.firebasestorage.app",
+            messagingSenderId: "649359518677",
+            appId: "1:649359518677:web:879b4ed9fa5150d24d2b5c"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Função genérica para carregar pendências
+            const loadPending = (accessType, listElement, inputElement) => {
+                const dbPath = accessType === 'admin' ? 'admins' : 'users';
+                const ref = database.ref(dbPath).orderByChild('status').equalTo('pending');
+                
+                ref.on('value', (snapshot) => {
+                    listElement.innerHTML = '';
+                    if (!snapshot.exists()) {
+                        listElement.innerHTML = '<li>Nenhuma solicitação pendente.</li>';
+                        return;
+                    }
+                    snapshot.forEach((child) => {
+                        const id = child.key;
+                        const li = document.createElement('li');
+                        li.textContent = id;
+                        li.onclick = () => { inputElement.value = id; };
+                        listElement.appendChild(li);
+                    });
+                });
+            };
+
+            // Função genérica para ativar
+            const activate = async (accessType, inputElement, messageElement) => {
+                const id = inputElement.value.trim();
+                if (!id) {
+                    messageElement.textContent = 'Por favor, insira um ID.';
+                    messageElement.className = 'message error';
+                    return;
+                }
+                const dbPath = accessType === 'admin' ? 'admins/' : 'users';
+                try {
+                    await database.ref(dbPath + '/' + id).update({ status: 'active' });
+                    messageElement.textContent = `ID ${id} ativado com sucesso!`;
+                    messageElement.className = 'message success';
+                    inputElement.value = '';
+                } catch (error) {
+                    messageElement.textContent = 'Erro ao ativar o ID.';
+                    messageElement.className = 'message error';
+                }
+            };
+            
+            // Lógica para Lojistas
+            const userInput = document.getElementById('userInput');
+            const userMsg = document.getElementById('userMessage');
+            const pendingUsersList = document.getElementById('pendingUsersList');
+            document.getElementById('activateUserBtn').addEventListener('click', () => activate('user', userInput, userMsg));
+            loadPending('user', pendingUsersList, userInput);
+
+            // Lógica para Admins
+            const adminInput = document.getElementById('adminInput');
+            const adminMsg = document.getElementById('adminMessage');
+            const pendingAdminsList = document.getElementById('pendingAdminsList');
+            document.getElementById('activateAdminBtn').addEventListener('click', () => activate('admin', adminInput, adminMsg));
+            loadPending('admin', pendingAdminsList, adminInput);
+        });
+    </script>
+
+</body>
+</html>
