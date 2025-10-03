@@ -173,7 +173,38 @@
     </nav>
 
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <script>
+        // --- PASSO 1: COLE A CONFIGURAÇÃO DO SEU FIREBASE AQUI ---
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_AUTH_DOMAIN",
+            databaseURL: "SUA_DATABASE_URL",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_STORAGE_BUCKET",
+            messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        // --- PASSO 2: INICIALIZE O FIREBASE ---
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
+        // --- LÓGICA PARA GERAR UM ID ÚNICO E PERSISTENTE ---
+        function getOrGenerateUserId() {
+            let userId = localStorage.getItem('uniqueUserId');
+            if (!userId) {
+                // Gera um ID simples e único
+                userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('uniqueUserId', userId);
+            }
+            return userId;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const ui = {
                 loading: document.getElementById('loading'),
@@ -183,7 +214,7 @@
                 submitPasswordBtn: document.getElementById('submitPassword'),
                 cancelPasswordBtn: document.getElementById('cancelPassword'),
                 passwordError: document.getElementById('passwordError'),
-                menuItems: document.querySelectorAll('.nav-item') // Apenas o menu da base
+                menuItems: document.querySelectorAll('.nav-item')
             };
 
             const setActiveMenuItem = (pageUrl) => {
@@ -221,24 +252,65 @@
                 ui.adminPasswordInput.value = '';
             };
 
-            // --- EVENT LISTENERS ---
+            // --- NOVA FUNÇÃO PARA O BOTÃO "CRIAR LOJA" ---
+            const handleCreateStoreClick = async () => {
+                const userId = getOrGenerateUserId();
+                ui.loading.style.display = 'flex';
+
+                try {
+                    const snapshot = await database.ref('users/' + userId).once('value');
+                    const userData = snapshot.val();
+
+                    if (userData && userData.status === 'active') {
+                        // Se o usuário está ativo, carrega a página
+                        loadPage('criarlojas.html', 'Criar Loja');
+                    } else {
+                        // Se não está ativo ou não existe, envia para o WhatsApp
+                        if (!userData) {
+                            // Salva o usuário no Firebase como pendente na primeira vez
+                            await database.ref('users/' + userId).set({
+                                status: 'pending',
+                                requestedAt: new Date().toISOString()
+                            });
+                        }
+                        
+                        const numeroWhatsApp = '5521987715733'; // Formato internacional
+                        const mensagem = `Olá! Gostaria de solicitar acesso para criar uma loja. Meu ID de solicitação é: ${userId}`;
+                        const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
+
+                        alert(`Para criar sua loja, solicite a liberação do seu acesso.\n\nSeu ID de Solicitação é: ${userId}\n\nVocê será redirecionado para o WhatsApp.`);
+                        window.open(urlWhatsApp, '_blank');
+                        ui.loading.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error("Erro ao verificar status do usuário:", error);
+                    alert("Ocorreu um erro. Tente novamente.");
+                    ui.loading.style.display = 'none';
+                }
+            };
+
+            // --- EVENT LISTENERS ATUALIZADOS ---
             ui.menuItems.forEach(item => {
+                const page = item.dataset.page;
+
                 if (item.id === 'adminNavItem') {
                     item.addEventListener('click', showPasswordModal);
+                } else if (page === 'criarlojas.html') {
+                    // Lógica especial para o botão "Criar Loja"
+                    item.addEventListener('click', handleCreateStoreClick);
                 } else {
                     item.addEventListener('click', () => {
-                        const pageUrl = item.dataset.page;
-                        const title = item.dataset.title;
-                        loadPage(pageUrl, title);
+                        loadPage(item.dataset.page, item.dataset.title);
                     });
                 }
             });
 
             ui.cancelPasswordBtn.addEventListener('click', closePasswordModal);
             ui.submitPasswordBtn.addEventListener('click', () => {
-                if (ui.adminPasswordInput.value === 'ADM12345') {
+                if (ui.adminPasswordInput.value === 'ADM12345') { // Sua senha de admin
                     closePasswordModal();
-                    loadPage('admin.html', 'Administração');
+                    // Carregamos a página admin.html que você criará no próximo passo
+                    window.open('admin.html', '_blank');
                 } else {
                     ui.passwordError.style.display = 'flex';
                     ui.adminPasswordInput.focus();
@@ -255,6 +327,7 @@
             }
         });
     </script>
+
 
 </body>
 </html>
