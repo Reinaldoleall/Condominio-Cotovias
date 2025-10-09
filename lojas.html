@@ -249,7 +249,8 @@
 
     <main class="page-container">
         <div class="results-grid" id="resultsGrid">
-            </div>
+            <!-- A loja fixa será adicionada aqui via JavaScript -->
+        </div>
         <div class="empty-state" id="emptyState" style="display: none;">
             <i class="material-icons-outlined">search_off</i>
             <h2>Nenhum resultado encontrado</h2>
@@ -281,6 +282,16 @@
             
             let allStores = [];
             let sortOrder = 'asc'; // 'asc' para A-Z
+
+            // Loja fixa - Magazine Luiza
+            const fixedStore = {
+                id: 'magazine-luiza',
+                name: 'Magazine Luiza',
+                description: 'Tudo que você precisa em um só lugar! Eletrônicos, móveis, eletrodomésticos e muito mais.',
+                logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_FSBujTblqbK8XqF25lLhiwbVnse-eEm3V_YiSxE3hQ&s=10',
+                type: 'store',
+                isFixed: true
+            };
 
             const debounce = (func, delay) => {
                 let timeout;
@@ -340,6 +351,23 @@
                 
                 showEmptyState(false);
                 const fragment = document.createDocumentFragment();
+                
+                // Adiciona a loja fixa primeiro
+                const fixedStoreCard = document.createElement('a');
+                fixedStoreCard.href = 'https://www.magazinevoce.com.br/magazinereinaldoleal/';
+                fixedStoreCard.target = "_blank";
+                fixedStoreCard.className = 'store-card';
+                fixedStoreCard.innerHTML = `
+                    <div class="card-banner" style="background-image: url('${fixedStore.logo}')"></div>
+                    <div class="card-content">
+                        <h3 class="store-card__title">${fixedStore.name}</h3>
+                        <p class="store-card__description">${fixedStore.description}</p>
+                        <span class="store-card__button">Visitar Loja →</span>
+                    </div>
+                `;
+                fragment.appendChild(fixedStoreCard);
+                
+                // Adiciona as outras lojas
                 itemsToRender.forEach(item => {
                     const card = document.createElement('a');
                     card.target = "_blank"; // Abrir em nova aba
