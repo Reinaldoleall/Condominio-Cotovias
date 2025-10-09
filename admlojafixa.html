@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Painel de Administração - Lojas Fixas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --md-sys-color-primary: #6750A4;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-on-primary-container: #21005D;
+            --md-sys-color-secondary: #625B71;
+            --md-sys-color-background: #F8F9FA;
+            --md-sys-color-surface: #FFFFFF;
+            --md-sys-color-on-surface: #1C1B1F;
+            --md-sys-color-on-surface-variant: #49454F;
+            --md-sys-color-outline: #CAC4D0;
+            --md-sys-color-error: #B3261E;
+            --md-sys-color-on-error: #FFFFFF;
+            --md-sys-color-success: #0D652D;
+            --md-sys-font-family: 'Inter', sans-serif;
+            --md-sys-border-radius: 16px;
+            --md-sys-elevation-1: 0 2px 4px rgba(0,0,0,0.05);
+            --md-sys-elevation-2: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--md-sys-font-family);
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-surface);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* --- HEADER --- */
+        .page-header {
+            background-color: var(--md-sys-color-surface);
+            padding: 16px;
+            border-bottom: 1px solid #E0E0E0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--md-sys-color-on-surface);
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border: none;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .nav-button:hover {
+            background-color: #5a4a93;
+            box-shadow: 0 2px 8px rgba(103, 80, 164, 0.3);
+        }
+        .nav-button.secondary {
+            background-color: transparent;
+            color: var(--md-sys-color-primary);
+            border: 1px solid var(--md-sys-color-primary);
+        }
+        .nav-button.secondary:hover {
+            background-color: rgba(103, 80, 164, 0.05);
+        }
+        
+        /* --- CONTEÚDO PRINCIPAL --- */
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 16px;
+        }
+        
+        /* --- FORMULÁRIO DE CADASTRO --- */
+        .form-section {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--md-sys-border-radius);
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: var(--md-sys-elevation-1);
+        }
+        .form-section h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--md-sys-color-on-surface);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+        .form-input, .form-textarea {
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 8px;
+            background-color: var(--md-sys-color-background);
+            transition: all 0.2s ease;
+            font-family: var(--md-sys-font-family);
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 3px var(--md-sys-color-primary-container);
+        }
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .form-button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .form-button.primary {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+        }
+        .form-button.primary:hover {
+            background-color: #5a4a93;
+        }
+        .form-button.secondary {
+            background-color: transparent;
+            color: var(--md-sys-color-primary);
+            border: 1px solid var(--md-sys-color-primary);
+        }
+        .form-button.secondary:hover {
+            background-color: rgba(103, 80, 164, 0.05);
+        }
+        
+        /* --- LISTA DE LOJAS --- */
+        .stores-section {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--md-sys-border-radius);
+            padding: 24px;
+            box-shadow: var(--md-sys-elevation-1);
+        }
+        .stores-section h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--md-sys-color-on-surface);
+        }
+        .stores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .store-card {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--md-sys-border-radius);
+            box-shadow: var(--md-sys-elevation-1);
+            overflow: hidden;
+            border: 1px solid #E0E0E0;
+            transition: all 0.2s ease;
+        }
+        .store-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--md-sys-elevation-2);
+        }
+        .card-banner {
+            height: 0;
+            padding-top: 56.25%; /* Proporção 16:9 */
+            background-size: cover;
+            background-position: center;
+            background-color: #f0f0f0;
+        }
+        .card-content {
+            padding: 20px;
+        }
+        .store-card__title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .store-card__description {
+            font-size: 0.95rem;
+            color: var(--md-sys-color-on-surface-variant);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .store-card__url {
+            font-size: 0.85rem;
+            color: var(--md-sys-color-secondary);
+            margin-bottom: 16px;
+            word-break: break-all;
+        }
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        .card-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: none;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .card-button:hover {
+            background-color: #f0f0f0;
+        }
+        .card-button.edit:hover {
+            border-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-primary);
+        }
+        .card-button.delete:hover {
+            border-color: var(--md-sys-color-error);
+            color: var(--md-sys-color-error);
+        }
+        
+        /* --- MENSAGENS --- */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .message.success {
+            background-color: rgba(13, 101, 45, 0.1);
+            color: var(--md-sys-color-success);
+            border: 1px solid rgba(13, 101, 45, 0.2);
+        }
+        .message.error {
+            background-color: rgba(179, 38, 30, 0.1);
+            color: var(--md-sys-color-error);
+            border: 1px solid rgba(179, 38, 30, 0.2);
+        }
+        
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 768px) {
+            .page-container { padding: 24px 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .header-content { flex-direction: column; gap: 16px; }
+            .nav-buttons { width: 100%; justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .stores-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Painel de Administração - Lojas Fixas</h1>
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-button secondary">
+                    <i class="material-icons-outlined" style="margin-right: 8px;">arrow_back</i>
+                    Voltar ao Portal
+                </a>
+                <button class="nav-button" id="addStoreButton">
+                    <i class="material-icons-outlined" style="margin-right: 8px;">add</i>
+                    Nova Loja
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <div id="messageContainer"></div>
+        
+        <section class="form-section" id="storeForm" style="display: none;">
+            <h2 id="formTitle">Cadastrar Nova Loja</h2>
+            <form id="storeFormElement">
+                <input type="hidden" id="storeId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="storeName" class="form-label">Nome da Loja</label>
+                        <input type="text" id="storeName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="storeLogo" class="form-label">URL do Logo</label>
+                        <input type="url" id="storeLogo" class="form-input" placeholder="https://exemplo.com/logo.jpg">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="storeDescription" class="form-label">Descrição</label>
+                        <textarea id="storeDescription" class="form-textarea" required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="storeUrl" class="form-label">URL da Loja</label>
+                        <input type="url" id="storeUrl" class="form-input" required placeholder="https://exemplo.com">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="form-button secondary" id="cancelButton">Cancelar</button>
+                    <button type="submit" class="form-button primary" id="saveButton">Salvar Loja</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="stores-section">
+            <h2>Lojas Fixas Cadastradas</h2>
+            <div class="stores-grid" id="storesGrid">
+                <!-- As lojas fixas serão carregadas aqui -->
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firebaseConfig = {
+                apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
+                authDomain: "rifalidiane-fde3b.firebaseapp.com",
+                databaseURL: "https://rifalidiane-fde3b-default-rtdb.firebaseio.com",
+                projectId: "rifalidiane-fde3b",
+                storageBucket: "rifalidiane-fde3b.appspot.com",
+                messagingSenderId: "649359518677",
+                appId: "1:649359518677:web:879b4ed9fa5150d24d2b5c"
+            };
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+
+            // Elementos do DOM
+            const storeForm = document.getElementById('storeForm');
+            const formTitle = document.getElementById('formTitle');
+            const storeFormElement = document.getElementById('storeFormElement');
+            const storeIdInput = document.getElementById('storeId');
+            const storeNameInput = document.getElementById('storeName');
+            const storeLogoInput = document.getElementById('storeLogo');
+            const storeDescriptionInput = document.getElementById('storeDescription');
+            const storeUrlInput = document.getElementById('storeUrl');
+            const addStoreButton = document.getElementById('addStoreButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const saveButton = document.getElementById('saveButton');
+            const storesGrid = document.getElementById('storesGrid');
+            const messageContainer = document.getElementById('messageContainer');
+
+            // Estado da aplicação
+            let fixedStores = [];
+            let isEditing = false;
+
+            // Event Listeners
+            addStoreButton.addEventListener('click', showForm);
+            cancelButton.addEventListener('click', hideForm);
+            storeFormElement.addEventListener('submit', saveStore);
+
+            // Funções
+            function showForm() {
+                isEditing = false;
+                formTitle.textContent = 'Cadastrar Nova Loja';
+                storeFormElement.reset();
+                storeIdInput.value = '';
+                storeForm.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function hideForm() {
+                storeForm.style.display = 'none';
+            }
+
+            function editStore(store) {
+                isEditing = true;
+                formTitle.textContent = 'Editar Loja';
+                storeIdInput.value = store.id;
+                storeNameInput.value = store.name;
+                storeLogoInput.value = store.logo || '';
+                storeDescriptionInput.value = store.description;
+                storeUrlInput.value = store.url;
+                storeForm.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            async function saveStore(e) {
+                e.preventDefault();
+                
+                const storeData = {
+                    name: storeNameInput.value.trim(),
+                    logo: storeLogoInput.value.trim(),
+                    description: storeDescriptionInput.value.trim(),
+                    url: storeUrlInput.value.trim(),
+                    isFixed: true
+                };
+
+                // Validação básica
+                if (!storeData.name || !storeData.description || !storeData.url) {
+                    showMessage('Por favor, preencha todos os campos obrigatórios.', 'error');
+                    return;
+                }
+
+                try {
+                    saveButton.disabled = true;
+                    saveButton.textContent = 'Salvando...';
+
+                    let storeId = storeIdInput.value;
+                    
+                    if (isEditing && storeId) {
+                        // Atualizar loja existente
+                        await set(ref(db, `fixedStores/${storeId}`), storeData);
+                        showMessage('Loja atualizada com sucesso!', 'success');
+                    } else {
+                        // Criar nova loja
+                        storeId = 'store-' + Date.now();
+                        await set(ref(db, `fixedStores/${storeId}`), storeData);
+                        showMessage('Loja cadastrada com sucesso!', 'success');
+                    }
+
+                    hideForm();
+                    loadFixedStores();
+                } catch (error) {
+                    console.error("Erro ao salvar loja:", error);
+                    showMessage('Erro ao salvar loja. Tente novamente.', 'error');
+                } finally {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Salvar Loja';
+                }
+            }
+
+            async function deleteStore(storeId) {
+                if (!confirm('Tem certeza que deseja excluir esta loja?')) {
+                    return;
+                }
+
+                try {
+                    await remove(ref(db, `fixedStores/${storeId}`));
+                    showMessage('Loja excluída com sucesso!', 'success');
+                    loadFixedStores();
+                } catch (error) {
+                    console.error("Erro ao excluir loja:", error);
+                    showMessage('Erro ao excluir loja. Tente novamente.', 'error');
+                }
+            }
+
+            async function loadFixedStores() {
+                try {
+                    const storesRef = ref(db, 'fixedStores/');
+                    const snapshot = await get(storesRef);
+                    
+                    if (snapshot.exists()) {
+                        const storesData = snapshot.val();
+                        fixedStores = Object.entries(storesData).map(([id, store]) => ({
+                            id,
+                            ...store
+                        }));
+                        renderStores();
+                    } else {
+                        fixedStores = [];
+                        renderStores();
+                    }
+                } catch (error) {
+                    console.error("Erro ao carregar lojas fixas:", error);
+                    showMessage('Erro ao carregar lojas. Tente novamente.', 'error');
+                }
+            }
+
+            function renderStores() {
+                storesGrid.innerHTML = '';
+                
+                if (fixedStores.length === 0) {
+                    storesGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--md-sys-color-on-surface-variant);">
+                            <i class="material-icons-outlined" style="font-size: 4rem; margin-bottom: 16px;">storefront</i>
+                            <h3>Nenhuma loja cadastrada</h3>
+                            <p>Clique em "Nova Loja" para adicionar sua primeira loja fixa.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const fragment = document.createDocumentFragment();
+                
+                fixedStores.forEach(store => {
+                    const card = document.createElement('div');
+                    card.className = 'store-card';
+                    card.innerHTML = `
+                        <div class="card-banner" style="background-image: url('${store.logo || 'https://placehold.co/600x340/EADDFF/21005D?text=Loja'}')"></div>
+                        <div class="card-content">
+                            <h3 class="store-card__title">${store.name}</h3>
+                            <p class="store-card__description">${store.description}</p>
+                            <p class="store-card__url">${store.url}</p>
+                            <div class="card-actions">
+                                <button class="card-button edit" data-id="${store.id}">
+                                    <i class="material-icons-outlined">edit</i>
+                                </button>
+                                <button class="card-button delete" data-id="${store.id}">
+                                    <i class="material-icons-outlined">delete</i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    fragment.appendChild(card);
+                });
+                
+                storesGrid.appendChild(fragment);
+                
+                // Adicionar event listeners aos botões
+                document.querySelectorAll('.card-button.edit').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const storeId = button.getAttribute('data-id');
+                        const store = fixedStores.find(s => s.id === storeId);
+                        if (store) editStore(store);
+                    });
+                });
+                
+                document.querySelectorAll('.card-button.delete').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const storeId = button.getAttribute('data-id');
+                        deleteStore(storeId);
+                    });
+                });
+            }
+
+            function showMessage(message, type) {
+                messageContainer.innerHTML = `
+                    <div class="message ${type}">
+                        <i class="material-icons-outlined">${type === 'success' ? 'check_circle' : 'error'}</i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                // Remover a mensagem após 5 segundos
+                setTimeout(() => {
+                    messageContainer.innerHTML = '';
+                }, 5000);
+            }
+
+            // Inicializar
+            loadFixedStores();
+        });
+    </script>
+</body>
+</html>
