@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
     <style>
-        /* --- SEU CSS ORIGINAL (SEM ALTERAÇÕES) --- */
+        /* --- SEU CSS ORIGINAL (COM ADAPTAÇÕES) --- */
         :root {
             --cor-primaria: #4A90E2; --cor-primaria-hover: #357ABD; --cor-fundo: #F9F9FB;
             --cor-surface: #FFFFFF; --cor-texto-principal: #333333; --cor-texto-secundario: #777777;
@@ -27,8 +27,42 @@
         .app-content { flex: 1; height: 100vh; display: flex; flex-direction: column; padding-bottom: var(--bottom-nav-height); }
         .main-content { flex: 1; overflow: auto; position: relative; }
         .content-frame { width: 100%; height: 100%; border: none; background-color: var(--cor-fundo); }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height); background-color: var(--cor-surface); border-top: 1px solid var(--cor-borda); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-around; z-index: 150; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding-top: 8px; color: var(--cor-texto-secundario); font-size: 0.7rem; font-weight: 500; background: none; border: none; cursor: pointer; transition: color 0.2s ease; text-align: center; }
+        
+        /* --- NOVOS ESTILOS PARA NAVEGAÇÃO COM ROLAGEM --- */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            height: var(--bottom-nav-height); 
+            background-color: var(--cor-surface); 
+            border-top: 1px solid var(--cor-borda); 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
+            display: flex; 
+            overflow-x: auto; 
+            overflow-y: hidden; 
+            white-space: nowrap; 
+            z-index: 150; 
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-overflow-scrolling: touch;
+        }
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            flex: 0 0 auto; 
+            min-width: 70px; 
+            padding: 8px 12px 4px; 
+            color: var(--cor-texto-secundario); 
+            font-size: 0.7rem; 
+            font-weight: 500; 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            transition: color 0.2s ease; 
+            text-align: center; 
+        }
         .nav-item .material-icons-outlined { font-size: 24px; margin-bottom: 2px; }
         .nav-item:hover { color: var(--cor-texto-principal); }
         .nav-item.active { color: var(--cor-primaria); }
@@ -75,6 +109,11 @@
         <button class="nav-item" id="adminNavItem" data-page="admin.html" data-title="Admin">
             <i class="material-icons-outlined">admin_panel_settings</i>
             <span>Admin</span>
+        </button>
+        <!-- NOVO ÍCONE ADICIONADO -->
+        <button class="nav-item" data-page="historico.html" data-title="Histórico de Encomendas">
+            <i class="material-icons-outlined">history</i>
+            <span>Histórico</span>
         </button>
     </nav>
 
