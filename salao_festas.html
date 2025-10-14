@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva do Salão - Vivendas das Cotovias</title>
+    
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        main {
+            padding-top: 20px;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+        }
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background-color: var(--light);
+            border-radius: 8px;
+        }
+        #user-display {
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        #logout-button {
+            padding: 5px 10px;
+            background-color: var(--accent);
+        }
+        #logout-button:hover {
+            background-color: #c0392b;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--secondary);
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+            margin-top: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .calendar-controls button {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+        }
+         .calendar-controls button:hover {
+            background: var(--light);
+            border-color: #ccc;
+        }
+        #current-month {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .calendar-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px 5px;
+            background-color: var(--light);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .calendar-day {
+            border: 1px solid #ddd;
+            padding: 8px;
+            min-height: 100px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .calendar-day-number {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .calendar-day:hover {
+            background-color: var(--light);
+            transform: translateY(-2px);
+        }
+        .calendar-day.reserved {
+            background-color: #ffeaa7;
+            border-color: var(--warning);
+        }
+        .calendar-day.available {
+            background-color: #d1f7c4;
+            border-color: var(--success);
+        }
+        .calendar-day.past {
+            background-color: #f0f0f0;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        .reservation-info-wrapper {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .reservation-info {
+            font-size: 0.7rem;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .reservation-info.confirmed { background-color: var(--success); color: white; }
+        .reservation-info.pending { background-color: var(--warning); color: var(--dark); }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            border-radius: 4px;
+        }
+        
+        .reservation-form {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+        }
+         input:focus, select:focus {
+            outline: 2px solid var(--secondary);
+            background-color: white;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        .btn-danger {
+            background-color: var(--accent);
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        .btn-success {
+            background-color: var(--success);
+        }
+        .btn-success:hover {
+            background-color: #229954;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .reservations-list {
+            margin-top: 20px;
+            display: grid;
+            gap: 15px;
+        }
+        
+        .reservation-item {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .reservation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .reservation-date {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .reservation-status {
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d4edda; color: #155724; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        
+        .reservation-details { display: grid; gap: 5px; font-size: 0.9rem; }
+        .reservation-actions { margin-top: 15px; display: flex; gap: 10px; }
+        
+        .notification {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid transparent;
+            text-align: center;
+        }
+        .notification.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .notification.error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        
+        .loader {
+            border: 6px solid var(--light);
+            border-top: 6px solid var(--secondary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        dialog {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 0 2em rgba(0, 0, 0, 0.3);
+            padding: 1.5em;
+            width: 90%;
+            max-width: 400px;
+            margin: auto;
+        }
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* --- MELHORIAS PARA CELULAR --- */
+        @media (max-width: 768px) {
+            body {
+                font-size: 95%;
+            }
+            .container {
+                padding: 10px;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+            main {
+                padding-top: 10px;
+            }
+            .tab {
+                flex-grow: 1;
+                text-align: center;
+                padding: 10px 5px;
+                font-size: 0.8rem;
+            }
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+            .calendar {
+                gap: 5px;
+            }
+            .calendar-header {
+                font-size: 0.7rem;
+                padding: 8px 2px;
+            }
+            .calendar-day {
+                min-height: 70px;
+                padding: 5px;
+                font-size: 0.8rem;
+                border-radius: 5px;
+            }
+            .calendar-controls {
+                margin-bottom: 15px;
+            }
+            #current-month {
+                font-size: 1rem;
+                text-align: center;
+                margin: 0 10px;
+            }
+             .calendar-controls button {
+                padding: 8px 10px;
+            }
+            .reservation-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            .tab-content, .login-form {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <div id="login-area">
+            <form id="login-form" class="login-form">
+                <h2>Acesso ao Sistema</h2>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit">Entrar</button>
+                <div id="auth-error" class="notification error" style="display:none; margin-top: 15px;"></div>
+            </form>
+        </div>
+
+        <div id="main-content" style="display:none;">
+            <div class="user-info">
+                <span id="user-display"></span>
+                <button id="logout-button" class="btn-small">Sair</button>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="calendar">🗓️ Calendário</div>
+                <div class="tab" data-tab="reservation">📝 Fazer Reserva</div>
+                <div class="tab" data-tab="my-reservations">📋 Minhas Reservas</div>
+                <div class="tab" data-tab="admin" id="admin-tab" style="display:none;">👑 Admin</div>
+            </div>
+            
+            <div id="notification" class="notification"></div>
+            <div id="loader" class="loader" style="display:none;"></div>
+            
+            <div id="calendar" class="tab-content active">
+                <h2>Calendário</h2>
+                <div class="calendar-controls">
+                    <button id="prev-month" aria-label="Mês anterior">&#9664;</button>
+                    <h3 id="current-month"></h3>
+                    <button id="next-month" aria-label="Próximo mês">&#9654;</button>
+                </div>
+                <div class="calendar" id="calendar-grid"></div>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-color" style="background-color: #d1f7c4;"></div><span>Disponível</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: #ffeaa7;"></div><span>Reservado</span></div>
+                </div>
+            </div>
+            
+            <div id="reservation" class="tab-content">
+                <h2>Fazer Reserva</h2>
+                <form id="reservation-form" class="reservation-form">
+                    <div class="form-group"><label for="reservation-date">Data da Reserva</label><input type="date" id="reservation-date" required></div>
+                    <div class="form-group"><label for="reservation-period">Período</label><select id="reservation-period" required><option value="">Selecione...</option><option value="manha">Manhã (8h-12h)</option><option value="tarde">Tarde (13h-17h)</option><option value="noite">Noite (18h-22h)</option></select></div>
+                    <div class="form-group"><label for="event-type">Tipo de Evento</label><input type="text" id="event-type" placeholder="Ex: Aniversário" required></div>
+                    <div class="form-group"><label for="guests">Nº de Convidados (máx: 50)</label><input type="number" id="guests" min="1" max="50" required></div>
+                    <button type="submit">Enviar Solicitação</button>
+                </form>
+            </div>
+            
+            <div id="my-reservations" class="tab-content">
+                <h2>Minhas Reservas</h2>
+                <div class="reservations-list" id="user-reservations-list"></div>
+            </div>
+            
+            <div id="admin" class="tab-content">
+                <h2>Administração</h2>
+                <div class="form-group"><label for="admin-filter">Filtrar por Status</label><select id="admin-filter"><option value="all">Todas</option><option value="pending">Pendentes</option><option value="confirmed">Confirmadas</option><option value="cancelled">Canceladas</option></select></div>
+                <div class="reservations-list" id="admin-reservations-list"></div>
+            </div>
+        </div>
+    </main>
+
+    <dialog id="confirm-modal">
+        <div class="modal-content">
+            <p id="modal-text">Você tem certeza?</p>
+            <div class="modal-actions">
+                <button id="modal-confirm-btn" class="btn-danger">Confirmar</button>
+                <button id="modal-cancel-btn">Cancelar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // O JAVASCRIPT CONTINUA O MESMO, SEM ALTERAÇÕES
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const firebaseConfig = {
+                apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+                authDomain: "rifas-c414b.firebaseapp.com",
+                databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+                projectId: "rifas-c414b",
+                storageBucket: "rifas-c414b.appspot.com",
+                messagingSenderId: "770195193538",
+                appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            const auth = firebase.auth();
+
+            let currentUser = null;
+            let currentDate = new Date();
+            let allReservations = [];
+            const reservationsCollection = db.collection('reservations');
+            const usersCollection = db.collection('users');
+
+            const loader = document.getElementById('loader');
+            const notification = document.getElementById('notification');
+            const loginArea = document.getElementById('login-area');
+            const mainContent = document.getElementById('main-content');
+            const calendarGrid = document.getElementById('calendar-grid');
+            const currentMonthEl = document.getElementById('current-month');
+            const reservationForm = document.getElementById('reservation-form');
+            const userReservationsList = document.getElementById('user-reservations-list');
+            const adminReservationsList = document.getElementById('admin-reservations-list');
+            const confirmModal = document.getElementById('confirm-modal');
+            let confirmAction = null;
+
+            auth.onAuthStateChanged(async (user) => {
+                showLoader(true);
+                if (user) {
+                    const userDoc = await usersCollection.doc(user.uid).get();
+                    if (userDoc.exists) {
+                        currentUser = { uid: user.uid, email: user.email, ...userDoc.data() };
+                        initializeAppUI();
+                    } else {
+                        console.error("Usuário não encontrado no Firestore. Criando um perfil básico.");
+                        const basicProfile = {
+                            email: user.email,
+                            name: user.email.split('@')[0],
+                            apartment: 'N/A',
+                            isAdmin: false
+                        };
+                        await usersCollection.doc(user.uid).set(basicProfile);
+                        currentUser = { uid: user.uid, ...basicProfile };
+                        initializeAppUI();
+                    }
+                } else {
+                    currentUser = null;
+                    showLoginUI();
+                }
+                showLoader(false);
+            });
+
+            function showLoginUI() {
+                mainContent.style.display = 'none';
+                loginArea.style.display = 'block';
+            }
+
+            async function initializeAppUI() {
+                loginArea.style.display = 'none';
+                mainContent.style.display = 'block';
+                document.getElementById('user-display').textContent = `Olá, ${currentUser.name || currentUser.email}`;
+                document.getElementById('admin-tab').style.display = currentUser.isAdmin ? 'block' : 'none';
+                await loadDataFromFirestore();
+            }
+
+            async function loadDataFromFirestore() {
+                showLoader(true);
+                try {
+                    const snapshot = await reservationsCollection.orderBy('date').get();
+                    allReservations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderAll();
+                } catch (error) {
+                    showNotification("Erro ao carregar dados.", 'error');
+                } finally {
+                    showLoader(false);
+                }
+            }
+
+            function renderAll() {
+                renderCalendar();
+                renderUserReservations();
+                if (currentUser && currentUser.isAdmin) {
+                    renderAdminReservations();
+                }
+            }
+            
+            function renderCalendar() {
+                calendarGrid.innerHTML = '';
+                const month = currentDate.getMonth();
+                const year = currentDate.getFullYear();
+                currentMonthEl.textContent = `${new Date(year, month).toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}`;
+
+                const firstDay = new Date(year, month, 1).getDay();
+                const lastDate = new Date(year, month + 1, 0).getDate();
+
+                const daysOfWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
+                calendarGrid.innerHTML = daysOfWeek.map(day => `<div class="calendar-header">${day}</div>`).join('');
+
+                for (let i = 0; i < firstDay; i++) {
+                    calendarGrid.insertAdjacentHTML('beforeend', '<div></div>');
+                }
+                
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
+                for (let day = 1; day <= lastDate; day++) {
+                    const dayEl = document.createElement('div');
+                    dayEl.className = 'calendar-day';
+                    const dayDate = new Date(year, month, day);
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    
+                    dayEl.innerHTML = `<div class="calendar-day-number">${day}</div><div class="reservation-info-wrapper"></div>`;
+
+                    const reservationsOnDay = allReservations.filter(r => r.date === dateStr && r.status !== 'cancelled');
+
+                    if (dayDate < today) {
+                        dayEl.classList.add('past');
+                    } else if (reservationsOnDay.length > 0) {
+                        dayEl.classList.add('reserved');
+                        const infoWrapper = dayEl.querySelector('.reservation-info-wrapper');
+                        reservationsOnDay.forEach(res => {
+                             const infoEl = document.createElement('div');
+                             infoEl.className = `reservation-info ${res.status}`;
+                             infoEl.textContent = `${res.period.charAt(0).toUpperCase()}`;
+                             infoWrapper.appendChild(infoEl);
+                        });
+                    } else {
+                        dayEl.classList.add('available');
+                        dayEl.addEventListener('click', () => {
+                            document.getElementById('reservation-date').value = dateStr;
+                            document.querySelector('.tab[data-tab="reservation"]').click();
+                        });
+                    }
+                    calendarGrid.appendChild(dayEl);
+                }
+            }
+
+            function renderUserReservations() {
+                const userReservations = allReservations.filter(r => r.userId === currentUser.uid);
+                userReservationsList.innerHTML = userReservations.length === 0 ? '<p>Você não possui reservas.</p>' : '';
+                userReservations.forEach(res => userReservationsList.appendChild(createReservationItem(res, 'user')));
+            }
+
+            function renderAdminReservations() {
+                const filter = document.getElementById('admin-filter').value;
+                const filtered = filter === 'all' ? allReservations : allReservations.filter(r => r.status === filter);
+                adminReservationsList.innerHTML = filtered.length === 0 ? '<p>Nenhuma reserva encontrada.</p>' : '';
+                filtered.forEach(res => adminReservationsList.appendChild(createReservationItem(res, 'admin')));
+            }
+
+            function createReservationItem(res, view) {
+                const item = document.createElement('div');
+                item.className = 'reservation-item';
+                const date = new Date(res.date + 'T00:00:00-03:00').toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'});
+                const periodMap = { manha: "Manhã", tarde: "Tarde", noite: "Noite" };
+                
+                let adminInfo = '';
+                if(view === 'admin') {
+                    adminInfo = `<div><strong>Morador:</strong> ${res.userName} (Apto ${res.userApt})</div>`;
+                }
+
+                let actions = '';
+                if (view === 'user' && res.status === 'pending') {
+                    actions = `<button class="btn-small btn-danger" onclick="window.confirmAction('Deseja cancelar esta reserva?', () => window.handleDelete('${res.id}'))">Cancelar</button>`;
+                }
+                if (view === 'admin') {
+                    if (res.status === 'pending') {
+                        actions += `<button class="btn-small btn-success" onclick="window.handleStatusUpdate('${res.id}', 'confirmed')">Confirmar</button>`;
+                    }
+                    if (res.status !== 'cancelled') {
+                        actions += `<button class="btn-small btn-danger" onclick="window.handleStatusUpdate('${res.id}', 'cancelled')">Cancelar</button>`;
+                    }
+                }
+
+                item.innerHTML = `
+                    <div class="reservation-header">
+                        <div class="reservation-date">${date} - ${periodMap[res.period]}</div>
+                        <div class="reservation-status status-${res.status}">${res.status}</div>
+                    </div>
+                    <div class="reservation-details">
+                        ${adminInfo}
+                        <div><strong>Evento:</strong> ${res.eventType}</div>
+                        <div><strong>Convidados:</strong> ${res.guests}</div>
+                    </div>
+                    <div class="reservation-actions">${actions}</div>
+                `;
+                return item;
+            }
+
+            reservationForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = {
+                    date: document.getElementById('reservation-date').value,
+                    period: document.getElementById('reservation-period').value,
+                    eventType: document.getElementById('event-type').value,
+                    guests: parseInt(document.getElementById('guests').value),
+                    userId: currentUser.uid,
+                    userName: currentUser.name || currentUser.email,
+                    userApt: currentUser.apartment || 'N/A',
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (!formData.date || !formData.period || !formData.eventType || isNaN(formData.guests)) {
+                    return showNotification('Por favor, preencha todos os campos.', 'error');
+                }
+
+                if (new Date(formData.date) < new Date().setHours(0,0,0,0)) {
+                    return showNotification('Não é possível reservar uma data no passado.', 'error');
+                }
+
+                const isReserved = allReservations.some(r => r.date === formData.date && r.period === formData.period && r.status !== 'cancelled');
+                if (isReserved) {
+                    return showNotification('Este período já está reservado.', 'error');
+                }
+
+                showLoader(true);
+                try {
+                    await reservationsCollection.add(formData);
+                    showNotification('Reserva enviada com sucesso!', 'success');
+                    reservationForm.reset();
+                    await loadDataFromFirestore();
+                    document.querySelector('.tab[data-tab="my-reservations"]').click();
+                } catch (error) {
+                    console.error("Erro ao criar reserva:", error);
+                    showNotification('Erro ao criar reserva. Verifique o console para detalhes.', 'error');
+                } finally {
+                    showLoader(false);
+                }
+            });
+            
+            window.handleStatusUpdate = async (id, status) => {
+                showLoader(true);
+                try {
+                    await reservationsCollection.doc(id).update({ status });
+                    showNotification('Status atualizado com sucesso!', 'success');
+                    await loadDataFromFirestore();
+                } catch (error) {
+                    showNotification('Erro ao atualizar status.', 'error');
+                } finally {
+                    showLoader(false);
+                }
+            };
+            
+            window.handleDelete = async (id) => {
+                 showLoader(true);
+                try {
+                    await reservationsCollection.doc(id).delete();
+                    showNotification('Reserva removida com sucesso!', 'success');
+                    await loadDataFromFirestore();
+                } catch (error) {
+                    showNotification('Erro ao remover reserva.', 'error');
+                } finally {
+                    showLoader(false);
+                }
+            };
+
+            document.getElementById('login-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const authError = document.getElementById('auth-error');
+                auth.signInWithEmailAndPassword(email, password).catch(err => {
+                    authError.textContent = "Email ou senha incorretos.";
+                    authError.style.display = 'block';
+                });
+            });
+
+            document.getElementById('logout-button').addEventListener('click', () => auth.signOut());
+
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+
+            document.getElementById('prev-month').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+            document.getElementById('next-month').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+            document.getElementById('admin-filter').addEventListener('change', renderAdminReservations);
+
+            function showLoader(show) { loader.style.display = show ? 'block' : 'none'; }
+            
+            function showNotification(message, type) {
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.style.display = 'block';
+                setTimeout(() => { notification.style.display = 'none'; }, 5000);
+            }
+
+            window.confirmAction = (text, callback) => {
+                document.getElementById('modal-text').textContent = text;
+                confirmAction = callback;
+                confirmModal.showModal();
+            }
+            document.getElementById('modal-cancel-btn').addEventListener('click', () => confirmModal.close());
+            document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+                if(confirmAction) confirmAction();
+                confirmModal.close();
+            });
+        });
+    </script>
+</body>
+</html>
