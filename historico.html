@@ -275,7 +275,7 @@ body {
     position: fixed;
     bottom: 1.5rem;
     left: 50%;
-    transform: translate(-50%, 150%);
+    transform: translate(-50%, 200%); /* Aumente para 200% */
     background-color: var(--color-text-primary);
     color: white;
     padding: 0.75rem 1.25rem;
@@ -284,6 +284,7 @@ body {
     z-index: 2000;
     transition: transform var(--transition);
     pointer-events: none;
+    overflow: hidden;
 }
 .toast.show { transform: translate(-50%, 0); }
 .toast.success { background-color: var(--color-success); }
@@ -334,7 +335,9 @@ body {
     }
     .page-title { font-size: 1.5rem; }
 }
-
+.actions-group {
+  display: none;
+}
 </style>
 <body>
     <main class="container">
@@ -583,41 +586,12 @@ body {
             gerarPDF(encomendas, title, filename) {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
-
                 doc.setFontSize(18);
                 doc.text(title, 14, 22);
-
                 const head = [['Data', 'Bloco/Apto', 'Qtd', 'Porteiro', 'Retirado por', 'Status']];
-                const body = encomendas.map(item => [
-                    App.helpers.formatarData(item.data),
-                    item.blocoApto,
-                    item.quantidade,
-                    item.registradoPorNome || 'N/A',
-                    item.retiradoPorNome || 'N/A',
-                    item.status === 'pendente' ? 'Pendente' : 'Retirado'
-                ]);
-
-                doc.autoTable({
-                    startY: 30,
-                    head: head,
-                    body: body,
-                    theme: 'grid',
-                    headStyles: { fillColor: [79, 70, 229] }
-                });
-
-                // 1. Em vez de tentar salvar o arquivo diretamente (o que falha no WebView)...
-                // doc.save(filename);
-
-                // 2. Gere o conteúdo do PDF como uma string de dados (Data URI).
-                const pdfDataUri = doc.output('datauristring');
-
-                // 3. Peça ao sistema para abrir essa string de dados em uma nova janela/aba.
-                const newWindow = window.open(pdfDataUri, '_blank');
-
-                // Opcional: Adiciona um aviso caso o navegador do usuário bloqueie pop-ups.
-                if (!newWindow) {
-                    App.helpers.showToast('Não foi possível abrir o PDF. Verifique se os pop-ups estão habilitados.', 'error');
-                }
+                const body = encomendas.map(item => [ App.helpers.formatarData(item.data), item.blocoApto, item.quantidade, item.registradoPorNome || 'N/A', item.retiradoPorNome || 'N/A', item.status === 'pendente' ? 'Pendente' : 'Retirado' ]);
+                doc.autoTable({ startY: 30, head, body, theme: 'grid', headStyles: { fillColor: [79, 70, 229] } });
+                doc.save(filename);
             }
         },
         handlers: {
@@ -654,7 +628,6 @@ body {
                     });
                     App.helpers.gerarPDF(dadosFiltrados, 'Histórico de Encomendas', 'historico_encomendas.pdf');
                 } catch(e) {
-                    console.error("Erro ao exportar tabela:", e);
                     App.helpers.showToast('Erro ao gerar o PDF.', 'error');
                 } finally {
                     App.helpers.toggleButtonLoading(btn, false);
