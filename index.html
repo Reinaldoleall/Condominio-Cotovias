@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <style>
         /* --- SEU CSS ORIGINAL (COM ADAPTAÇÕES) --- */
@@ -74,11 +75,54 @@
         body {
   margin: 0 auto;
         }
+        
+                .chat-toggle-link {
+            /* Posicionamento flutuante no canto da tela */
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+
+            /* Aparência do círculo */
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #6750A4; /* Cor primária do seu app */
+            
+            /* Sombra */
+            box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2), 
+                        0px 6px 10px 0px rgba(0,0,0,0.14), 
+                        0px 1px 18px 0px rgba(0,0,0,0.12);
+
+            /* Alinhamento do ícone no centro */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /* Remove o sublinhado padrão de links */
+            text-decoration: none;
+            
+            /* Efeito de transição suave */
+            transition: all 0.3s ease;
+        }
+
+        /* Estilo do ícone dentro do botão */
+        .chat-toggle-link .material-icons {
+            color: #FFFFFF; /* Cor branca para o ícone */
+            font-size: 24px;
+        }
+
+        /* Efeito ao passar o mouse */
+        .chat-toggle-link:hover {
+            background-color: #4F378B; /* Uma cor um pouco mais escura para o hover */
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+      
         <div class="loading" id="loading">
             <div class="loading-spinner"></div>
         </div>
@@ -89,7 +133,10 @@
             </main>
         </div>
     </div>
-    
+        <a href="chat.html" class="chat-toggle-link" title="Abrir Interfone Virtual">
+        <span class="material-icons">chat</span>
+    </a>
+    <br>    <br>     <br>
     <nav class="bottom-nav">
         <button class="nav-item active" data-page="aviso.html" data-title="Avisos">
             <i class="material-icons-outlined">campaign</i>
