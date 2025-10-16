@@ -909,6 +909,42 @@ input:checked + .slider:before {
 .call-list-btn:hover {
     background-color: rgba(76, 175, 80, 0.1); /* Verde com 10% de opacidade */
 }
+/* Indicador de volume para teste de microfone */
+.volume-indicator {
+    width: 100%;
+    height: 8px;
+    background: var(--md-sys-color-surface-variant);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.volume-level {
+    height: 100%;
+    background: var(--md-sys-color-primary);
+    width: 0%;
+    transition: width 0.1s ease;
+}
+
+/* Status do microfone */
+.microphone-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    margin: 8px 0;
+}
+
+.microphone-status.connected {
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+
+.microphone-status.disconnected {
+    background: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+}
     </style>
 </head>
 <body>
@@ -1037,6 +1073,11 @@ input:checked + .slider:before {
                     <span class="slider"></span>
                 </label>
             </div>
+            <!-- Adicione este botão na seção "Ações" das configurações -->
+<button class="action-btn secondary" id="testMicrophone">
+    <span class="material-icons">mic</span>
+    Testar Microfone
+</button>
             <div class="setting-item">
                 <div class="setting-info">
                     <div class="setting-label">Receber mensagens</div>
@@ -1226,11 +1267,18 @@ const resetSettings = document.getElementById('resetSettings');
                     `;
                 }
             });
+            
+            setTimeout(() => {
+    requestMicrophonePermission();
+}, 2000);
 
             // Event Listeners
             chatToggle.addEventListener('click', toggleChat);
             minimizeChat.addEventListener('click', minimizeChatWindow);
             closeChat.addEventListener('click', closeChatWindow);
+            
+            document.getElementById('testMicrophone').addEventListener('click', testMicrophone);
+
             
             chatTabs.forEach(tab => {
                 tab.addEventListener('click', () => switchTab(tab.dataset.tab));
@@ -1276,6 +1324,160 @@ blockCurrentUser.addEventListener('click', () => {
             loadSettings();
             
         });
+        
+        // Solicitar permissão do microfone ao iniciar o chat
+async function requestMicrophonePermission() {
+    try {
+        // Tentar acessar o microfone para solicitar permissão
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Parar imediatamente após obter a permissão
+        stream.getTracks().forEach(track => track.stop());
+        console.log('Permissão do microfone concedida');
+        return true;
+    } catch (error) {
+        console.error('Erro ao acessar microfone:', error);
+        
+        // Mostrar instruções para o usuário
+        if (error.name === 'NotAllowedError') {
+            showMicrophonePermissionInstructions();
+        }
+        return false;
+    }
+}
+
+async function testMicrophone() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            } 
+        });
+        
+        // Criar elemento de áudio para feedback
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        source.connect(analyser);
+        
+        // Mostrar indicador visual
+        showMicrophoneTestUI(stream, analyser);
+        
+    } catch (error) {
+        console.error('Erro ao testar microfone:', error);
+        alert('Não foi possível acessar o microfone. Verifique as permissões.');
+    }
+}
+
+function showMicrophoneTestUI(stream, analyser) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 24px; border-radius: 12px; max-width: 300px; text-align: center;">
+            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 16px;">Teste do Microfone</h3>
+            <div id="volumeIndicator" style="width: 100%; height: 20px; background: #f0f0f0; border-radius: 10px; margin: 20px 0; overflow: hidden;">
+                <div id="volumeLevel" style="height: 100%; background: #4CAF50; width: 0%; transition: width 0.1s;"></div>
+            </div>
+            <p id="volumeText" style="margin-bottom: 20px;">Fale para testar o microfone...</p>
+            <button onclick="stopMicrophoneTest(this)" 
+                    style="background: var(--md-sys-color-primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                Parar Teste
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animar o indicador de volume
+    const volumeLevel = document.getElementById('volumeLevel');
+    const volumeText = document.getElementById('volumeText');
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    
+    function updateVolume() {
+        analyser.getByteFrequencyData(dataArray);
+        const volume = Math.max(...dataArray) / 255 * 100;
+        volumeLevel.style.width = volume + '%';
+        
+        if (volume < 10) {
+            volumeLevel.style.background = '#f44336';
+            volumeText.textContent = 'Microfone não detectando áudio';
+        } else if (volume < 30) {
+            volumeLevel.style.background = '#FF9800';
+            volumeText.textContent = 'Volume baixo';
+        } else {
+            volumeLevel.style.background = '#4CAF50';
+            volumeText.textContent = 'Microfone funcionando!';
+        }
+        
+        if (modal.isConnected) {
+            requestAnimationFrame(updateVolume);
+        }
+    }
+    
+    updateVolume();
+    
+    // Armazenar a stream para parar depois
+    modal._stream = stream;
+}
+
+function stopMicrophoneTest(button) {
+    const modal = button.closest('div').parentElement;
+    if (modal._stream) {
+        modal._stream.getTracks().forEach(track => track.stop());
+    }
+    modal.remove();
+}
+
+// Mostrar instruções para habilitar o microfone
+function showMicrophonePermissionInstructions() {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 24px; border-radius: 12px; max-width: 400px; text-align: center;">
+            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 16px;">Permissão do Microfone Necessária</h3>
+            <p style="margin-bottom: 20px; color: var(--md-sys-color-on-surface);">
+                Para fazer chamadas de voz, é necessário permitir o acesso ao microfone.
+            </p>
+            <div style="text-align: left; background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 8px 0;"><strong>Como permitir:</strong></p>
+                <p style="margin: 4px 0;">1. Clique no ícone de câmera/microfone na barra de endereço</p>
+                <p style="margin: 4px 0;">2. Selecione "Permitir" para acesso ao microfone</p>
+                <p style="margin: 4px 0;">3. Atualize a página e tente novamente</p>
+            </div>
+            <button onclick="this.closest('div').style.display='none'" 
+                    style="background: var(--md-sys-color-primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                Entendi
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
 
         // Inicializar o chat
 function initializeChat() {
@@ -1309,6 +1511,7 @@ function initializeChat() {
     // Retornar função de cleanup para usar se necessário
     return cleanupListeners;
 }
+
 
 // Funções de Configurações
 function loadSettings() {
@@ -2557,61 +2760,92 @@ const hangUpBtn = document.getElementById('hangUpBtn');
 // FUNÇÃO PRINCIPAL: INICIAR UMA CHAMADA
 // =================================================================
 async function initiateCall(calleeId, calleeName) {
-    if (!currentUser) return alert('Você precisa estar logado para ligar.');
-    currentCalleeId = calleeId;
-
-    showCallUI('outgoing', calleeName);
-
-    peerConnection = new RTCPeerConnection(configuration);
-    registerPeerConnectionListeners(calleeId);
-
-    // 1. Obter mídia local (áudio)
-    try {
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        localStream.getTracks().forEach(track => {
-            peerConnection.addTrack(track, localStream);
-        });
-    } catch (error) {
-        console.error("Erro ao acessar microfone: ", error);
-        alert("Não foi possível acessar seu microfone.");
-        cleanupCall();
+    if (!currentUser) {
+        alert('Você precisa estar logado para ligar.');
         return;
     }
-    
-    // 2. Criar uma "oferta" de chamada
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
 
-    const callData = {
-        offer: {
-            type: offer.type,
-            sdp: offer.sdp,
-        },
-        callerId: currentUser.uid,
-        callerName: currentUser.displayName || 'Usuário'
-    };
-
-    // 3. Enviar a oferta para o usuário de destino via Firebase
-    await db.ref(`calls/${calleeId}`).set(callData);
-
-    // 4. Escutar por uma "resposta" do outro usuário
-    db.ref(`calls/${currentUser.uid}/answer`).on('value', async (snapshot) => {
-        if (snapshot.exists()) {
-            const answer = snapshot.val();
-            if (peerConnection.currentRemoteDescription) return;
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-            updateCallStatus(`Conectado com ${calleeName}`);
+    // Verificar permissão do microfone antes de iniciar a chamada
+    try {
+        // Solicitar permissão explícita
+        const permission = await requestMicrophonePermission();
+        if (!permission) {
+            alert('Permissão do microfone é necessária para fazer chamadas.');
+            return;
         }
-    });
 
-    // 5. Escutar por rejeição ou fim da chamada
-    db.ref(`calls/${calleeId}`).on('value', (snapshot) => {
-        if (!snapshot.exists()) {
-            // Se o nó da chamada foi deletado, a chamada terminou.
-            console.log("A chamada foi finalizada pelo outro usuário.");
+        currentCalleeId = calleeId;
+        showCallUI('outgoing', calleeName);
+
+        peerConnection = new RTCPeerConnection(configuration);
+        registerPeerConnectionListeners(calleeId);
+
+        // Configurações avançadas de áudio
+        const audioConstraints = {
+            audio: {
+                channelCount: 1,
+                sampleRate: 48000,
+                sampleSize: 16,
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+                latency: 0.01
+            },
+            video: false
+        };
+
+        // Obter mídia local com configurações otimizadas
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+            console.log('Microfone acessado com sucesso:', localStream.getAudioTracks().length, 'tracks de áudio');
+            
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+                console.log('Track adicionada:', track.kind, track.label);
+            });
+        } catch (error) {
+            console.error("Erro crítico ao acessar microfone: ", error);
+            alert("Erro ao acessar microfone. Verifique as permissões e tente novamente.");
             cleanupCall();
+            return;
         }
-    });
+        
+        // Resto do código da chamada permanece o mesmo...
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        const callData = {
+            offer: {
+                type: offer.type,
+                sdp: offer.sdp,
+            },
+            callerId: currentUser.uid,
+            callerName: currentUser.displayName || 'Usuário'
+        };
+
+        await db.ref(`calls/${calleeId}`).set(callData);
+
+        db.ref(`calls/${currentUser.uid}/answer`).on('value', async (snapshot) => {
+            if (snapshot.exists()) {
+                const answer = snapshot.val();
+                if (peerConnection.currentRemoteDescription) return;
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                updateCallStatus(`Conectado com ${calleeName}`);
+            }
+        });
+
+        db.ref(`calls/${calleeId}`).on('value', (snapshot) => {
+            if (!snapshot.exists()) {
+                console.log("Chamada finalizada pelo outro usuário.");
+                cleanupCall();
+            }
+        });
+
+    } catch (error) {
+        console.error('Erro ao iniciar chamada:', error);
+        alert('Erro ao iniciar chamada. Tente novamente.');
+        cleanupCall();
+    }
 }
 
 
