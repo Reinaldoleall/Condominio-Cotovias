@@ -945,6 +945,92 @@ input:checked + .slider:before {
     background: var(--md-sys-color-error-container);
     color: var(--md-sys-color-on-error-container);
 }
+/* ============================================= */
+/* ========== CONTROLES DE VIVA-VOZ =========== */
+/* ============================================= */
+
+.call-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 10001;
+}
+
+.call-control-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 20px;
+}
+
+.call-control-btn.speaker {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+}
+
+.call-control-btn.mute {
+    background-color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-on-secondary);
+}
+
+.call-control-btn.hangup {
+    background-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+}
+
+.call-control-btn:hover {
+    transform: scale(1.1);
+}
+
+.call-control-btn.active {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+/* Indicadores de status da chamada */
+.call-status-bar {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quality-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.quality-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+}
+
+.quality-dot.poor {
+    background-color: #f44336;
+}
     </style>
 </head>
 <body>
@@ -2740,6 +2826,16 @@ let remoteStream;
 let peerConnection;
 let currentCallerId = null;
 let currentCalleeId = null;
+let isSpeakerOn = false;
+let isMuted = false;
+let proximitySensorEnabled = false;
+let isNearEar = false;
+let audioContext;
+let gainNode;
+let callStartTime;
+let callTimerInterval;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 3;
 const db = firebase.database();
 
 // --- Configuração dos servidores STUN (essencial para P2P) ---
@@ -2765,9 +2861,7 @@ async function initiateCall(calleeId, calleeName) {
         return;
     }
 
-    // Verificar permissão do microfone antes de iniciar a chamada
     try {
-        // Solicitar permissão explícita
         const permission = await requestMicrophonePermission();
         if (!permission) {
             alert('Permissão do microfone é necessária para fazer chamadas.');
@@ -2776,11 +2870,20 @@ async function initiateCall(calleeId, calleeName) {
 
         currentCalleeId = calleeId;
         showCallUI('outgoing', calleeName);
+        
+        // Mostrar controles de chamada
+        document.getElementById('callControls').style.display = 'flex';
+        document.getElementById('callStatusBar').style.display = 'flex';
 
         peerConnection = new RTCPeerConnection(configuration);
+        
+        // Configurar todas as melhorias
         registerPeerConnectionListeners(calleeId);
+        setupReconnectionLogic();
+        setupCallQualityMonitoring();
+        setupAudioControls();
+        setupProximitySensor();
 
-        // Configurações avançadas de áudio
         const audioConstraints = {
             audio: {
                 channelCount: 1,
@@ -2794,23 +2897,15 @@ async function initiateCall(calleeId, calleeName) {
             video: false
         };
 
-        // Obter mídia local com configurações otimizadas
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
-            console.log('Microfone acessado com sucesso:', localStream.getAudioTracks().length, 'tracks de áudio');
-            
-            localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, localStream);
-                console.log('Track adicionada:', track.kind, track.label);
-            });
-        } catch (error) {
-            console.error("Erro crítico ao acessar microfone: ", error);
-            alert("Erro ao acessar microfone. Verifique as permissões e tente novamente.");
-            cleanupCall();
-            return;
-        }
+        localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
         
-        // Resto do código da chamada permanece o mesmo...
+        // Configurar processamento de áudio para melhor qualidade
+        await setupAudioProcessing();
+        
+        localStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, localStream);
+        });
+
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
 
@@ -2820,11 +2915,16 @@ async function initiateCall(calleeId, calleeName) {
                 sdp: offer.sdp,
             },
             callerId: currentUser.uid,
-            callerName: currentUser.displayName || 'Usuário'
+            callerName: currentUser.displayName || 'Usuário',
+            timestamp: Date.now()
         };
 
         await db.ref(`calls/${calleeId}`).set(callData);
+        
+        // Iniciar timer da chamada
+        startCallTimer();
 
+        // Escutar por resposta
         db.ref(`calls/${currentUser.uid}/answer`).on('value', async (snapshot) => {
             if (snapshot.exists()) {
                 const answer = snapshot.val();
@@ -2848,7 +2948,343 @@ async function initiateCall(calleeId, calleeName) {
     }
 }
 
+// Processamento de áudio para melhor qualidade
+async function setupAudioProcessing() {
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        await audioContext.resume();
+        
+        const source = audioContext.createMediaStreamSource(localStream);
+        gainNode = audioContext.createGain();
+        
+        // Filtro para melhorar qualidade de voz
+        const filter = audioContext.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 800;
+        filter.Q.value = 1;
+        
+        source.connect(filter);
+        filter.connect(gainNode);
+        
+        const destination = audioContext.createMediaStreamDestination();
+        gainNode.connect(destination);
+        
+        // Substituir o stream original pelo processado
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = destination.stream;
+        
+    } catch (error) {
+        console.log('Processamento de áudio não disponível:', error);
+    }
+}
 
+function setupReconnectionLogic() {
+    if (peerConnection) {
+        peerConnection.onconnectionstatechange = () => {
+            console.log('Estado da conexão:', peerConnection.connectionState);
+            
+            switch(peerConnection.connectionState) {
+                case 'disconnected':
+                case 'failed':
+                    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                        setTimeout(() => {
+                            reconnectCall();
+                            reconnectAttempts++;
+                        }, 2000);
+                    } else {
+                        alert('Falha na conexão. Chamada será encerrada.');
+                        hangUp();
+                    }
+                    break;
+                case 'connected':
+                    reconnectAttempts = 0;
+                    updateCallStatus('Conectado');
+                    break;
+            }
+        };
+    }
+}
+
+async function reconnectCall() {
+    if (!currentCalleeId) return;
+    
+    try {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        
+        await db.ref(`calls/${currentCalleeId}`).update({
+            offer: {
+                type: offer.type,
+                sdp: offer.sdp,
+            },
+            reconnect: true
+        });
+        
+        updateCallStatus('Reconectando...');
+    } catch (error) {
+        console.error('Erro na reconexão:', error);
+    }
+}
+
+// Monitoramento de qualidade da chamada
+function setupCallQualityMonitoring() {
+    if (peerConnection) {
+        setInterval(async () => {
+            if (peerConnection.iceConnectionState === 'connected') {
+                const stats = await peerConnection.getStats();
+                let audioLevel = 0;
+                
+                stats.forEach(report => {
+                    if (report.type === 'inbound-rtp' && report.mediaType === 'audio') {
+                        audioLevel = report.audioLevel || 0;
+                    }
+                });
+                
+                // Atualizar indicador visual de qualidade
+                updateCallQualityIndicator(audioLevel);
+            }
+        }, 2000);
+    }
+}
+
+function updateCallQualityIndicator(level) {
+    const qualityElement = document.getElementById('callQuality');
+    if (qualityElement) {
+        const quality = level > 0.1 ? 'Boa' : 'Fraca';
+        qualityElement.textContent = `Qualidade: ${quality}`;
+    }
+}
+
+function setupAudioControls() {
+    createCallControlsUI();
+    setupSpeakerControl();
+    setupMuteControl();
+}
+
+function createCallControlsUI() {
+    const controlsHTML = `
+        <div class="call-controls" id="callControls" style="display: none;">
+            <button class="call-control-btn speaker" id="speakerBtn" title="Viva-voz">
+                <span class="material-icons">volume_up</span>
+            </button>
+            <button class="call-control-btn mute" id="muteBtn" title="Silenciar">
+                <span class="material-icons">mic_off</span>
+            </button>
+            <button class="call-control-btn hangup" id="hangupBtn" title="Desligar">
+                <span class="material-icons">call_end</span>
+            </button>
+        </div>
+        
+        <div class="call-status-bar" id="callStatusBar" style="display: none;">
+            <div class="quality-indicator">
+                <span id="callQuality">Qualidade: Boa</span>
+                <div class="quality-dot" id="qualityDot"></div>
+            </div>
+            <span id="callTimer">00:00</span>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', controlsHTML);
+    
+    // Event listeners
+    document.getElementById('speakerBtn').addEventListener('click', toggleSpeaker);
+    document.getElementById('muteBtn').addEventListener('click', toggleMute);
+    document.getElementById('hangupBtn').addEventListener('click', hangUp);
+}
+
+function toggleSpeaker() {
+    isSpeakerOn = !isSpeakerOn;
+    const speakerBtn = document.getElementById('speakerBtn');
+    
+    if (isSpeakerOn) {
+        enableSpeaker();
+        speakerBtn.classList.add('active');
+        speakerBtn.innerHTML = '<span class="material-icons">volume_up</span>';
+    } else {
+        disableSpeaker();
+        speakerBtn.classList.remove('active');
+        speakerBtn.innerHTML = '<span class="material-icons">volume_off</span>';
+    }
+}
+
+function enableSpeaker() {
+    if (audioContext) {
+        audioContext.resume();
+    }
+    
+    // Aumentar volume para viva-voz
+    if (gainNode) {
+        gainNode.gain.value = 1.5; // Aumenta o volume em 50%
+    }
+    
+    // Tentar usar os alto-falantes
+    if (remoteStream) {
+        const audioElement = new Audio();
+        audioElement.srcObject = remoteStream;
+        audioElement.volume = 1.0;
+        
+        // Forçar uso de alto-falantes
+        if (audioElement.setSinkId) {
+            audioElement.setSinkId('').catch(err => {
+                console.log('Erro ao configurar alto-falantes:', err);
+            });
+        }
+    }
+}
+
+function disableSpeaker() {
+    if (gainNode) {
+        gainNode.gain.value = 1.0; // Volume normal
+    }
+}
+
+function toggleMute() {
+    isMuted = !isMuted;
+    const muteBtn = document.getElementById('muteBtn');
+    
+    if (localStream) {
+        localStream.getAudioTracks().forEach(track => {
+            track.enabled = !isMuted;
+        });
+    }
+    
+    if (isMuted) {
+        muteBtn.classList.add('active');
+        muteBtn.innerHTML = '<span class="material-icons">mic_off</span>';
+    } else {
+        muteBtn.classList.remove('active');
+        muteBtn.innerHTML = '<span class="material-icons">mic</span>';
+    }
+}
+
+function startCallTimer() {
+    callStartTime = Date.now();
+    callTimerInterval = setInterval(updateCallTimer, 1000);
+}
+
+function updateCallTimer() {
+    const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+    const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const seconds = (elapsed % 60).toString().padStart(2, '0');
+    document.getElementById('callTimer').textContent = `${minutes}:${seconds}`;
+}
+
+function stopCallTimer() {
+    if (callTimerInterval) {
+        clearInterval(callTimerInterval);
+        callTimerInterval = null;
+    }
+    
+    // Resetar display do timer
+    const callTimer = document.getElementById('callTimer');
+    if (callTimer) {
+        callTimer.textContent = '00:00';
+    }
+}
+
+function setupProximitySensor() {
+    // Verificar se o sensor de proximidade está disponível
+    if ('ondeviceproximity' in window || 'onuserproximity' in window) {
+        enableProximitySensor();
+    } else {
+        console.log('Sensor de proximidade não disponível');
+        // Fallback: usar detecção baseada em áudio
+        setupAudioBasedProximity();
+    }
+}
+
+function enableProximitySensor() {
+    if ('ondeviceproximity' in window) {
+        window.addEventListener('deviceproximity', handleProximityEvent);
+    }
+    
+    if ('onuserproximity' in window) {
+        window.addEventListener('userproximity', handleProximityEvent);
+    }
+    
+    proximitySensorEnabled = true;
+    console.log('Sensor de proximidade ativado');
+}
+
+function handleProximityEvent(event) {
+    const wasNearEar = isNearEar;
+    isNearEar = event.near;
+    
+    if (wasNearEar !== isNearEar) {
+        toggleAudioOutput(isNearEar);
+    }
+}
+
+function toggleAudioOutput(nearEar) {
+    if (nearEar) {
+        // Modo ouvido: usar fone de ouvido/auto-falante pequeno
+        disableSpeaker();
+        setAudioOutput('earpiece');
+    } else {
+        // Modo viva-voz: usar alto-falante principal
+        enableSpeaker();
+        setAudioOutput('speaker');
+    }
+}
+
+function setAudioOutput(outputType) {
+    if (!remoteStream) return;
+    
+    const audioElements = document.querySelectorAll('audio[srcObject]');
+    audioElements.forEach(audio => {
+        if (audio.setSinkId) {
+            const sinkId = outputType === 'speaker' ? '' : 'earpiece';
+            audio.setSinkId(sinkId).catch(err => {
+                console.log('Erro ao configurar saída de áudio:', err);
+            });
+        }
+        
+        // Ajustar volume baseado no modo
+        audio.volume = outputType === 'speaker' ? 1.0 : 0.7;
+    });
+}
+
+// Fallback: detecção baseada em áudio para dispositivos sem sensor
+function setupAudioBasedProximity() {
+    let audioContext;
+    let analyser;
+    let lastTouchTime = 0;
+    
+    // Detectar toque na tela como proxy para "colocar no ouvido"
+    document.addEventListener('touchstart', (e) => {
+        lastTouchTime = Date.now();
+        
+        // Se o toque foi na parte superior da tela, assumir que está no ouvido
+        if (e.touches[0].clientY < window.innerHeight * 0.3) {
+            toggleAudioOutput(true);
+        }
+    });
+    
+    document.addEventListener('touchend', () => {
+        setTimeout(() => {
+            if (Date.now() - lastTouchTime > 1000) {
+                toggleAudioOutput(false);
+            }
+        }, 1500);
+    });
+    
+    // Detecção por movimento (acelerômetro)
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', handleOrientation);
+    }
+}
+
+function handleOrientation(event) {
+    // Simplificação: se o dispositivo estiver inclinado como se estivesse no ouvido
+    const gamma = Math.abs(event.gamma); // Inclinação lateral
+    const beta = Math.abs(event.beta);   // Inclinação frontal
+    
+    if (gamma > 45 && beta > 45) {
+        toggleAudioOutput(true);
+    } else {
+        toggleAudioOutput(false);
+    }
+}
 // =================================================================
 // FUNÇÃO PRINCIPAL: ESCUTAR POR CHAMADAS RECEBIDAS
 // =================================================================
@@ -2922,21 +3358,134 @@ function hangUp() {
 
 // Limpa todos os dados da chamada
 function cleanupCall() {
+    // 1. Parar timer da chamada
+    stopCallTimer();
+    
+    // 2. Esconder controles de interface
+    const callControls = document.getElementById('callControls');
+    const callStatusBar = document.getElementById('callStatusBar');
+    if (callControls) callControls.style.display = 'none';
+    if (callStatusBar) callStatusBar.style.display = 'none';
+    
+    // 3. Limpar processamento de áudio
+    if (audioContext) {
+        audioContext.close().catch(error => {
+            console.log('Erro ao fechar audio context:', error);
+        });
+        audioContext = null;
+        gainNode = null;
+    }
+    
+    // 4. Resetar variáveis de estado
+    isSpeakerOn = false;
+    isMuted = false;
+    reconnectAttempts = 0;
+    isNearEar = false;
+    
+    // 5. Fechar conexão peer connection
     if (peerConnection) {
+        // Remover event listeners para evitar memory leaks
+        peerConnection.onconnectionstatechange = null;
+        peerConnection.onicecandidate = null;
+        peerConnection.ontrack = null;
+        peerConnection.onnegotiationneeded = null;
+        
         peerConnection.close();
         peerConnection = null;
     }
+    
+    // 6. Parar e limpar streams de mídia
     if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
+        localStream.getTracks().forEach(track => {
+            track.stop();
+            track.enabled = true; // Reativar track para futuras chamadas
+        });
         localStream = null;
     }
-    // Para de escutar por eventos específicos da chamada
-    if(currentCallerId) db.ref(`calls/${currentCallerId}/answer`).off();
-    if(currentCalleeId) db.ref(`calls/${currentCalleeId}`).off();
     
+    if (remoteStream) {
+        remoteStream.getTracks().forEach(track => track.stop());
+        remoteStream = null;
+    }
+    
+    // 7. Remover listeners do Firebase
+    if (currentCallerId) {
+        db.ref(`calls/${currentCallerId}/answer`).off();
+        db.ref(`calls/${currentCallerId}/iceCandidates`).off();
+    }
+    if (currentCalleeId) {
+        db.ref(`calls/${currentCalleeId}`).off();
+        db.ref(`calls/${currentCalleeId}/iceCandidates`).off();
+    }
+    
+    // 8. Limpar dados do Firebase
+    const cleanupPromises = [];
+    if (currentCallerId) {
+        cleanupPromises.push(db.ref(`calls/${currentCallerId}`).remove());
+    }
+    if (currentCalleeId) {
+        cleanupPromises.push(db.ref(`calls/${currentCalleeId}`).remove());
+    }
+    
+    // Executar limpeza em paralelo
+    Promise.allSettled(cleanupPromises).then(results => {
+        results.forEach((result, index) => {
+            if (result.status === 'rejected') {
+                console.warn(`Falha ao limpar dados ${index}:`, result.reason);
+            }
+        });
+    });
+    
+    // 9. Remover event listeners de sensor se existirem
+    if (proximitySensorEnabled) {
+        window.removeEventListener('deviceproximity', handleProximityEvent);
+        window.removeEventListener('userproximity', handleProximityEvent);
+        window.removeEventListener('deviceorientation', handleOrientation);
+        proximitySensorEnabled = false;
+    }
+    
+    // 10. Esconder UI da chamada
     hideCallUI();
+    
+    // 11. Resetar variáveis de identificação
     currentCallerId = null;
     currentCalleeId = null;
+    
+    // 12. Notificar usuário se necessário
+    console.log('Chamada finalizada e recursos liberados');
+    
+    // 13. Resetar elementos de áudio remoto
+    const remoteAudioElements = document.querySelectorAll('audio[srcObject]');
+    remoteAudioElements.forEach(audio => {
+        audio.srcObject = null;
+        audio.remove();
+    });
+    
+    // 14. Resetar botões de controle para estado padrão
+    const speakerBtn = document.getElementById('speakerBtn');
+    const muteBtn = document.getElementById('muteBtn');
+    
+    if (speakerBtn) {
+        speakerBtn.classList.remove('active');
+        speakerBtn.innerHTML = '<span class="material-icons">volume_up</span>';
+    }
+    
+    if (muteBtn) {
+        muteBtn.classList.remove('active');
+        muteBtn.innerHTML = '<span class="material-icons">mic</span>';
+    }
+    
+    // 15. Limpar qualquer intervalo ou timeout pendente
+    if (callTimerInterval) {
+        clearInterval(callTimerInterval);
+        callTimerInterval = null;
+    }
+    
+    // Limpar timeout de reconexão se existir
+    if (window.reconnectTimeout) {
+        clearTimeout(window.reconnectTimeout);
+        window.reconnectTimeout = null;
+    }
 }
 
 // Registra os listeners do PeerConnection (ICE candidates e tracks)
@@ -3004,4 +3553,4 @@ function updateCallStatus(status) {
 
     </script>
 </body>
-  </html>
+    </html>
