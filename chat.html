@@ -1571,7 +1571,7 @@ function initializeChat() {
     usersRef = database.ref('users');
     messagesRef = database.ref('messages');
     
-        listenForIncomingCalls(currentUser.uid);
+    listenForIncomingCalls(currentUser.uid);
     
     // Carregar usuários bloqueados
     loadBlockedUsers();
@@ -2815,42 +2815,39 @@ auth.onAuthStateChanged(user => {
         window.addEventListener('load', updateUserLastSeen);
         setInterval(updateUserLastSeen, 60000); // Atualizar a cada minuto
     </script>
-    <script>
-      // ====================================================
-// ============ SCRIPT WEBRTC - webrtc.js =============
+<script>
+// ====================================================
+// ============ SCRIPT WEBRTC CORRIGIDO ==============
 // ====================================================
 
 // --- Variáveis Globais da Chamada ---
-let localStream;
-let remoteStream;
-let peerConnection;
+let localStream = null;
+let remoteStream = null;
+let peerConnection = null;
 let currentCallerId = null;
 let currentCalleeId = null;
 let isSpeakerOn = false;
 let isMuted = false;
 let proximitySensorEnabled = false;
 let isNearEar = false;
-let audioContext;
-let gainNode;
-let callStartTime;
-let callTimerInterval;
+let audioContext = null;
+let gainNode = null;
+let callStartTime = null;
+let callTimerInterval = null;
 let reconnectAttempts = 0;
+let reconnectTimeout = null;
 const MAX_RECONNECT_ATTEMPTS = 3;
 const db = firebase.database();
 
-// --- Configuração dos servidores STUN (essencial para P2P) ---
+// --- Configuração dos servidores STUN ---
 const configuration = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
-    ]
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' }
+    ],
+    iceCandidatePoolSize: 10
 };
-
-// --- Elementos DOM do Modal de Chamada ---
-const callModal = document.getElementById('callModal');
-const answerCallBtn = document.getElementById('answerCallBtn');
-const rejectCallBtn = document.getElementById('rejectCallBtn');
-const hangUpBtn = document.getElementById('hangUpBtn');
 
 // =================================================================
 // FUNÇÃO PRINCIPAL: INICIAR UMA CHAMADA
@@ -2872,9 +2869,9 @@ async function initiateCall(calleeId, calleeName) {
         showCallUI('outgoing', calleeName);
         
         // Mostrar controles de chamada
-        document.getElementById('callControls').style.display = 'flex';
-        document.getElementById('callStatusBar').style.display = 'flex';
+        showCallControls();
 
+        // Criar PeerConnection
         peerConnection = new RTCPeerConnection(configuration);
         
         // Configurar todas as melhorias
@@ -2884,6 +2881,7 @@ async function initiateCall(calleeId, calleeName) {
         setupAudioControls();
         setupProximitySensor();
 
+        // Configurar áudio
         const audioConstraints = {
             audio: {
                 channelCount: 1,
@@ -2899,16 +2897,19 @@ async function initiateCall(calleeId, calleeName) {
 
         localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
         
-        // Configurar processamento de áudio para melhor qualidade
+        // Configurar processamento de áudio
         await setupAudioProcessing();
         
+        // Adicionar tracks ao PeerConnection
         localStream.getTracks().forEach(track => {
             peerConnection.addTrack(track, localStream);
         });
 
+        // Criar oferta
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
 
+        // Enviar dados da chamada
         const callData = {
             offer: {
                 type: offer.type,
@@ -2921,25 +2922,12 @@ async function initiateCall(calleeId, calleeName) {
 
         await db.ref(`calls/${calleeId}`).set(callData);
         
-        // Iniciar timer da chamada
+        // Iniciar timer
         startCallTimer();
 
         // Escutar por resposta
-        db.ref(`calls/${currentUser.uid}/answer`).on('value', async (snapshot) => {
-            if (snapshot.exists()) {
-                const answer = snapshot.val();
-                if (peerConnection.currentRemoteDescription) return;
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-                updateCallStatus(`Conectado com ${calleeName}`);
-            }
-        });
-
-        db.ref(`calls/${calleeId}`).on('value', (snapshot) => {
-            if (!snapshot.exists()) {
-                console.log("Chamada finalizada pelo outro usuário.");
-                cleanupCall();
-            }
-        });
+        setupAnswerListener();
+        setupCallStateListener();
 
     } catch (error) {
         console.error('Erro ao iniciar chamada:', error);
@@ -2948,16 +2936,124 @@ async function initiateCall(calleeId, calleeName) {
     }
 }
 
-// Processamento de áudio para melhor qualidade
+function setupAnswerListener() {
+    db.ref(`calls/${currentUser.uid}/answer`).on('value', async (snapshot) => {
+        if (snapshot.exists()) {
+            const answer = snapshot.val();
+            if (peerConnection.currentRemoteDescription) return;
+            
+            try {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                updateCallStatus('Conectado');
+            } catch (error) {
+                console.error('Erro ao definir resposta:', error);
+            }
+        }
+    });
+}
+
+function setupCallStateListener() {
+    db.ref(`calls/${currentCalleeId}`).on('value', (snapshot) => {
+        if (!snapshot.exists()) {
+            console.log("Chamada finalizada pelo outro usuário.");
+            cleanupCall();
+        }
+    });
+}
+
+// =================================================================
+// ESCUTA POR CHAMADAS RECEBIDAS
+// =================================================================
+function listenForIncomingCalls(userId) {
+    const userCallRef = db.ref(`calls/${userId}`);
+    userCallRef.on('value', async (snapshot) => {
+        const callData = snapshot.val();
+        if (callData && callData.offer && !currentCallerId) {
+            currentCallerId = callData.callerId;
+            currentCalleeId = userId;
+
+            showCallUI('incoming', callData.callerName);
+
+            // Configurar botões
+            setupCallButtons(callData);
+        }
+    });
+}
+
+function setupCallButtons(callData) {
+    // Botão Atender
+    document.getElementById('answerCallBtn').onclick = async () => {
+        try {
+            peerConnection = new RTCPeerConnection(configuration);
+            registerPeerConnectionListeners(callData.callerId);
+
+            // Obter stream local
+            const audioConstraints = {
+                audio: {
+                    channelCount: 1,
+                    sampleRate: 48000,
+                    echoCancellation: true,
+                    noiseSuppression: true
+                },
+                video: false
+            };
+
+            localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+            
+            // Processar áudio
+            await setupAudioProcessing();
+            
+            // Adicionar tracks
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+
+            // Configurar oferta recebida
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
+
+            // Criar resposta
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+
+            // Enviar resposta
+            await db.ref(`calls/${callData.callerId}/answer`).set({
+                type: answer.type,
+                sdp: answer.sdp,
+            });
+
+            // Mostrar controles
+            showCallControls();
+            startCallTimer();
+            updateCallStatus('Conectado');
+
+        } catch (error) {
+            console.error("Erro ao atender chamada: ", error);
+            alert("Erro ao atender chamada.");
+            rejectCall();
+        }
+    };
+
+    // Botão Rejeitar
+    document.getElementById('rejectCallBtn').onclick = rejectCall;
+}
+
+// =================================================================
+// CONTROLES DE ÁUDIO E VIVA-VOZ
+// =================================================================
 async function setupAudioProcessing() {
     try {
+        if (!window.AudioContext && !window.webkitAudioContext) {
+            console.log('AudioContext não suportado');
+            return;
+        }
+
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         await audioContext.resume();
         
         const source = audioContext.createMediaStreamSource(localStream);
         gainNode = audioContext.createGain();
         
-        // Filtro para melhorar qualidade de voz
+        // Filtro para melhorar qualidade
         const filter = audioContext.createBiquadFilter();
         filter.type = 'bandpass';
         filter.frequency.value = 800;
@@ -2969,7 +3065,7 @@ async function setupAudioProcessing() {
         const destination = audioContext.createMediaStreamDestination();
         gainNode.connect(destination);
         
-        // Substituir o stream original pelo processado
+        // Parar tracks originais e usar as processadas
         localStream.getTracks().forEach(track => track.stop());
         localStream = destination.stream;
         
@@ -2978,99 +3074,23 @@ async function setupAudioProcessing() {
     }
 }
 
-function setupReconnectionLogic() {
-    if (peerConnection) {
-        peerConnection.onconnectionstatechange = () => {
-            console.log('Estado da conexão:', peerConnection.connectionState);
-            
-            switch(peerConnection.connectionState) {
-                case 'disconnected':
-                case 'failed':
-                    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                        setTimeout(() => {
-                            reconnectCall();
-                            reconnectAttempts++;
-                        }, 2000);
-                    } else {
-                        alert('Falha na conexão. Chamada será encerrada.');
-                        hangUp();
-                    }
-                    break;
-                case 'connected':
-                    reconnectAttempts = 0;
-                    updateCallStatus('Conectado');
-                    break;
-            }
-        };
-    }
-}
-
-async function reconnectCall() {
-    if (!currentCalleeId) return;
-    
-    try {
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        
-        await db.ref(`calls/${currentCalleeId}`).update({
-            offer: {
-                type: offer.type,
-                sdp: offer.sdp,
-            },
-            reconnect: true
-        });
-        
-        updateCallStatus('Reconectando...');
-    } catch (error) {
-        console.error('Erro na reconexão:', error);
-    }
-}
-
-// Monitoramento de qualidade da chamada
-function setupCallQualityMonitoring() {
-    if (peerConnection) {
-        setInterval(async () => {
-            if (peerConnection.iceConnectionState === 'connected') {
-                const stats = await peerConnection.getStats();
-                let audioLevel = 0;
-                
-                stats.forEach(report => {
-                    if (report.type === 'inbound-rtp' && report.mediaType === 'audio') {
-                        audioLevel = report.audioLevel || 0;
-                    }
-                });
-                
-                // Atualizar indicador visual de qualidade
-                updateCallQualityIndicator(audioLevel);
-            }
-        }, 2000);
-    }
-}
-
-function updateCallQualityIndicator(level) {
-    const qualityElement = document.getElementById('callQuality');
-    if (qualityElement) {
-        const quality = level > 0.1 ? 'Boa' : 'Fraca';
-        qualityElement.textContent = `Qualidade: ${quality}`;
-    }
-}
-
 function setupAudioControls() {
     createCallControlsUI();
-    setupSpeakerControl();
-    setupMuteControl();
 }
 
 function createCallControlsUI() {
+    // Verificar se já existe para não duplicar
+    if (document.getElementById('callControls')) return;
+
     const controlsHTML = `
         <div class="call-controls" id="callControls" style="display: none;">
             <button class="call-control-btn speaker" id="speakerBtn" title="Viva-voz">
                 <span class="material-icons">volume_up</span>
             </button>
             <button class="call-control-btn mute" id="muteBtn" title="Silenciar">
-                <span class="material-icons">mic_off</span>
+                <span class="material-icons">mic</span>
             </button>
-            <button class="call-control-btn hangup" id="hangupBtn" title="Desligar">
+            <button class="call-control-btn hangup" id="hangupControlBtn" title="Desligar">
                 <span class="material-icons">call_end</span>
             </button>
         </div>
@@ -3089,7 +3109,14 @@ function createCallControlsUI() {
     // Event listeners
     document.getElementById('speakerBtn').addEventListener('click', toggleSpeaker);
     document.getElementById('muteBtn').addEventListener('click', toggleMute);
-    document.getElementById('hangupBtn').addEventListener('click', hangUp);
+    document.getElementById('hangupControlBtn').addEventListener('click', hangUp);
+}
+
+function showCallControls() {
+    const callControls = document.getElementById('callControls');
+    const callStatusBar = document.getElementById('callStatusBar');
+    if (callControls) callControls.style.display = 'flex';
+    if (callStatusBar) callStatusBar.style.display = 'flex';
 }
 
 function toggleSpeaker() {
@@ -3108,34 +3135,19 @@ function toggleSpeaker() {
 }
 
 function enableSpeaker() {
-    if (audioContext) {
-        audioContext.resume();
-    }
-    
-    // Aumentar volume para viva-voz
     if (gainNode) {
-        gainNode.gain.value = 1.5; // Aumenta o volume em 50%
+        gainNode.gain.value = 1.5;
     }
     
-    // Tentar usar os alto-falantes
-    if (remoteStream) {
-        const audioElement = new Audio();
-        audioElement.srcObject = remoteStream;
-        audioElement.volume = 1.0;
-        
-        // Forçar uso de alto-falantes
-        if (audioElement.setSinkId) {
-            audioElement.setSinkId('').catch(err => {
-                console.log('Erro ao configurar alto-falantes:', err);
-            });
-        }
-    }
+    // Configurar saída de áudio para alto-falante
+    setAudioOutput('speaker');
 }
 
 function disableSpeaker() {
     if (gainNode) {
-        gainNode.gain.value = 1.0; // Volume normal
+        gainNode.gain.value = 1.0;
     }
+    setAudioOutput('earpiece');
 }
 
 function toggleMute() {
@@ -3157,38 +3169,30 @@ function toggleMute() {
     }
 }
 
-function startCallTimer() {
-    callStartTime = Date.now();
-    callTimerInterval = setInterval(updateCallTimer, 1000);
-}
-
-function updateCallTimer() {
-    const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-    const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
-    const seconds = (elapsed % 60).toString().padStart(2, '0');
-    document.getElementById('callTimer').textContent = `${minutes}:${seconds}`;
-}
-
-function stopCallTimer() {
-    if (callTimerInterval) {
-        clearInterval(callTimerInterval);
-        callTimerInterval = null;
-    }
+function setAudioOutput(outputType) {
+    if (!remoteStream) return;
     
-    // Resetar display do timer
-    const callTimer = document.getElementById('callTimer');
-    if (callTimer) {
-        callTimer.textContent = '00:00';
-    }
+    const audioElements = document.querySelectorAll('audio[srcObject]');
+    audioElements.forEach(audio => {
+        if (audio.setSinkId) {
+            const sinkId = outputType === 'speaker' ? '' : 'earpiece';
+            audio.setSinkId(sinkId).catch(err => {
+                console.log('Erro ao configurar saída de áudio:', err);
+            });
+        }
+        
+        audio.volume = outputType === 'speaker' ? 1.0 : 0.7;
+    });
 }
 
+// =================================================================
+// SENSOR DE PROXIMIDADE (OUVIDO)
+// =================================================================
 function setupProximitySensor() {
-    // Verificar se o sensor de proximidade está disponível
     if ('ondeviceproximity' in window || 'onuserproximity' in window) {
         enableProximitySensor();
     } else {
         console.log('Sensor de proximidade não disponível');
-        // Fallback: usar detecção baseada em áudio
         setupAudioBasedProximity();
     }
 }
@@ -3203,7 +3207,6 @@ function enableProximitySensor() {
     }
     
     proximitySensorEnabled = true;
-    console.log('Sensor de proximidade ativado');
 }
 
 function handleProximityEvent(event) {
@@ -3215,46 +3218,11 @@ function handleProximityEvent(event) {
     }
 }
 
-function toggleAudioOutput(nearEar) {
-    if (nearEar) {
-        // Modo ouvido: usar fone de ouvido/auto-falante pequeno
-        disableSpeaker();
-        setAudioOutput('earpiece');
-    } else {
-        // Modo viva-voz: usar alto-falante principal
-        enableSpeaker();
-        setAudioOutput('speaker');
-    }
-}
-
-function setAudioOutput(outputType) {
-    if (!remoteStream) return;
-    
-    const audioElements = document.querySelectorAll('audio[srcObject]');
-    audioElements.forEach(audio => {
-        if (audio.setSinkId) {
-            const sinkId = outputType === 'speaker' ? '' : 'earpiece';
-            audio.setSinkId(sinkId).catch(err => {
-                console.log('Erro ao configurar saída de áudio:', err);
-            });
-        }
-        
-        // Ajustar volume baseado no modo
-        audio.volume = outputType === 'speaker' ? 1.0 : 0.7;
-    });
-}
-
-// Fallback: detecção baseada em áudio para dispositivos sem sensor
 function setupAudioBasedProximity() {
-    let audioContext;
-    let analyser;
     let lastTouchTime = 0;
     
-    // Detectar toque na tela como proxy para "colocar no ouvido"
     document.addEventListener('touchstart', (e) => {
         lastTouchTime = Date.now();
-        
-        // Se o toque foi na parte superior da tela, assumir que está no ouvido
         if (e.touches[0].clientY < window.innerHeight * 0.3) {
             toggleAudioOutput(true);
         }
@@ -3268,16 +3236,14 @@ function setupAudioBasedProximity() {
         }, 1500);
     });
     
-    // Detecção por movimento (acelerômetro)
     if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', handleOrientation);
     }
 }
 
 function handleOrientation(event) {
-    // Simplificação: se o dispositivo estiver inclinado como se estivesse no ouvido
-    const gamma = Math.abs(event.gamma); // Inclinação lateral
-    const beta = Math.abs(event.beta);   // Inclinação frontal
+    const gamma = Math.abs(event.gamma);
+    const beta = Math.abs(event.beta);
     
     if (gamma > 45 && beta > 45) {
         toggleAudioOutput(true);
@@ -3285,65 +3251,196 @@ function handleOrientation(event) {
         toggleAudioOutput(false);
     }
 }
-// =================================================================
-// FUNÇÃO PRINCIPAL: ESCUTAR POR CHAMADAS RECEBIDAS
-// =================================================================
-function listenForIncomingCalls(userId) {
-    const userCallRef = db.ref(`calls/${userId}`);
-    userCallRef.on('value', async (snapshot) => {
-        const callData = snapshot.val();
-        if (callData && callData.offer) {
-            currentCallerId = callData.callerId;
-            currentCalleeId = userId;
 
-            showCallUI('incoming', callData.callerName);
-
-            // Ações dos botões
-            answerCallBtn.onclick = async () => {
-                peerConnection = new RTCPeerConnection(configuration);
-                registerPeerConnectionListeners(callData.callerId);
-
-                // Adicionar stream local
-                try {
-                    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                    localStream.getTracks().forEach(track => {
-                        peerConnection.addTrack(track, localStream);
-                    });
-                } catch (error) {
-                    console.error("Erro ao acessar microfone: ", error);
-                    alert("Não foi possível acessar seu microfone.");
-                    rejectCall();
-                    return;
-                }
-
-                // Definir a oferta recebida
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
-
-                // Criar a resposta
-                const answer = await peerConnection.createAnswer();
-                await peerConnection.setLocalDescription(answer);
-
-                // Enviar a resposta de volta ao chamador
-                await db.ref(`calls/${callData.callerId}/answer`).set({
-                    type: answer.type,
-                    sdp: answer.sdp,
-                });
-                
-                updateCallStatus(`Conectado com ${callData.callerName}`);
-            };
-
-            rejectCallBtn.onclick = rejectCall;
-        }
-    });
+function toggleAudioOutput(nearEar) {
+    if (nearEar) {
+        disableSpeaker();
+        setAudioOutput('earpiece');
+    } else {
+        enableSpeaker();
+        setAudioOutput('speaker');
+    }
 }
 
 // =================================================================
-// FUNÇÕES AUXILIARES DA CHAMADA
+// RECONEXÃO E MONITORAMENTO
 // =================================================================
+function setupReconnectionLogic() {
+    if (peerConnection) {
+        peerConnection.onconnectionstatechange = () => {
+            console.log('Estado da conexão:', peerConnection.connectionState);
+            
+            switch(peerConnection.connectionState) {
+                case 'disconnected':
+                case 'failed':
+                    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                        reconnectTimeout = setTimeout(() => {
+                            reconnectCall();
+                            reconnectAttempts++;
+                        }, 2000);
+                    } else {
+                        alert('Falha na conexão. Chamada será encerrada.');
+                        hangUp();
+                    }
+                    break;
+                case 'connected':
+                    reconnectAttempts = 0;
+                    updateCallStatus('Conectado');
+                    break;
+            }
+        };
+    }
+}
 
+async function reconnectCall() {
+    if (!currentCalleeId || !peerConnection) return;
+    
+    try {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        
+        await db.ref(`calls/${currentCalleeId}`).update({
+            offer: {
+                type: offer.type,
+                sdp: offer.sdp,
+            },
+            reconnect: true,
+            timestamp: Date.now()
+        });
+        
+        updateCallStatus('Reconectando...');
+    } catch (error) {
+        console.error('Erro na reconexão:', error);
+    }
+}
+
+function setupCallQualityMonitoring() {
+    if (!peerConnection) return;
+    
+    setInterval(async () => {
+        if (peerConnection.iceConnectionState === 'connected') {
+            try {
+                const stats = await peerConnection.getStats();
+                let audioLevel = 0;
+                let packetsLost = 0;
+                let packetsTotal = 0;
+                
+                stats.forEach(report => {
+                    if (report.type === 'inbound-rtp' && report.mediaType === 'audio') {
+                        audioLevel = report.audioLevel || 0;
+                        packetsLost += report.packetsLost || 0;
+                        packetsTotal += report.packetsReceived || 1;
+                    }
+                });
+                
+                updateCallQualityIndicator(audioLevel, packetsLost, packetsTotal);
+            } catch (error) {
+                console.log('Erro ao obter estatísticas:', error);
+            }
+        }
+    }, 3000);
+}
+
+function updateCallQualityIndicator(level, packetsLost, packetsTotal) {
+    const qualityElement = document.getElementById('callQuality');
+    const qualityDot = document.getElementById('qualityDot');
+    
+    if (!qualityElement || !qualityDot) return;
+    
+    const packetLoss = packetsTotal > 0 ? (packetsLost / packetsTotal) * 100 : 0;
+    let quality = 'Boa';
+    let qualityClass = '';
+    
+    if (packetLoss > 10 || level < 0.05) {
+        quality = 'Fraca';
+        qualityClass = 'poor';
+    } else if (packetLoss > 5 || level < 0.1) {
+        quality = 'Média';
+    }
+    
+    qualityElement.textContent = `Qualidade: ${quality}`;
+    qualityDot.className = `quality-dot ${qualityClass}`;
+}
+
+// =================================================================
+// TIMER DA CHAMADA
+// =================================================================
+function startCallTimer() {
+    callStartTime = Date.now();
+    callTimerInterval = setInterval(updateCallTimer, 1000);
+}
+
+function updateCallTimer() {
+    const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+    const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const seconds = (elapsed % 60).toString().padStart(2, '0');
+    
+    const callTimer = document.getElementById('callTimer');
+    if (callTimer) {
+        callTimer.textContent = `${minutes}:${seconds}`;
+    }
+}
+
+function stopCallTimer() {
+    if (callTimerInterval) {
+        clearInterval(callTimerInterval);
+        callTimerInterval = null;
+    }
+    
+    const callTimer = document.getElementById('callTimer');
+    if (callTimer) {
+        callTimer.textContent = '00:00';
+    }
+}
+
+// =================================================================
+// WEBRTC EVENT HANDLERS
+// =================================================================
+function registerPeerConnectionListeners(otherUserId) {
+    if (!peerConnection) return;
+
+    // ICE Candidates
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            db.ref(`calls/${otherUserId}/iceCandidates`).push(event.candidate.toJSON());
+        }
+    };
+
+    // Receber ICE Candidates
+    db.ref(`calls/${currentUser.uid}/iceCandidates`).on('child_added', (snapshot) => {
+        if (snapshot.exists() && peerConnection) {
+            const candidate = new RTCIceCandidate(snapshot.val());
+            peerConnection.addIceCandidate(candidate).catch(error => {
+                console.log('Erro ao adicionar ICE candidate:', error);
+            });
+            snapshot.ref.remove();
+        }
+    });
+
+    // Stream remota
+    peerConnection.ontrack = (event) => {
+        remoteStream = event.streams[0];
+        const remoteAudio = new Audio();
+        remoteAudio.srcObject = remoteStream;
+        remoteAudio.autoplay = true;
+        remoteAudio.controls = false;
+        
+        // Adicionar ao DOM para funcionar em mobile
+        document.body.appendChild(remoteAudio);
+    };
+
+    // Eventos de estado
+    peerConnection.oniceconnectionstatechange = () => {
+        console.log('ICE Connection State:', peerConnection.iceConnectionState);
+    };
+}
+
+// =================================================================
+// CONTROLES DA CHAMADA
+// =================================================================
 function rejectCall() {
     if (currentCallerId) {
-        db.ref(`calls/${currentCalleeId}`).remove(); // Remove a oferta
+        db.ref(`calls/${currentCalleeId}`).remove();
     }
     cleanupCall();
 }
@@ -3356,18 +3453,51 @@ function hangUp() {
     cleanupCall();
 }
 
-// Limpa todos os dados da chamada
+// =================================================================
+// LIMPEZA DE RECURSOS - FUNÇÃO PRINCIPAL CORRIGIDA
+// =================================================================
 function cleanupCall() {
-    // 1. Parar timer da chamada
+    // 1. Parar timer
     stopCallTimer();
     
-    // 2. Esconder controles de interface
+    // 2. Esconder controles
+    hideCallControls();
+    
+    // 3. Limpar áudio
+    cleanupAudio();
+    
+    // 4. Resetar variáveis
+    resetCallVariables();
+    
+    // 5. Fechar PeerConnection
+    closePeerConnection();
+    
+    // 6. Parar streams
+    stopMediaStreams();
+    
+    // 7. Remover listeners
+    removeFirebaseListeners();
+    
+    // 8. Limpar dados do Firebase
+    cleanupFirebaseData();
+    
+    // 9. Remover sensores
+    removeSensorListeners();
+    
+    // 10. Esconder UI
+    hideCallUI();
+    
+    console.log('Chamada finalizada - recursos liberados');
+}
+
+function hideCallControls() {
     const callControls = document.getElementById('callControls');
     const callStatusBar = document.getElementById('callStatusBar');
     if (callControls) callControls.style.display = 'none';
     if (callStatusBar) callStatusBar.style.display = 'none';
-    
-    // 3. Limpar processamento de áudio
+}
+
+function cleanupAudio() {
     if (audioContext) {
         audioContext.close().catch(error => {
             console.log('Erro ao fechar audio context:', error);
@@ -3375,30 +3505,35 @@ function cleanupCall() {
         audioContext = null;
         gainNode = null;
     }
-    
-    // 4. Resetar variáveis de estado
+}
+
+function resetCallVariables() {
     isSpeakerOn = false;
     isMuted = false;
     reconnectAttempts = 0;
     isNearEar = false;
-    
-    // 5. Fechar conexão peer connection
+    currentCallerId = null;
+    currentCalleeId = null;
+}
+
+function closePeerConnection() {
     if (peerConnection) {
-        // Remover event listeners para evitar memory leaks
         peerConnection.onconnectionstatechange = null;
         peerConnection.onicecandidate = null;
         peerConnection.ontrack = null;
         peerConnection.onnegotiationneeded = null;
+        peerConnection.oniceconnectionstatechange = null;
         
         peerConnection.close();
         peerConnection = null;
     }
-    
-    // 6. Parar e limpar streams de mídia
+}
+
+function stopMediaStreams() {
     if (localStream) {
         localStream.getTracks().forEach(track => {
             track.stop();
-            track.enabled = true; // Reativar track para futuras chamadas
+            track.enabled = true;
         });
         localStream = null;
     }
@@ -3408,7 +3543,15 @@ function cleanupCall() {
         remoteStream = null;
     }
     
-    // 7. Remover listeners do Firebase
+    // Remover elementos de áudio
+    const remoteAudioElements = document.querySelectorAll('audio[srcObject]');
+    remoteAudioElements.forEach(audio => {
+        audio.srcObject = null;
+        audio.remove();
+    });
+}
+
+function removeFirebaseListeners() {
     if (currentCallerId) {
         db.ref(`calls/${currentCallerId}/answer`).off();
         db.ref(`calls/${currentCallerId}/iceCandidates`).off();
@@ -3417,8 +3560,9 @@ function cleanupCall() {
         db.ref(`calls/${currentCalleeId}`).off();
         db.ref(`calls/${currentCalleeId}/iceCandidates`).off();
     }
-    
-    // 8. Limpar dados do Firebase
+}
+
+function cleanupFirebaseData() {
     const cleanupPromises = [];
     if (currentCallerId) {
         cleanupPromises.push(db.ref(`calls/${currentCallerId}`).remove());
@@ -3427,7 +3571,6 @@ function cleanupCall() {
         cleanupPromises.push(db.ref(`calls/${currentCalleeId}`).remove());
     }
     
-    // Executar limpeza em paralelo
     Promise.allSettled(cleanupPromises).then(results => {
         results.forEach((result, index) => {
             if (result.status === 'rejected') {
@@ -3435,95 +3578,25 @@ function cleanupCall() {
             }
         });
     });
-    
-    // 9. Remover event listeners de sensor se existirem
+}
+
+function removeSensorListeners() {
     if (proximitySensorEnabled) {
         window.removeEventListener('deviceproximity', handleProximityEvent);
         window.removeEventListener('userproximity', handleProximityEvent);
         window.removeEventListener('deviceorientation', handleOrientation);
         proximitySensorEnabled = false;
     }
-    
-    // 10. Esconder UI da chamada
-    hideCallUI();
-    
-    // 11. Resetar variáveis de identificação
-    currentCallerId = null;
-    currentCalleeId = null;
-    
-    // 12. Notificar usuário se necessário
-    console.log('Chamada finalizada e recursos liberados');
-    
-    // 13. Resetar elementos de áudio remoto
-    const remoteAudioElements = document.querySelectorAll('audio[srcObject]');
-    remoteAudioElements.forEach(audio => {
-        audio.srcObject = null;
-        audio.remove();
-    });
-    
-    // 14. Resetar botões de controle para estado padrão
-    const speakerBtn = document.getElementById('speakerBtn');
-    const muteBtn = document.getElementById('muteBtn');
-    
-    if (speakerBtn) {
-        speakerBtn.classList.remove('active');
-        speakerBtn.innerHTML = '<span class="material-icons">volume_up</span>';
-    }
-    
-    if (muteBtn) {
-        muteBtn.classList.remove('active');
-        muteBtn.innerHTML = '<span class="material-icons">mic</span>';
-    }
-    
-    // 15. Limpar qualquer intervalo ou timeout pendente
-    if (callTimerInterval) {
-        clearInterval(callTimerInterval);
-        callTimerInterval = null;
-    }
-    
-    // Limpar timeout de reconexão se existir
-    if (window.reconnectTimeout) {
-        clearTimeout(window.reconnectTimeout);
-        window.reconnectTimeout = null;
-    }
 }
 
-// Registra os listeners do PeerConnection (ICE candidates e tracks)
-function registerPeerConnectionListeners(otherUserId) {
-    peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-            // Envia o ICE candidate para o outro usuário via Firebase
-            db.ref(`calls/${otherUserId}/iceCandidates`).push(event.candidate.toJSON());
-        }
-    };
-
-    // Escuta por ICE candidates do outro usuário
-    db.ref(`calls/${currentUser.uid}/iceCandidates`).on('child_added', (snapshot) => {
-        if (snapshot.exists()) {
-            const candidate = new RTCIceCandidate(snapshot.val());
-            peerConnection.addIceCandidate(candidate);
-            snapshot.ref.remove(); // Remove o candidato após usar
-        }
-    });
-    
-    // Quando a stream remota é recebida
-    peerConnection.ontrack = (event) => {
-        remoteStream = event.streams[0];
-        const remoteAudio = new Audio();
-        remoteAudio.srcObject = remoteStream;
-        remoteAudio.autoplay = true;
-        remoteAudio.controls = false;
-    };
-}
-
-
 // =================================================================
-// FUNÇÕES DE UI (INTERFACE DO USUÁRIO)
+// INTERFACE DO USUÁRIO
 // =================================================================
-
 function showCallUI(type, userName) {
+    const callModal = document.getElementById('callModal');
+    if (!callModal) return;
+    
     callModal.classList.add('active');
-    hangUpBtn.onclick = hangUp;
 
     const initial = userName ? userName.charAt(0).toUpperCase() : 'U';
 
@@ -3532,7 +3605,7 @@ function showCallUI(type, userName) {
         document.getElementById('outgoingCallUI').style.display = 'none';
         document.getElementById('incomingCallName').textContent = userName;
         document.getElementById('incomingCallAvatar').textContent = initial;
-    } else { // outgoing
+    } else {
         document.getElementById('outgoingCallUI').style.display = 'block';
         document.getElementById('incomingCallUI').style.display = 'none';
         document.getElementById('outgoingCallName').textContent = userName;
@@ -3542,15 +3615,32 @@ function showCallUI(type, userName) {
 }
 
 function hideCallUI() {
-    callModal.classList.remove('active');
+    const callModal = document.getElementById('callModal');
+    if (callModal) {
+        callModal.classList.remove('active');
+    }
 }
 
 function updateCallStatus(status) {
-    document.getElementById('outgoingCallUI').style.display = 'block';
-    document.getElementById('incomingCallUI').style.display = 'none';
-    document.getElementById('outgoingCallStatus').textContent = status;
+    const outgoingCallStatus = document.getElementById('outgoingCallStatus');
+    if (outgoingCallStatus) {
+        outgoingCallStatus.textContent = status;
+    }
 }
 
-    </script>
+// =================================================================
+// INICIALIZAÇÃO
+// =================================================================
+// Adicione esta linha no seu initializeChat() existente:
+// listenForIncomingCalls(currentUser.uid);
+
+// Limpar timeout global ao sair
+window.addEventListener('beforeunload', function() {
+    if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+    }
+    cleanupCall();
+});
+</script>
 </body>
     </html>
