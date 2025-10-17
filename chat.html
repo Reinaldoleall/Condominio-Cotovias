@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interfone Virtual</title>
-
+    
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-
+    
     <style>
-        /* =================================
-           1. VARIÁVEIS E ESTILOS GLOBAIS
-           ================================= */
         :root {
-            /* Tema Claro (Padrão) */
             --md-sys-color-primary: #6750A4;
             --md-sys-color-on-primary: #FFFFFF;
             --md-sys-color-primary-container: #EADDFF;
@@ -33,31 +32,42 @@
             --md-sys-color-on-error-container: #410002;
             --md-sys-color-outline: #79747E;
             --md-sys-color-shadow: #000000;
-            --md-sys-color-success: #4CAF50;
-
-            --md-ref-typeface-plain: 'Roboto', sans-serif;
+            
+            --md-ref-typeface-plain: Roboto, sans-serif;
         }
-
+        
         /* Tema Escuro */
-        body.dark-theme {
-            --md-sys-color-primary: #D0BCFF;
-            --md-sys-color-on-primary: #371E73;
-            --md-sys-color-primary-container: #4F378B;
-            --md-sys-color-on-primary-container: #EADDFF;
-            --md-sys-color-secondary: #CCC2DC;
-            --md-sys-color-on-secondary: #332D41;
-            --md-sys-color-secondary-container: #4A4458;
-            --md-sys-color-on-secondary-container: #E8DEF8;
-            --md-sys-color-surface: #1C1B1F;
-            --md-sys-color-on-surface: #E6E1E5;
-            --md-sys-color-surface-variant: #49454F;
-            --md-sys-color-on-surface-variant: #CAC4D0;
-            --md-sys-color-error: #F2B8B5;
-            --md-sys-color-on-error: #601410;
-            --md-sys-color-error-container: #8C1D18;
-            --md-sys-color-on-error-container: #F9DEDC;
-            --md-sys-color-outline: #938F99;
-        }
+body.dark-theme {
+    --md-sys-color-primary: #D0BCFF;
+    --md-sys-color-on-primary: #371E73;
+    --md-sys-color-primary-container: #4F378B;
+    --md-sys-color-on-primary-container: #EADDFF;
+    --md-sys-color-secondary: #CCC2DC;
+    --md-sys-color-on-secondary: #332D41;
+    --md-sys-color-secondary-container: #4A4458;
+    --md-sys-color-on-secondary-container: #E8DEF8;
+    --md-sys-color-surface: #1C1B1F;
+    --md-sys-color-on-surface: #E6E1E5;
+    --md-sys-color-surface-variant: #49454F;
+    --md-sys-color-on-surface-variant: #CAC4D0;
+    --md-sys-color-error: #F2B8B5;
+    --md-sys-color-on-error: #601410;
+    --md-sys-color-error-container: #8C1D18;
+    --md-sys-color-on-error-container: #F9DEDC;
+    --md-sys-color-outline: #938F99;
+    --md-sys-color-shadow: #000000;
+}
+
+body.dark-theme .chat-container {
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+}
+
+body.dark-theme .message-input {
+    background-color: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    border-color: var(--md-sys-color-outline);
+}
 
         * {
             margin: 0;
@@ -69,18 +79,9 @@
         body {
             background-color: var(--md-sys-color-surface);
             color: var(--md-sys-color-on-surface);
-            transition: background-color 0.3s, color 0.3s;
         }
-        
-        /* Estilos para a barra de rolagem */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--md-sys-color-surface-variant); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb { background: var(--md-sys-color-outline); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--md-sys-color-primary); }
 
-        /* =================================
-           2. BOTÃO FLUTUANTE E BADGE
-           ================================= */
+        /* Botão Flutuante do Chat */
         .chat-toggle {
             position: fixed;
             bottom: 24px;
@@ -93,68 +94,47 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12);
+            box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12);
             cursor: pointer;
             z-index: 1000;
             transition: all 0.3s ease;
         }
 
         .chat-toggle:hover {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
             transform: scale(1.05);
         }
 
-        .unread-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
+        .chat-toggle .material-icons {
+            font-size: 24px;
+        }
+
+        .chat-toggle.active {
             background-color: var(--md-sys-color-error);
-            color: var(--md-sys-color-on-error);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            display: none;
-            align-items: center;
-            justify-content: center;
         }
 
-        .unread-badge.pulse { animation: pulse 0.5s ease-in-out; }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-
-        /* =================================
-           3. CONTAINER PRINCIPAL DO CHAT
-           ================================= */
+        /* Container do Chat */
         .chat-container {
             position: fixed;
             bottom: 90px;
             right: 24px;
-            width: 360px;
-            height: 550px;
+            width: 350px;
+            height: 500px;
             background-color: var(--md-sys-color-surface);
             border-radius: 12px;
-            box-shadow: 0 8px 10px -5px rgba(0,0,0,0.2), 0 16px 24px 2px rgba(0,0,0,0.14), 0 6px 30px 5px rgba(0,0,0,0.12);
-            display: flex;
+            box-shadow: 0px 8px 10px -5px rgba(0,0,0,0.2), 0px 16px 24px 2px rgba(0,0,0,0.14), 0px 6px 30px 5px rgba(0,0,0,0.12);
+            display: none;
             flex-direction: column;
             z-index: 999;
             overflow: hidden;
-            transform: translateY(20px) scale(0.95);
-            opacity: 0;
-            visibility: hidden;
-            transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
         }
 
         .chat-container.active {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-            visibility: visible;
+            display: flex;
         }
 
-        /* Cabeçalho */
+        /* Cabeçalho do Chat */
         .chat-header {
             background-color: var(--md-sys-color-primary);
             color: var(--md-sys-color-on-primary);
@@ -162,34 +142,53 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-shrink: 0;
+            border-radius: 0px 0px 0 0;
         }
 
-        .chat-title { font-size: 18px; font-weight: 500; }
-        .chat-actions { display: flex; gap: 8px; }
+        .chat-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 8px;
+        }
 
         .chat-action-btn {
-            background: none; border: none;
+            background: none;
+            border: none;
             color: var(--md-sys-color-on-primary);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; width: 32px; height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
             transition: background-color 0.2s;
         }
-        .chat-action-btn:hover { background-color: rgba(255, 255, 255, 0.1); }
-        
-        /* Abas */
+
+        .chat-action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Abas do Chat */
         .chat-tabs {
             display: flex;
             background-color: var(--md-sys-color-surface-variant);
             border-bottom: 1px solid var(--md-sys-color-outline);
-            flex-shrink: 0;
         }
+
         .chat-tab {
-            flex: 1; padding: 12px 16px; text-align: center; cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
             font-weight: 500;
-            border-bottom: 2px solid transparent;
         }
+
         .chat-tab.active {
             background-color: var(--md-sys-color-surface);
             border-bottom: 2px solid var(--md-sys-color-primary);
@@ -202,411 +201,1084 @@
             flex-direction: column;
             overflow: hidden;
         }
+
         .chat-tab-content {
-            flex: 1; display: none; flex-direction: column; overflow: hidden;
-        }
-        .chat-tab-content.active { display: flex; }
-
-        /* Estados de Vazio e Carregando */
-        .empty-state, .loading {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 40px 20px; text-align: center; color: var(--md-sys-color-on-surface-variant);
-        }
-        .empty-state .material-icons { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-        .spinner {
-            width: 24px; height: 24px; border: 3px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%; border-top-color: var(--md-sys-color-primary);
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* =================================
-           4. LISTAS (CONVERSAS E USUÁRIOS)
-           ================================= */
-        .conversations-list, .users-list {
-            flex: 1; overflow-y: auto; padding: 8px;
-        }
-        .conversation-item, .user-item {
-            display: flex; align-items: center; padding: 12px;
-            border-radius: 8px; margin-bottom: 8px; cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .conversation-item:hover, .user-item:hover { background-color: var(--md-sys-color-surface-variant); }
-        
-        .conversation-avatar, .user-avatar {
-            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
-            background-color: var(--md-sys-color-secondary-container);
-            color: var(--md-sys-color-on-secondary-container);
-            display: flex; align-items: center; justify-content: center;
-            margin-right: 12px; font-weight: 500;
-        }
-        .conversation-info, .user-info { flex: 1; min-width: 0; }
-        .conversation-name, .user-name {
-            font-weight: 500; font-size: 14px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .user-details { font-size: 12px; color: var(--md-sys-color-on-surface-variant); }
-
-        /* Específico de Conversas */
-        .conversation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .conversation-time { font-size: 11px; color: var(--md-sys-color-on-surface-variant); white-space: nowrap; }
-        .conversation-preview { font-size: 12px; color: var(--md-sys-color-on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .conversation-unread {
-            background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
-            border-radius: 50%; width: 18px; height: 18px; font-size: 10px;
-            display: flex; align-items: center; justify-content: center;
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        /* Status Online/Offline */
-        .user-status {
-            width: 8px; height: 8px; border-radius: 50%;
-            background-color: var(--md-sys-color-success);
-        }
-        .user-status.offline { background-color: var(--md-sys-color-outline); }
-        
-        .conversation-actions, .user-actions {
-            display: flex; gap: 8px; align-items: center; margin-left: 8px;
-        }
-        
-        .call-list-btn { color: var(--md-sys-color-success); }
-        .call-list-btn:hover { background-color: rgba(76, 175, 80, 0.1); }
-
-        /* =================================
-           5. TELA DE CONVERSA INDIVIDUAL
-           ================================= */
-        #conversationTab .conversation-header {
-            padding: 12px 16px; border-bottom: 1px solid var(--md-sys-color-outline);
-            justify-content: space-between; flex-shrink: 0;
-        }
-        .conversation-user { display: flex; align-items: center; }
-        .conversation-back {
-            background: none; border: none; color: var(--md-sys-color-primary);
-            cursor: pointer; margin-right: 8px; display: flex;
-        }
-        
-        /* Mensagens */
-        .messages-container {
-            flex: 1; overflow-y: auto; padding: 16px;
-            display: flex; flex-direction: column; gap: 12px;
-        }
-        .message {
-            max-width: 80%; padding: 12px; border-radius: 12px; position: relative;
-        }
-        .message.sent {
-            align-self: flex-end; background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary); border-bottom-right-radius: 4px;
-        }
-        .message.received {
-            align-self: flex-start; background-color: var(--md-sys-color-surface-variant);
-            color: var(--md-sys-color-on-surface-variant); border-bottom-left-radius: 4px;
-        }
-        .message-time { font-size: 10px; margin-top: 4px; text-align: right; opacity: 0.7; }
-        
-        /* Input de Mensagem */
-        .message-input-container {
-            display: flex; padding: 16px; border-top: 1px solid var(--md-sys-color-outline);
-            gap: 8px; flex-shrink: 0;
-        }
-        .message-input {
-            flex: 1; padding: 12px 16px; border: 1px solid var(--md-sys-color-outline);
-            border-radius: 24px; outline: none; font-size: 14px;
-            background-color: var(--md-sys-color-surface);
-        }
-        .message-input:focus { border-color: var(--md-sys-color-primary); }
-        
-        .send-button {
-            background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
-            border: none; border-radius: 50%; width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        /* =================================
-           6. TELA DE CONFIGURAÇÕES
-           ================================= */
-        #settingsTab .settings-content {
-            flex: 1; overflow-y: auto; padding: 16px;
-        }
-        .settings-section { margin-bottom: 24px; }
-        .settings-title { font-size: 16px; font-weight: 500; margin-bottom: 12px; }
-        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-
-        .setting-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 0; border-bottom: 1px solid var(--md-sys-color-surface-variant);
-        }
-        .setting-item:last-child { border-bottom: none; }
-        .setting-info { flex: 1; }
-        .setting-label { font-weight: 500; font-size: 14px; margin-bottom: 2px; }
-        .setting-description { font-size: 12px; color: var(--md-sys-color-on-surface-variant); }
-
-        /* Componente Switch */
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--md-sys-color-surface-variant); transition: .3s; border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s; border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--md-sys-color-primary); }
-        input:checked + .slider:before { transform: translateX(20px); }
-
-        /* Lista de Bloqueados */
-        .blocked-users-list { max-height: 200px; overflow-y: auto; }
-        .blocked-user {
-            display: flex; align-items: center; justify-content: space-between; padding: 12px;
-            border-radius: 8px; margin-bottom: 8px; background-color: var(--md-sys-color-surface-variant);
-        }
-        .unblock-btn {
-            background: none; border: none; color: var(--md-sys-color-error); cursor: pointer;
-            font-size: 14px; padding: 4px 8px; border-radius: 4px; transition: background-color 0.2s;
-        }
-        .unblock-btn:hover { background-color: var(--md-sys-color-error-container); }
-        .block-btn {
-            background: none; border: none; color: var(--md-sys-color-error); cursor: pointer; padding: 6px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            transition: background-color 0.2s;
-        }
-        .block-btn:hover { background-color: var(--md-sys-color-error-container); }
-        
-        /* Botões de Ação */
-        .action-btn {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 16px; border: none; border-radius: 8px; cursor: pointer;
-            font-size: 14px; font-weight: 500; transition: all 0.2s; width: 100%;
-        }
-        .action-btn.secondary { background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface-variant); }
-        .action-btn.secondary:hover { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
-        .action-btn.danger { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
-        .action-btn.danger:hover { background: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }
-
-        /* =================================
-           7. MODAIS E NOTIFICAÇÕES
-           ================================= */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center;
-            z-index: 2000;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: var(--md-sys-color-surface); border-radius: 12px; padding: 24px;
-            max-width: 400px; width: 90%; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-        .modal-title { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
-        .modal-message { color: var(--md-sys-color-on-surface-variant); margin-bottom: 20px; }
-        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
-        .modal-btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
-        
-        /* =================================
-           8. CONTROLES DE CHAMADA (WEBRTC)
-           ================================= */
-        .call-controls, .call-status-bar {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10001;
-            display: none; /* Inicia escondido */
-        }
-
-        .call-controls {
-            bottom: 20px;
+        .chat-tab-content.active {
             display: flex;
-            gap: 15px;
-            background: rgba(30, 30, 30, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 15px;
-            border-radius: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-        .call-control-btn {
-            width: 50px; height: 50px; border-radius: 50%; border: none;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s ease; font-size: 20px;
-            color: var(--md-sys-color-on-primary);
+
+        /* Lista de Usuários */
+        .users-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
         }
-        .call-control-btn.speaker { background-color: var(--md-sys-color-primary); }
-        .call-control-btn.mute { background-color: var(--md-sys-color-secondary); }
-        .call-control-btn.hangup { background-color: var(--md-sys-color-error); }
-        .call-control-btn:hover { transform: scale(1.1); }
-        .call-control-btn.active { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5); }
-        
-        .call-status-bar {
-            top: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
+
+        .user-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .quality-indicator { display: flex; align-items: center; gap: 5px; }
-        .quality-dot { width: 8px; height: 8px; border-radius: 50%; background-color: var(--md-sys-color-success); }
-        .quality-dot.poor { background-color: var(--md-sys-color-error); }
 
-        /* =================================
-           9. RESPONSIVIDADE
-           ================================= */
+        .user-item:hover {
+            background-color: var(--md-sys-color-surface-variant);
+        }
+
+        .user-item.active {
+            background-color: var(--md-sys-color-primary-container);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: 500;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .user-details {
+            font-size: 12px;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .user-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+        }
+
+        .user-status.offline {
+            background-color: #9E9E9E;
+        }
+
+        /* Área de Conversa */
+        .conversation-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--md-sys-color-outline);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .conversation-user {
+            display: flex;
+            align-items: center;
+        }
+
+        .conversation-back {
+            background: none;
+            border: none;
+            color: var(--md-sys-color-primary);
+            cursor: pointer;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background-color: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-on-surface-variant);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 10px;
+            margin-top: 4px;
+            text-align: right;
+            opacity: 0.7;
+        }
+
+        .message-input-container {
+            display: flex;
+            padding: 16px;
+            border-top: 1px solid var(--md-sys-color-outline);
+            gap: 8px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 24px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .message-input:focus {
+            border-color: var(--md-sys-color-primary);
+        }
+
+        .send-button {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .send-button:hover {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+        }
+
+        /* Configurações */
+        .settings-content {
+            padding: 16px;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .blocked-users-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .blocked-user {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background-color: var(--md-sys-color-surface-variant);
+        }
+
+        .unblock-btn {
+            background: none;
+            border: none;
+            color: var(--md-sys-color-error);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .unblock-btn:hover {
+            background-color: var(--md-sys-color-error-container);
+        }
+
+        /* Estados de loading e vazio */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .empty-state .material-icons {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--md-sys-color-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsividade */
         @media (max-width: 480px) {
             .chat-container {
-                width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0;
+                width: 100%;
+                height: 100%;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
             }
+            
             .chat-toggle {
-                bottom: 16px; right: 16px;
+                bottom: 16px;
+                right: 16px;
             }
         }
+        /* Adicione isso ao seu CSS existente */
+.chat-toggle {
+    position: relative;
+}
+
+.unread-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #f44336;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.unread-badge.pulse {
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+/* Estilos para a lista de conversas */
+.conversations-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid var(--md-sys-color-surface-variant);
+}
+
+.conversation-item:hover {
+    background-color: var(--md-sys-color-surface-variant);
+}
+
+.conversation-item.active {
+    background-color: var(--md-sys-color-primary-container);
+}
+
+.conversation-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-weight: 500;
+}
+
+.conversation-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.conversation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.conversation-name {
+    font-weight: 500;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-time {
+    font-size: 11px;
+    color: var(--md-sys-color-on-surface-variant);
+    white-space: nowrap;
+}
+
+.conversation-preview {
+    font-size: 12px;
+    color: var(--md-sys-color-on-surface-variant);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-unread {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+}
+/* Estilos para Configurações */
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.settings-action-btn {
+    background: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.settings-action-btn:hover {
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--md-sys-color-surface-variant);
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-info {
+    flex: 1;
+}
+
+.setting-label {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.setting-description {
+    font-size: 12px;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+/* Switch Toggle */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--md-sys-color-surface-variant);
+    transition: .3s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--md-sys-color-primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* Select */
+.setting-select {
+    padding: 6px 12px;
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: 8px;
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    font-size: 14px;
+    min-width: 100px;
+}
+
+.setting-select:focus {
+    border-color: var(--md-sys-color-primary);
+    outline: none;
+}
+
+/* Botões de Ação */
+.settings-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.action-btn.secondary {
+    background: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.action-btn.secondary:hover {
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+
+.action-btn.danger {
+    background: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+}
+
+.action-btn.danger:hover {
+    background: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+}
+
+/* Modal de Confirmação */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: var(--md-sys-color-surface);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.modal-message {
+    color: var(--md-sys-color-on-surface-variant);
+    margin-bottom: 20px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.modal-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.modal-btn.cancel {
+    background: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.modal-btn.confirm {
+    background: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+}
+    /* Botão de Bloquear */
+.block-btn {
+    background: none;
+    border: none;
+    color: var(--md-sys-color-error);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.block-btn:hover {
+    background-color: var(--md-sys-color-error-container);
+}
+
+.user-actions {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+}
+
+.conversation-actions {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+}
+/* Scroll apenas na aba Configurações - Versão Compatível */
+#settingsTab .settings-content {
+    flex: 1;
+    overflow-y: scroll;
+    padding: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--md-sys-color-outline) var(--md-sys-color-surface-variant);
+}
+
+/* Para Firefox */
+#settingsTab .settings-content {
+    scrollbar-width: thin;
+    scrollbar-color: var(--md-sys-color-outline) var(--md-sys-color-surface-variant);
+}
+
+/* Para Webkit (Chrome, Safari, Edge) */
+#settingsTab .settings-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#settingsTab .settings-content::-webkit-scrollbar-track {
+    background: var(--md-sys-color-surface-variant);
+    border-radius: 3px;
+}
+
+#settingsTab .settings-content::-webkit-scrollbar-thumb {
+    background: var(--md-sys-color-outline);
+    border-radius: 3px;
+}
+
+#settingsTab .settings-content::-webkit-scrollbar-thumb:hover {
+    background: var(--md-sys-color-primary);
+}
+
+/* Garantir que outras abas não tenham scroll */
+.chat-tab-content:not(#settingsTab) {
+    overflow: hidden;
+}
+
+/* Ajuste específico para cada aba */
+#usersTab .users-list,
+#conversationsTab .conversations-list,
+#conversationTab .messages-container {
+    overflow-y: auto;
+}
+
+/* Lista de usuários bloqueados com scroll */
+#settingsTab .blocked-users-list {
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+#settingsTab .blocked-users-list::-webkit-scrollbar {
+    width: 4px;
+}
+/* ============================================== */
+/* =========== CORREÇÃO COR BOTÃO LIGAR =========== */
+/* ============================================== */
+
+/* Altera a cor do ícone de "call" para verde */
+#startCallBtn,
+.call-list-btn {
+    color: #4CAF50; /* Um tom de verde padrão e agradável */
+}
+
+/* Adiciona um efeito de fundo verde claro ao passar o mouse */
+#startCallBtn:hover,
+.call-list-btn:hover {
+    background-color: rgba(76, 175, 80, 0.1); /* Verde com 10% de opacidade */
+}
+/* Indicador de volume para teste de microfone */
+.volume-indicator {
+    width: 100%;
+    height: 8px;
+    background: var(--md-sys-color-surface-variant);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.volume-level {
+    height: 100%;
+    background: var(--md-sys-color-primary);
+    width: 0%;
+    transition: width 0.1s ease;
+}
+
+/* Status do microfone */
+.microphone-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    margin: 8px 0;
+}
+
+.microphone-status.connected {
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+
+.microphone-status.disconnected {
+    background: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+}
+/* ============================================= */
+/* ========== CONTROLES DE VIVA-VOZ =========== */
+/* ============================================= */
+
+.call-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 10001;
+}
+
+.call-control-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 20px;
+}
+
+.call-control-btn.speaker {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+}
+
+.call-control-btn.mute {
+    background-color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-on-secondary);
+}
+
+.call-control-btn.hangup {
+    background-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+}
+
+.call-control-btn:hover {
+    transform: scale(1.1);
+}
+
+.call-control-btn.active {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+/* Indicadores de status da chamada */
+.call-status-bar {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quality-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.quality-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+}
+
+.quality-dot.poor {
+    background-color: #f44336;
+}
     </style>
 </head>
 <body>
+    <!-- Botão flutuante do chat -->
     <div class="chat-toggle" id="chatToggle">
         <span class="material-icons">chat</span>
-        <div class="unread-badge" id="unreadBadge">0</div>
     </div>
 
+    <!-- Container do chat -->
     <div class="chat-container" id="chatContainer">
+        <!-- Cabeçalho -->
         <div class="chat-header">
             <div class="chat-title">Interfone Virtual</div>
             <div class="chat-actions">
+                <button class="chat-action-btn" id="minimizeChat">
+                    <span class="material-icons">minimize</span>
+                </button>
                 <button class="chat-action-btn" id="closeChat">
                     <span class="material-icons">close</span>
                 </button>
             </div>
         </div>
 
-        <div class="chat-tabs">
-            <div class="chat-tab active" data-tab="conversations">Conversas</div>
-            <div class="chat-tab" data-tab="users">Usuários</div>
-            <div class="chat-tab" data-tab="settings">Configurações</div>
+        <!-- Abas -->
+<!-- Substitua as abas existentes por: -->
+<div class="chat-tabs">
+    <div class="chat-tab active" data-tab="conversations">Conversas</div>
+    <div class="chat-tab" data-tab="users">Usuários</div>
+    <div class="chat-tab" data-tab="conversation">Conversa</div>
+    <div class="chat-tab" data-tab="settings">Configurações</div>
+</div>
+
+<!-- Adicione esta nova div no conteúdo das abas: -->
+<div class="chat-tab-content active" id="conversationsTab">
+    <div class="conversations-list" id="conversationsList">
+        <div class="loading">
+            <div class="spinner"></div>
         </div>
+    </div>
+</div>
 
+        <!-- Conteúdo -->
         <div class="chat-content">
-            <div class="chat-tab-content active" id="conversationsTab">
-                <div class="conversations-list" id="conversationsList">
-                    <div class="loading"><div class="spinner"></div></div>
-                </div>
-            </div>
-            
-            <div class="chat-tab-content" id="usersTab">
+            <!-- Aba de Usuários -->
+            <div class="chat-tab-content active" id="usersTab">
                 <div class="users-list" id="usersList">
+                    <!-- Lista de usuários será carregada aqui -->
+                    <div class="loading">
+                        <div class="spinner"></div>
                     </div>
+                </div>
             </div>
 
+            <!-- Aba de Conversa -->
             <div class="chat-tab-content" id="conversationTab">
-                <div class="conversation-header">
-                    <div class="conversation-user">
-                        <button class="conversation-back" id="backToLists">
-                            <span class="material-icons">arrow_back</span>
-                        </button>
-                        <div id="currentUserName">Selecione um usuário</div>
-                    </div>
-                    <div class="conversation-actions">
-                        <div class="user-status" id="currentUserStatus"></div>
-                        <button class="chat-action-btn" id="startCallBtn" title="Ligar para usuário" style="color: var(--md-sys-color-success);">
-                            <span class="material-icons">call</span>
-                        </button>
-                        <button class="block-btn" id="blockCurrentUserBtn" title="Bloquear usuário">
-                            <span class="material-icons">block</span>
-                        </button>
+<div class="conversation-header">
+    <div class="conversation-user">
+        <button class="conversation-back" id="backToUsers">
+            <span class="material-icons">arrow_back</span>
+        </button>
+        <div id="currentUserName">Selecione um usuário</div>
+    </div>
+    <div class="conversation-actions">
+        <button class="chat-action-btn" id="startCallBtn" title="Ligar para usuário" style="display: none;">
+            <span class="material-icons">call</span>
+        </button>
+        <div class="user-status" id="currentUserStatus"></div>
+        <button class="block-btn" id="blockCurrentUser" title="Bloquear usuário" style="display: none;">
+            <span class="material-icons">block</span>
+        </button>
+    </div>
+</div>
+
+                <div class="messages-container" id="messagesContainer">
+                    <div class="empty-state">
+                        <span class="material-icons">forum</span>
+                        <p>Selecione um usuário para iniciar uma conversa</p>
                     </div>
                 </div>
-                <div class="messages-container" id="messagesContainer">
-                    </div>
                 <div class="message-input-container">
                     <input type="text" class="message-input" id="messageInput" placeholder="Digite sua mensagem..." disabled>
-                    <button class="send-button" id="sendMessageBtn" disabled>
+                    <button class="send-button" id="sendMessage" disabled>
                         <span class="material-icons">send</span>
                     </button>
                 </div>
             </div>
 
-            <div class="chat-tab-content" id="settingsTab">
-                <div class="settings-content">
-                    <div class="settings-section">
-                        <div class="settings-title">Notificações</div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <div class="setting-label">Som de notificação</div>
-                                <div class="setting-description">Tocar som ao receber mensagens</div>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="soundNotificationSwitch" checked><span class="slider"></span></label>
-                        </div>
-                    </div>
-                    <div class="settings-section">
-                        <div class="settings-title">Privacidade</div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <div class="setting-label">Status online</div>
-                                <div class="setting-description">Mostrar quando estou online</div>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="onlineStatusSwitch" checked><span class="slider"></span></label>
-                        </div>
-                    </div>
-                    <div class="settings-section">
-                        <div class="settings-title">Aparência</div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <div class="setting-label">Tema escuro</div>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="darkThemeSwitch"><span class="slider"></span></label>
-                        </div>
-                    </div>
-                    <div class="settings-section">
-                        <div class="settings-title">Usuários Bloqueados</div>
-                        <div class="blocked-users-list" id="blockedUsersList">
-                            </div>
-                    </div>
-                    <div class="settings-section">
-                         <div class="settings-title">Ações</div>
-                         <button class="action-btn secondary" id="testMicrophoneBtn"><span class="material-icons">mic</span> Testar Microfone</button>
-                    </div>
+            <!-- Aba de Configurações -->
+<div class="chat-tab-content" id="settingsTab">
+    <div class="settings-content">
+        <!-- Notificações -->
+        <div class="settings-section">
+            <div class="settings-title">Notificações</div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-label">Som de notificação</div>
+                    <div class="setting-description">Tocar som quando receber mensagens</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="soundNotification" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-label">Notificações na aba</div>
+                    <div class="setting-description">Mostrar notificações quando o chat estiver minimizado</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="tabNotification" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Privacidade -->
+        <div class="settings-section">
+            <div class="settings-title">Privacidade</div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-label">Status online</div>
+                    <div class="setting-description">Mostrar quando estou online para outros usuários</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="onlineStatus" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <!-- Adicione este botão na seção "Ações" das configurações -->
+<button class="action-btn secondary" id="testMicrophone">
+    <span class="material-icons">mic</span>
+    Testar Microfone
+</button>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-label">Receber mensagens</div>
+                    <div class="setting-description">Permitir que outros usuários me enviem mensagens</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="receiveMessages" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Usuários Bloqueados -->
+        <div class="settings-section">
+            <div class="settings-header">
+                <div class="settings-title">Usuários Bloqueados</div>
+                <button class="settings-action-btn" id="clearBlocked">
+                    <span class="material-icons">delete_sweep</span>
+                    Limpar Todos
+                </button>
+            </div>
+            <div class="blocked-users-list" id="blockedUsersList">
+                <div class="empty-state">
+                    <span class="material-icons">block</span>
+                    <p>Nenhum usuário bloqueado</p>
                 </div>
             </div>
+        </div>
+
+        <!-- Aparência -->
+        <div class="settings-section">
+            <div class="settings-title">Aparência</div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-label">Tema escuro</div>
+                    <div class="setting-description">Alternar entre tema claro e escuro</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="darkTheme">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-label">Tamanho do texto</div>
+                    <div class="setting-description">Ajustar o tamanho das mensagens</div>
+                </div>
+                <select class="setting-select" id="fontSize">
+                    <option value="small">Pequeno</option>
+                    <option value="medium" selected>Médio</option>
+                    <option value="large">Grande</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Ações -->
+        <div class="settings-section">
+            <div class="settings-title">Ações</div>
+            <div class="settings-actions">
+                <button class="action-btn secondary" id="clearHistory">
+                    <span class="material-icons">delete</span>
+                    Limpar Histórico
+                </button>
+                <button class="action-btn secondary" id="exportChat">
+                    <span class="material-icons">download</span>
+                    Exportar Conversas
+                </button>
+                <button class="action-btn danger" id="resetSettings">
+                    <span class="material-icons">restore</span>
+                    Redefinir Configurações
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
     
     <div class="modal-overlay" id="callModal">
-        <div class="modal" id="callContainer" style="width: 320px; text-align: center;">
-            <div id="incomingCallUI" style="display: none;">
-                <div class="user-avatar" id="incomingCallAvatar" style="margin: 0 auto 16px; width: 80px; height: 80px; font-size: 32px;"></div>
-                <div class="modal-title" id="incomingCallName"></div>
-                <p class="modal-message">está te ligando...</p>
-                <div class="modal-actions" style="margin-top: 24px; justify-content: space-around;">
-                    <button class="modal-btn" id="rejectCallBtn" style="background-color: var(--md-sys-color-error); color: var(--md-sys-color-on-error);"><span class="material-icons">call_end</span> Rejeitar</button>
-                    <button class="modal-btn" id="answerCallBtn" style="background-color: var(--md-sys-color-success); color: white;"><span class="material-icons">call</span> Atender</button>
-                </div>
+    <div class="modal" id="callContainer" style="width: 320px; text-align: center;">
+        <div id="incomingCallUI" style="display: none;">
+            <div class="user-avatar" id="incomingCallAvatar" style="margin: 0 auto 16px; width: 80px; height: 80px; font-size: 32px;"></div>
+            <div class="modal-title" id="incomingCallName"></div>
+            <p class="modal-message" id="incomingCallStatus">está te ligando...</p>
+            <div class="modal-actions" style="margin-top: 24px;">
+                <button class="modal-btn" id="rejectCallBtn" style="background-color: var(--md-sys-color-error); color: var(--md-sys-color-on-error);">
+                    <span class="material-icons">call_end</span> Rejeitar
+                </button>
+                <button class="modal-btn" id="answerCallBtn" style="background-color: #4CAF50; color: white;">
+                    <span class="material-icons">call</span> Atender
+                </button>
             </div>
-            <div id="outgoingCallUI" style="display: none;">
-                <div class="user-avatar" id="outgoingCallAvatar" style="margin: 0 auto 16px; width: 80px; height: 80px; font-size: 32px;"></div>
-                <div class="modal-title" id="outgoingCallName"></div>
-                <p class="modal-message" id="outgoingCallStatus">Chamando...</p>
-                 <div class="modal-actions" style="margin-top: 24px; justify-content: center;">
-                    <button class="modal-btn" id="hangUpBtn" style="background-color: var(--md-sys-color-error); color: var(--md-sys-color-on-error);"><span class="material-icons">call_end</span> Desligar</button>
-                </div>
+        </div>
+        <div id="outgoingCallUI" style="display: none;">
+            <div class="user-avatar" id="outgoingCallAvatar" style="margin: 0 auto 16px; width: 80px; height: 80px; font-size: 32px;"></div>
+            <div class="modal-title" id="outgoingCallName"></div>
+            <p class="modal-message" id="outgoingCallStatus">Chamando...</p>
+             <div class="modal-actions" style="margin-top: 24px;">
+                <button class="modal-btn" id="hangUpBtn" style="background-color: var(--md-sys-color-error); color: var(--md-sys-color-on-error);">
+                    <span class="material-icons">call_end</span> Desligar
+                </button>
             </div>
         </div>
     </div>
+</div>
 
+
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-    // IIFE para encapsular o código e evitar poluição global
-    (function() {
-        'use strict';
-
-        // =======================================================
-        // 1. CONFIGURAÇÃO E INICIALIZAÇÃO
-        // =======================================================
-
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // !!! IMPORTANTE: SUBSTITUA PELAS SUAS CONFIGURAÇÕES DO FIREBASE AQUI !!!
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          const firebaseConfig = {
+        // Configuração do Firebase (substitua com suas próprias configurações)
+        const firebaseConfig = {
             apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
                 authDomain: "rifas-c414b.firebaseapp.com",
                 databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
@@ -616,726 +1288,2359 @@
                 appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
             };
 
-
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.database();
+        const database = firebase.database();
 
-        // --- Estado da Aplicação ---
-        const appState = {
-            currentUser: null,
-            selectedUser: null,
-            users: {},
-            blockedUsers: [],
-            settings: {
-                soundNotification: true,
-                onlineStatus: true,
-                darkTheme: false,
-            },
-            firebaseListeners: [], // Armazena referências aos listeners para remoção
-        };
+        // Variáveis globais
+        let currentUser = null;
+        let selectedUser = null;
+        let usersRef = null;
+        let messagesRef = null;
+        let blockedUsers = [];
+        let conversationsList = [];
+        
+        let userSettings = {
+    soundNotification: true,
+    tabNotification: true,
+    onlineStatus: true,
+    receiveMessages: true,
+    darkTheme: false,
+    fontSize: 'medium'
+};
 
-        // --- Elementos DOM ---
-        const dom = {
-            chatToggle: document.getElementById('chatToggle'),
-            chatContainer: document.getElementById('chatContainer'),
-            closeChat: document.getElementById('closeChat'),
-            chatTabs: document.querySelectorAll('.chat-tab'),
-            tabContents: document.querySelectorAll('.chat-tab-content'),
-            conversationsList: document.getElementById('conversationsList'),
-            usersList: document.getElementById('usersList'),
-            messagesContainer: document.getElementById('messagesContainer'),
-            messageInput: document.getElementById('messageInput'),
-            sendMessageBtn: document.getElementById('sendMessageBtn'),
-            backToLists: document.getElementById('backToLists'),
-            currentUserName: document.getElementById('currentUserName'),
-            currentUserStatus: document.getElementById('currentUserStatus'),
-            startCallBtn: document.getElementById('startCallBtn'),
-            blockCurrentUserBtn: document.getElementById('blockCurrentUserBtn'),
-            blockedUsersList: document.getElementById('blockedUsersList'),
-            unreadBadge: document.getElementById('unreadBadge'),
-            // Configurações
-            soundNotificationSwitch: document.getElementById('soundNotificationSwitch'),
-            onlineStatusSwitch: document.getElementById('onlineStatusSwitch'),
-            darkThemeSwitch: document.getElementById('darkThemeSwitch'),
-            testMicrophoneBtn: document.getElementById('testMicrophoneBtn'),
-            // Modais de Chamada
-            callModal: document.getElementById('callModal'),
-            incomingCallUI: document.getElementById('incomingCallUI'),
-            outgoingCallUI: document.getElementById('outgoingCallUI'),
-            incomingCallAvatar: document.getElementById('incomingCallAvatar'),
-            incomingCallName: document.getElementById('incomingCallName'),
-            outgoingCallAvatar: document.getElementById('outgoingCallAvatar'),
-            outgoingCallName: document.getElementById('outgoingCallName'),
-            outgoingCallStatus: document.getElementById('outgoingCallStatus'),
-            answerCallBtn: document.getElementById('answerCallBtn'),
-            rejectCallBtn: document.getElementById('rejectCallBtn'),
-            hangUpBtn: document.getElementById('hangUpBtn'),
-        };
+        // Elementos DOM
+        const chatToggle = document.getElementById('chatToggle');
+        const chatContainer = document.getElementById('chatContainer');
+        const minimizeChat = document.getElementById('minimizeChat');
+        const closeChat = document.getElementById('closeChat');
+        const chatTabs = document.querySelectorAll('.chat-tab');
+        const tabContents = document.querySelectorAll('.chat-tab-content');
+        const usersList = document.getElementById('usersList');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendMessage = document.getElementById('sendMessage');
+        const backToUsers = document.getElementById('backToUsers');
+        const currentUserName = document.getElementById('currentUserName');
+        const currentUserStatus = document.getElementById('currentUserStatus');
+        const blockedUsersList = document.getElementById('blockedUsersList');
+        const soundNotification = document.getElementById('soundNotification');
+const tabNotification = document.getElementById('tabNotification');
+const onlineStatus = document.getElementById('onlineStatus');
+const receiveMessages = document.getElementById('receiveMessages');
+const darkTheme = document.getElementById('darkTheme');
+const fontSize = document.getElementById('fontSize');
+const clearBlocked = document.getElementById('clearBlocked');
+const clearHistory = document.getElementById('clearHistory');
+const exportChat = document.getElementById('exportChat');
+const resetSettings = document.getElementById('resetSettings');
 
-        // --- Inicialização Principal ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initAuthListener();
-            initEventListeners();
-        });
-
-        // =======================================================
-        // 2. AUTENTICAÇÃO
-        // =======================================================
-
-        function initAuthListener() {
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se o usuário está autenticado
             auth.onAuthStateChanged(user => {
                 if (user) {
-                    appState.currentUser = user;
-                    // Simulação: se o usuário não tiver nome, use parte do email
-                    if (!appState.currentUser.displayName) {
-                         appState.currentUser.displayName = user.email.split('@')[0];
-                    }
-                    onUserLogin();
+                    currentUser = user;
+                    initializeChat();
                 } else {
-                    onUserLogout();
+                    // Se não estiver autenticado, mostrar mensagem
+                    usersList.innerHTML = `
+                        <div class="empty-state">
+                            <span class="material-icons">login</span>
+                            <p>Faça login para usar o interfone virtual</p>
+                        </div>
+                    `;
                 }
             });
-        }
-
-        function onUserLogin() {
-            console.log('Usuário logado:', appState.currentUser.uid);
-            updateUserPresence(true);
-            loadSettings();
-            attachFirebaseListeners();
-            listenForIncomingCalls(appState.currentUser.uid);
-        }
-
-        function onUserLogout() {
-            console.log('Usuário deslogado.');
-            if (appState.currentUser) {
-                updateUserPresence(false);
-            }
-            detachFirebaseListeners();
-            resetAppState();
-            renderLoggedOutView();
-            closeChatWindow();
-        }
-        
-        function updateUserPresence(isOnline) {
-            const userStatusRef = db.ref(`/users/${appState.currentUser.uid}`);
-            const presenceData = {
-                online: isOnline,
-                lastSeen: firebase.database.ServerValue.TIMESTAMP,
-                nome: appState.currentUser.displayName || 'Usuário Anônimo'
-            };
             
-            if (isOnline) {
-                userStatusRef.update(presenceData);
-                // Define onDisconnect para atualizar status quando a conexão for perdida
-                userStatusRef.onDisconnect().update({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-            } else {
-                 userStatusRef.update({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-            }
-        }
-        
-        function resetAppState() {
-            appState.currentUser = null;
-            appState.selectedUser = null;
-            appState.users = {};
-            appState.blockedUsers = [];
-        }
+            setTimeout(() => {
+    requestMicrophonePermission();
+}, 2000);
 
+            // Event Listeners
+            chatToggle.addEventListener('click', toggleChat);
+            minimizeChat.addEventListener('click', minimizeChatWindow);
+            closeChat.addEventListener('click', closeChatWindow);
+            
+            document.getElementById('testMicrophone').addEventListener('click', testMicrophone);
 
-        // =======================================================
-        // 3. GERENCIAMENTO DE EVENTOS (UI)
-        // =======================================================
-        
-        function initEventListeners() {
-            dom.chatToggle.addEventListener('click', toggleChatWindow);
-            dom.closeChat.addEventListener('click', closeChatWindow);
-            dom.backToLists.addEventListener('click', () => showListView());
-
-            dom.chatTabs.forEach(tab => {
+            
+            chatTabs.forEach(tab => {
                 tab.addEventListener('click', () => switchTab(tab.dataset.tab));
             });
-
-            dom.sendMessageBtn.addEventListener('click', sendMessage);
-            dom.messageInput.addEventListener('keypress', e => {
-                if (e.key === 'Enter') sendMessage();
-            });
             
-            dom.startCallBtn.addEventListener('click', () => {
-                if(appState.selectedUser) {
-                    initiateCall(appState.selectedUser.id, appState.selectedUser.nome);
+            const blockCurrentUser = document.getElementById('blockCurrentUser');
+blockCurrentUser.addEventListener('click', () => {
+    if (selectedUser) {
+        blockUser(selectedUser.id);
+    }
+});
+            
+            backToUsers.addEventListener('click', () => switchTab('users'));
+            
+            sendMessage.addEventListener('click', sendNewMessage);
+            
+            
+                // Event listeners para configurações
+    soundNotification.addEventListener('change', saveSettings);
+    tabNotification.addEventListener('change', saveSettings);
+    onlineStatus.addEventListener('change', saveSettings);
+    receiveMessages.addEventListener('change', saveSettings);
+    darkTheme.addEventListener('change', toggleDarkTheme);
+    fontSize.addEventListener('change', saveSettings);
+    
+    clearBlocked.addEventListener('click', clearAllBlockedUsers);
+    clearHistory.addEventListener('click', clearChatHistory);
+    exportChat.addEventListener('click', exportChatHistory);
+    resetSettings.addEventListener('click', resetAllSettings);
+    
+    // Carregar configurações salvas
+    
+            
+            
+            
+            
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendNewMessage();
                 }
             });
             
-            dom.blockCurrentUserBtn.addEventListener('click', () => {
-                 if(appState.selectedUser) {
-                    blockUser(appState.selectedUser.id, appState.selectedUser.nome);
-                }
-            });
+            loadSettings();
             
-            // Listeners das configurações
-            dom.soundNotificationSwitch.addEventListener('change', saveSettings);
-            dom.onlineStatusSwitch.addEventListener('change', saveSettings);
-            dom.darkThemeSwitch.addEventListener('change', saveSettings);
-            dom.testMicrophoneBtn.addEventListener('click', testMicrophone);
+        });
+        
+        // Solicitar permissão do microfone ao iniciar o chat
+async function requestMicrophonePermission() {
+    try {
+        // Tentar acessar o microfone para solicitar permissão
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Parar imediatamente após obter a permissão
+        stream.getTracks().forEach(track => track.stop());
+        console.log('Permissão do microfone concedida');
+        return true;
+    } catch (error) {
+        console.error('Erro ao acessar microfone:', error);
+        
+        // Mostrar instruções para o usuário
+        if (error.name === 'NotAllowedError') {
+            showMicrophonePermissionInstructions();
         }
+        return false;
+    }
+}
 
-        function toggleChatWindow() {
-            dom.chatContainer.classList.toggle('active');
-        }
+async function testMicrophone() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            } 
+        });
+        
+        // Criar elemento de áudio para feedback
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        source.connect(analyser);
+        
+        // Mostrar indicador visual
+        showMicrophoneTestUI(stream, analyser);
+        
+    } catch (error) {
+        console.error('Erro ao testar microfone:', error);
+        alert('Não foi possível acessar o microfone. Verifique as permissões.');
+    }
+}
 
-        function closeChatWindow() {
-            dom.chatContainer.classList.remove('active');
+function showMicrophoneTestUI(stream, analyser) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 24px; border-radius: 12px; max-width: 300px; text-align: center;">
+            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 16px;">Teste do Microfone</h3>
+            <div id="volumeIndicator" style="width: 100%; height: 20px; background: #f0f0f0; border-radius: 10px; margin: 20px 0; overflow: hidden;">
+                <div id="volumeLevel" style="height: 100%; background: #4CAF50; width: 0%; transition: width 0.1s;"></div>
+            </div>
+            <p id="volumeText" style="margin-bottom: 20px;">Fale para testar o microfone...</p>
+            <button onclick="stopMicrophoneTest(this)" 
+                    style="background: var(--md-sys-color-primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                Parar Teste
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animar o indicador de volume
+    const volumeLevel = document.getElementById('volumeLevel');
+    const volumeText = document.getElementById('volumeText');
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    
+    function updateVolume() {
+        analyser.getByteFrequencyData(dataArray);
+        const volume = Math.max(...dataArray) / 255 * 100;
+        volumeLevel.style.width = volume + '%';
+        
+        if (volume < 10) {
+            volumeLevel.style.background = '#f44336';
+            volumeText.textContent = 'Microfone não detectando áudio';
+        } else if (volume < 30) {
+            volumeLevel.style.background = '#FF9800';
+            volumeText.textContent = 'Volume baixo';
+        } else {
+            volumeLevel.style.background = '#4CAF50';
+            volumeText.textContent = 'Microfone funcionando!';
         }
         
-        function switchTab(tabName) {
-            dom.chatTabs.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === tabName));
-            dom.tabContents.forEach(content => {
-                // A aba de conversa individual é tratada de forma diferente
-                if (content.id !== 'conversationTab') {
-                    content.classList.toggle('active', content.id === `${tabName}Tab`);
+        if (modal.isConnected) {
+            requestAnimationFrame(updateVolume);
+        }
+    }
+    
+    updateVolume();
+    
+    // Armazenar a stream para parar depois
+    modal._stream = stream;
+}
+
+function stopMicrophoneTest(button) {
+    const modal = button.closest('div').parentElement;
+    if (modal._stream) {
+        modal._stream.getTracks().forEach(track => track.stop());
+    }
+    modal.remove();
+}
+
+// Mostrar instruções para habilitar o microfone
+function showMicrophonePermissionInstructions() {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 24px; border-radius: 12px; max-width: 400px; text-align: center;">
+            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 16px;">Permissão do Microfone Necessária</h3>
+            <p style="margin-bottom: 20px; color: var(--md-sys-color-on-surface);">
+                Para fazer chamadas de voz, é necessário permitir o acesso ao microfone.
+            </p>
+            <div style="text-align: left; background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 8px 0;"><strong>Como permitir:</strong></p>
+                <p style="margin: 4px 0;">1. Clique no ícone de câmera/microfone na barra de endereço</p>
+                <p style="margin: 4px 0;">2. Selecione "Permitir" para acesso ao microfone</p>
+                <p style="margin: 4px 0;">3. Atualize a página e tente novamente</p>
+            </div>
+            <button onclick="this.closest('div').style.display='none'" 
+                    style="background: var(--md-sys-color-primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                Entendi
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+        // Inicializar o chat
+function initializeChat() {
+    // Referências do Firebase
+    usersRef = database.ref('users');
+    messagesRef = database.ref('messages');
+    
+    listenForIncomingCalls(currentUser.uid);
+    
+    // Carregar usuários bloqueados
+    loadBlockedUsers();
+    
+    // Carregar lista de usuários
+    loadUsersList();
+    
+    // Carregar lista de conversas
+    loadConversationsList();
+    
+    // Carregar configurações
+    loadSettings();
+    
+    // Escutar por novas mensagens (versão otimizada)
+    const cleanupListeners = listenForMessagesOptimized();
+    
+    // Atualizar último acesso
+    updateUserLastSeen();
+    
+    // Inicializar indicador de mensagens não lidas
+    setTimeout(updateUnreadMessagesIndicator, 2000);
+    
+    // Retornar função de cleanup para usar se necessário
+    return cleanupListeners;
+}
+
+
+// Funções de Configurações
+function loadSettings() {
+    if (!currentUser) return;
+    
+    const settingsRef = database.ref(`users/${currentUser.uid}/settings`);
+    settingsRef.once('value').then(snapshot => {
+        const savedSettings = snapshot.val();
+        if (savedSettings) {
+            userSettings = { ...userSettings, ...savedSettings };
+            applySettings();
+        }
+    });
+}
+
+function saveSettings() {
+    if (!currentUser) return;
+    
+    // Atualizar objeto de configurações
+    userSettings.soundNotification = soundNotification.checked;
+    userSettings.tabNotification = tabNotification.checked;
+    userSettings.onlineStatus = onlineStatus.checked;
+    userSettings.receiveMessages = receiveMessages.checked;
+    userSettings.darkTheme = darkTheme.checked;
+    userSettings.fontSize = fontSize.value;
+    
+    // Salvar no Firebase
+    const settingsRef = database.ref(`users/${currentUser.uid}/settings`);
+    settingsRef.set(userSettings)
+        .then(() => {
+            console.log('Configurações salvas com sucesso');
+        })
+        .catch(error => {
+            console.error('Erro ao salvar configurações:', error);
+        });
+    
+    // Aplicar configurações imediatamente
+    applySettings();
+}
+
+function applySettings() {
+    // Aplicar tema
+    if (userSettings.darkTheme) {
+        document.body.classList.add('dark-theme');
+    } else {
+        document.body.classList.remove('dark-theme');
+    }
+    
+    // Aplicar tamanho da fonte
+    document.body.style.fontSize = getFontSizeValue(userSettings.fontSize);
+    
+    // Atualizar controles da interface
+    soundNotification.checked = userSettings.soundNotification;
+    tabNotification.checked = userSettings.tabNotification;
+    onlineStatus.checked = userSettings.onlineStatus;
+    receiveMessages.checked = userSettings.receiveMessages;
+    darkTheme.checked = userSettings.darkTheme;
+    fontSize.value = userSettings.fontSize;
+}
+
+function getFontSizeValue(size) {
+    switch(size) {
+        case 'small': return '12px';
+        case 'large': return '16px';
+        default: return '14px';
+    }
+}
+
+function toggleDarkTheme() {
+    userSettings.darkTheme = darkTheme.checked;
+    saveSettings();
+}
+
+// Funções de Ação
+function clearAllBlockedUsers() {
+    if (confirm('Tem certeza que deseja desbloquear todos os usuários?')) {
+        blockedUsers = [];
+        database.ref(`users/${currentUser.uid}/blockedUsers`).set([])
+            .then(() => {
+                updateBlockedUsersList();
+                alert('Todos os usuários foram desbloqueados.');
+            })
+            .catch(error => {
+                console.error('Erro ao desbloquear usuários:', error);
+                alert('Erro ao desbloquear usuários.');
+            });
+    }
+}
+
+function clearChatHistory() {
+    if (confirm('Tem certeza que deseja limpar todo o histórico de conversas? Esta ação não pode ser desfeita.')) {
+        const conversationsRef = database.ref('conversations');
+        conversationsRef.once('value').then(snapshot => {
+            const conversations = snapshot.val();
+            const updates = {};
+            
+            Object.keys(conversations).forEach(conversationId => {
+                if (conversationId.includes(currentUser.uid)) {
+                    updates[`conversations/${conversationId}`] = null;
                 }
             });
             
-            // Garante que a conversa individual seja escondida ao trocar de aba principal
-            if (tabName !== 'conversation') {
-                showListView();
+            database.ref().update(updates)
+                .then(() => {
+                    loadConversationsList();
+                    alert('Histórico de conversas limpo com sucesso.');
+                })
+                .catch(error => {
+                    console.error('Erro ao limpar histórico:', error);
+                    alert('Erro ao limpar histórico.');
+                });
+        });
+    }
+}
+
+function exportChatHistory() {
+    const conversationsRef = database.ref('conversations');
+    conversationsRef.once('value').then(snapshot => {
+        const conversations = snapshot.val();
+        const userConversations = [];
+        
+        Object.keys(conversations).forEach(conversationId => {
+            if (conversationId.includes(currentUser.uid)) {
+                const messages = conversations[conversationId];
+                userConversations.push({
+                    conversationId: conversationId,
+                    messages: messages
+                });
             }
+        });
+        
+        // Criar arquivo de exportação
+        const dataStr = JSON.stringify(userConversations, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `chat-export-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        alert('Conversas exportadas com sucesso!');
+    });
+}
+
+function resetAllSettings() {
+    if (confirm('Tem certeza que deseja redefinir todas as configurações para os valores padrão?')) {
+        userSettings = {
+            soundNotification: true,
+            tabNotification: true,
+            onlineStatus: true,
+            receiveMessages: true,
+            darkTheme: false,
+            fontSize: 'medium'
+        };
+        
+        const settingsRef = database.ref(`users/${currentUser.uid}/settings`);
+        settingsRef.set(userSettings)
+            .then(() => {
+                applySettings();
+                alert('Configurações redefinidas com sucesso.');
+            })
+            .catch(error => {
+                console.error('Erro ao redefinir configurações:', error);
+                alert('Erro ao redefinir configurações.');
+            });
+    }
+}
+
+// Adicione esta função para tocar som de notificação
+function playNotificationSound() {
+    try {
+        // Criar um som de notificação simples usando Web Audio API
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (error) {
+        console.log('Web Audio API não suportada ou bloqueada pelo navegador');
+    }
+}
+
+function showDesktopNotification(lastMessage, conversationId) {
+    // Verificar se as notificações são suportadas
+    if (!("Notification" in window)) {
+        console.log("Este navegador não suporta notificações desktop");
+        return;
+    }
+    
+    // Verificar se já temos permissão
+    if (Notification.permission === "granted") {
+        createNotification(lastMessage);
+    } else if (Notification.permission !== "denied") {
+        // Pedir permissão ao usuário
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                createNotification(lastMessage);
+            }
+        });
+    }
+    
+    function createNotification(message) {
+        // Buscar informações do remetente
+        const senderId = message.senderId;
+        usersRef.child(senderId).once('value').then(snapshot => {
+            const sender = snapshot.val();
+            const senderName = sender ? sender.nome || 'Usuário' : 'Usuário';
+            
+            const notification = new Notification("Interfone Virtual - Nova Mensagem", {
+                body: `${senderName}: ${message.text}`,
+                icon: '/favicon.ico', // Altere para o ícone do seu site
+                tag: conversationId,
+                requireInteraction: false
+            });
+            
+            notification.onclick = function() {
+                window.focus();
+                // Focar no chat e abrir a conversa
+                if (chatContainer) {
+                    chatContainer.classList.add('active');
+                    chatToggle.classList.add('active');
+                    
+                    // Buscar informações do usuário para selecionar a conversa
+                    usersRef.child(senderId).once('value').then(userSnapshot => {
+                        const userData = userSnapshot.val();
+                        if (userData) {
+                            selectUser(senderId, userData);
+                        }
+                    });
+                }
+                notification.close();
+            };
+            
+            // Fechar automaticamente após 5 segundos
+            setTimeout(() => {
+                notification.close();
+            }, 5000);
+        });
+    }
+}
+        // Carregar lista de usuários
+function loadUsersList() {
+    usersRef.on('value', snapshot => {
+        const users = snapshot.val();
+        usersList.innerHTML = '';
+        
+        if (!users) {
+            usersList.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-icons">people</span>
+                    <p>Nenhum usuário cadastrado</p>
+                </div>
+            `;
+            return;
         }
         
-        function showConversationView(user) {
-            appState.selectedUser = user;
+        Object.keys(users).forEach(userId => {
+            // Não mostrar o usuário atual na lista
+            if (userId === currentUser.uid) return;
             
-            // Esconder listas
-            dom.conversationsList.parentElement.style.display = 'none';
-            dom.usersList.parentElement.style.display = 'none';
+            const user = users[userId];
+            const isBlocked = blockedUsers.includes(userId);
             
-            // Mostrar view da conversa
-            dom.tabContents.forEach(c => c.classList.remove('active'));
-            document.getElementById('conversationTab').classList.add('active');
+            // Verificar se o usuário está online (fazer isso antes de criar o HTML)
+            const isOnline = user.lastSeen && (Date.now() - user.lastSeen) < 300000; // 5 minutos
             
-            // Atualizar UI da conversa
-            dom.currentUserName.textContent = user.nome || 'Usuário';
-            dom.currentUserStatus.className = `user-status ${user.online ? '' : 'offline'}`;
-            dom.messageInput.disabled = false;
-            dom.sendMessageBtn.disabled = false;
+            const userItem = document.createElement('div');
+            userItem.className = 'user-item';
+            userItem.dataset.userId = userId;
             
-            loadMessagesForConversation(appState.currentUser.uid, user.id);
+            if (isBlocked) {
+                // Mostrar usuários bloqueados de forma diferente
+                userItem.innerHTML = `
+                    <div class="user-avatar" style="opacity: 0.5;">${user.nome ? user.nome.charAt(0).toUpperCase() : 'U'}</div>
+                    <div class="user-info" style="opacity: 0.5;">
+                        <div class="user-name">${user.nome || 'Usuário'} (Bloqueado)</div>
+                        <div class="user-details">${user.bloco ? `Bloco ${user.bloco}, AP ${user.apartamento}` : 'Portaria'}</div>
+                    </div>
+                    <div class="user-actions">
+                        <button class="unblock-btn" title="Desbloquear usuário">
+                            <span class="material-icons">lock_open</span>
+                        </button>
+                    </div>
+                `;
+                
+                const unblockBtn = userItem.querySelector('.unblock-btn');
+                unblockBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    unblockUser(userId);
+                });
+                
+                userItem.style.cursor = 'not-allowed';
+                userItem.addEventListener('click', () => {
+                    alert('Este usuário está bloqueado. Desbloqueie-o nas configurações para enviar mensagens.');
+                });
+            } else {
+                // Código normal para usuários não bloqueados
+                userItem.innerHTML = `
+                    <div class="user-avatar">${user.nome ? user.nome.charAt(0).toUpperCase() : 'U'}</div>
+                    <div class="user-info">
+                        <div class="user-name">${user.nome || 'Usuário'}</div>
+                        <div class="user-details">${user.bloco ? `Bloco ${user.bloco}, AP ${user.apartamento}` : 'Portaria'}</div>
+                    </div>
+                    <div class="user-actions">
+                        <div class="user-status ${isOnline ? '' : 'offline'}"></div>
+                        <button class="block-btn" title="Bloquear usuário">
+                            <span class="material-icons">block</span>
+                        </button>
+                    </div>
+                `;
+                
+                const blockBtn = userItem.querySelector('.block-btn');
+                blockBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    blockUser(userId);
+                });
+                
+                userItem.addEventListener('click', () => selectUser(userId, user));
+            }
+            
+            usersList.appendChild(userItem);
+        });
+    });
+}
+
+        // Selecionar usuário para conversar
+        function selectUser(userId, userData) {
+            // Verificar se o usuário está bloqueado
+            if (blockedUsers.includes(userId)) {
+                alert('Este usuário está bloqueado. Desbloqueie-o nas configurações para enviar mensagens.');
+                return;
+            }
+            
+            selectedUser = {
+                id: userId,
+                ...userData
+            };
+            
+            const startCallBtn = document.getElementById('startCallBtn');
+    startCallBtn.style.display = 'flex'; // Mostra o botão
+    startCallBtn.onclick = () => {
+        initiateCall(userId, userData.nome || 'Usuário');
+    };
+            
+            currentUserName.textContent = userData.nome || 'Usuário';
+            
+            const blockCurrentUser = document.getElementById('blockCurrentUser');
+    blockCurrentUser.style.display = 'flex';
+            
+            // Verificar se o usuário está online
+            const isOnline = userData.lastSeen && (Date.now() - userData.lastSeen) < 300000;
+            currentUserStatus.className = `user-status ${isOnline ? '' : 'offline'}`;
+            
+            // Ativar a aba de conversa
+            switchTab('conversation');
+            
+            // Carregar mensagens da conversa
+            loadConversationMessages();
+            
+            // Habilitar campo de mensagem
+            messageInput.disabled = false;
+            sendMessage.disabled = false;
         }
 
-        function showListView() {
-            appState.selectedUser = null;
+        // Carregar mensagens da conversa
+        function loadConversationMessages() {
+            if (!selectedUser) return;
             
-            // Esconder conversa
-            document.getElementById('conversationTab').classList.remove('active');
+            const conversationId = getConversationId(currentUser.uid, selectedUser.id);
+            const conversationRef = database.ref(`conversations/${conversationId}`);
             
-            // Mostrar lista ativa
-            const activeTab = document.querySelector('.chat-tab.active').dataset.tab;
-            document.getElementById(`${activeTab}Tab`).style.display = 'flex';
-            document.getElementById(`${activeTab}Tab`).classList.add('active');
-            
-             // Resetar UI da conversa
-            dom.currentUserName.textContent = '';
-            dom.messageInput.disabled = true;
-            dom.sendMessageBtn.disabled = true;
-        }
-
-        // =======================================================
-        // 4. FIREBASE DATA & LISTENERS
-        // =======================================================
-
-        function attachFirebaseListeners() {
-            // Limpa listeners antigos para evitar duplicação
-            detachFirebaseListeners();
-
-            const usersRef = db.ref('users');
-            usersRef.on('value', handleUsersSnapshot, handleFirebaseError);
-            appState.firebaseListeners.push({ ref: usersRef, event: 'value' });
-            
-            const blockedRef = db.ref(`users/${appState.currentUser.uid}/blockedUsers`);
-            blockedRef.on('value', handleBlockedUsersSnapshot, handleFirebaseError);
-            appState.firebaseListeners.push({ ref: blockedRef, event: 'value' });
-
-            const conversationsRef = db.ref('conversations');
-            conversationsRef.on('value', handleConversationsSnapshot, handleFirebaseError);
-            appState.firebaseListeners.push({ ref: conversationsRef, event: 'value' });
-        }
-
-        function detachFirebaseListeners() {
-            appState.firebaseListeners.forEach(({ ref, event }) => ref.off(event));
-            appState.firebaseListeners = [];
-        }
-
-        function handleFirebaseError(error) {
-            console.error("Erro no Firebase:", error);
-        }
-
-        function handleUsersSnapshot(snapshot) {
-            appState.users = snapshot.val() || {};
-            renderUsersList();
+            conversationRef.on('value', snapshot => {
+                const messages = snapshot.val();
+                messagesContainer.innerHTML = '';
+                
+                if (!messages) {
+                    messagesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <span class="material-icons">chat_bubble_outline</span>
+                            <p>Nenhuma mensagem ainda. Inicie a conversa!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Ordenar mensagens por timestamp
+                const sortedMessages = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
+                
+                sortedMessages.forEach(message => {
+                    const messageElement = document.createElement('div');
+                    const isSent = message.senderId === currentUser.uid;
+                    
+                    messageElement.className = `message ${isSent ? 'sent' : 'received'}`;
+                    messageElement.innerHTML = `
+                        <div class="message-text">${message.text}</div>
+                        <div class="message-time">${formatTime(message.timestamp)}</div>
+                    `;
+                    
+                    messagesContainer.appendChild(messageElement);
+                });
+                
+                // Rolagem automática para a última mensagem
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
         }
         
-        function handleBlockedUsersSnapshot(snapshot) {
-            appState.blockedUsers = snapshot.val() || [];
-            // Re-renderiza as listas que dependem dos usuários bloqueados
-            renderUsersList();
-            renderConversationsList();
+        function loadConversationsList() {
+    if (!currentUser) return;
+    
+    const conversationsRef = database.ref('conversations');
+    const usersRef = database.ref('users');
+    
+    conversationsRef.on('value', snapshot => {
+        const conversations = snapshot.val();
+        conversationsList = [];
+        
+        if (!conversations) {
+            document.getElementById('conversationsList').innerHTML = `
+                <div class="empty-state">
+                    <span class="material-icons">forum</span>
+                    <p>Nenhuma conversa ainda</p>
+                </div>
+            `;
+            return;
         }
-
-        function handleConversationsSnapshot(snapshot) {
-            const allConversations = snapshot.val() || {};
+        
+        // Buscar informações dos usuários
+        usersRef.once('value').then(usersSnapshot => {
+            const allUsers = usersSnapshot.val();
             const userConversations = [];
-            let unreadCount = 0;
-
-            Object.keys(allConversations).forEach(convoId => {
-                if (convoId.includes(appState.currentUser.uid)) {
-                    const otherUserId = convoId.replace(appState.currentUser.uid, '').replace('_', '');
-                    if (appState.blockedUsers.includes(otherUserId)) return; // Ignora conversas com bloqueados
-
-                    const otherUser = appState.users[otherUserId];
-                    if (!otherUser) return;
+            
+            // Filtrar conversas do usuário atual
+            Object.keys(conversations).forEach(conversationId => {
+                if (conversationId.includes(currentUser.uid)) {
+                    const messages = conversations[conversationId];
+                    if (!messages) return;
                     
-                    const messages = Object.values(allConversations[convoId]);
-                    const lastMessage = messages[messages.length - 1];
+                    // Encontrar a última mensagem
+                    const messageKeys = Object.keys(messages);
+                    const lastMessageKey = messageKeys[messageKeys.length - 1];
+                    const lastMessage = messages[lastMessageKey];
                     
-                    if (lastMessage) {
-                         userConversations.push({
-                            id: otherUserId,
-                            user: otherUser,
-                            lastMessage: lastMessage
+                    if (!lastMessage) return;
+                    
+                    // Encontrar o outro usuário da conversa
+                    const userIds = conversationId.split('_');
+                    const otherUserId = userIds[0] === currentUser.uid ? userIds[1] : userIds[0];
+                    const otherUser = allUsers[otherUserId];
+                    
+                    if (otherUser && !blockedUsers.includes(otherUserId)) {
+                        userConversations.push({
+                            userId: otherUserId,
+                            userData: otherUser,
+                            lastMessage: lastMessage,
+                            conversationId: conversationId,
+                            unread: checkIfUnread(conversationId, lastMessage)
                         });
+                    }
+                }
+            });
+            
+            // Ordenar por última mensagem (mais recente primeiro)
+            userConversations.sort((a, b) => b.lastMessage.timestamp - a.lastMessage.timestamp);
+            conversationsList = userConversations;
+            
+            updateConversationsListDisplay();
+        });
+    });
+}
+
+        // Enviar mensagem
+        function sendNewMessage() {
+    if (!selectedUser || !messageInput.value.trim()) return;
+    
+    const messageText = messageInput.value.trim();
+    const conversationId = getConversationId(currentUser.uid, selectedUser.id);
+    const messageRef = database.ref(`conversations/${conversationId}`).push();
+    
+    const messageData = {
+        text: messageText,
+        senderId: currentUser.uid,
+        receiverId: selectedUser.id,
+        timestamp: Date.now()
+    };
+    
+    messageRef.set(messageData)
+        .then(() => {
+            messageInput.value = '';
+            // Atualizar a lista de conversas após enviar mensagem
+            loadConversationsList();
+        })
+        .catch(error => {
+            console.error('Erro ao enviar mensagem:', error);
+            alert('Erro ao enviar mensagem. Tente novamente.');
+        });
+}
+        
+        function checkIfUnread(conversationId, lastMessage) {
+    // Mensagens enviadas pelo usuário atual nunca são não lidas
+    if (lastMessage.senderId === currentUser.uid) return false;
+    
+    // Buscar quando o usuário visualizou esta conversa pela última vez
+    const lastSeenRef = database.ref(`users/${currentUser.uid}/lastSeenConversations/${conversationId}`);
+    
+    // Valor padrão é true (não lida) até provar o contrário
+    let unreadStatus = true;
+    
+    lastSeenRef.once('value').then(snapshot => {
+        const lastSeenTime = snapshot.val();
+        
+        // Se o usuário já viu esta conversa após a última mensagem, então está lida
+        if (lastSeenTime && lastSeenTime >= lastMessage.timestamp) {
+            unreadStatus = false;
+        }
+    }).catch(error => {
+        console.error('Erro ao verificar status de leitura:', error);
+        unreadStatus = false;
+    });
+    
+    return unreadStatus;
+}
+
+function updateConversationsListDisplay() {
+    const conversationsListElement = document.getElementById('conversationsList');
+    conversationsListElement.innerHTML = '';
+    
+    if (conversationsList.length === 0) {
+        conversationsListElement.innerHTML = `
+            <div class="empty-state">
+                <span class="material-icons">forum</span>
+                <p>Nenhuma conversa ainda</p>
+            </div>
+        `;
+        return;
+    }
+    
+    conversationsList.forEach(conversation => {
+        const conversationItem = document.createElement('div');
+        conversationItem.className = 'conversation-item';
+        conversationItem.dataset.userId = conversation.userId;
+        
+        const lastMessage = conversation.lastMessage;
+        const isSent = lastMessage.senderId === currentUser.uid;
+        const messagePreview = isSent ? `Você: ${lastMessage.text}` : lastMessage.text;
+        const time = formatTime(lastMessage.timestamp);
+        
+        conversationItem.innerHTML = `
+    <div class="conversation-avatar">
+        ${conversation.userData.nome ? conversation.userData.nome.charAt(0).toUpperCase() : 'U'}
+    </div>
+    <div class="conversation-info">
+        <div class="conversation-header">
+            <div class="conversation-name">${conversation.userData.nome || 'Usuário'}</div>
+            <div class="conversation-time">${time}</div>
+        </div>
+        <div class="conversation-preview">${messagePreview}</div>
+    </div>
+    <div class="conversation-actions">
+    ${conversation.unread ? '<div class="conversation-unread"></div>' : ''}
+    <button class="chat-action-btn call-list-btn" data-user-id="${conversation.userId}" data-user-name="${conversation.userData.nome || 'Usuário'}" title="Ligar">
+        <span class="material-icons">call</span>
+    </button>
+    <button class="block-btn" title="Bloquear usuário">
+        <span class="material-icons">block</span>
+    </button>
+</div>
+
+`;
+
+// Adicione este código após conversationItem.appendChild(conversationItem);
+const blockBtn = conversationItem.querySelector('.block-btn');
+blockBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Impede que o clique no botão selecione a conversa
+    blockUser(conversation.userId);
+});
+        
+        conversationItem.addEventListener('click', () => {
+            selectUser(conversation.userId, conversation.userData);
+        });
+        
+        conversationsListElement.appendChild(conversationItem);
+    });
+    document.querySelectorAll('.call-list-btn').forEach(button => {
+    button.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o clique abra a conversa de texto
+        const userId = e.currentTarget.dataset.userId;
+        const userName = e.currentTarget.dataset.userName;
+        initiateCall(userId, userName);
+    });
+});
+}
+
+        // Escutar por novas mensagens
+  function listenForMessages() {
+    const userConversationsRef = database.ref('conversations');
+    
+    userConversationsRef.on('child_changed', snapshot => {
+        const conversationId = snapshot.key;
+        if (conversationId.includes(currentUser.uid)) {
+            const messages = snapshot.val();
+            
+            // Encontrar a última mensagem
+            const messageKeys = Object.keys(messages);
+            const lastMessageKey = messageKeys[messageKeys.length - 1];
+            const lastMessage = messages[lastMessageKey];
+            
+            // Verificar se é uma mensagem recebida (não enviada pelo usuário atual)
+            const isReceivedMessage = lastMessage && lastMessage.senderId !== currentUser.uid;
+            
+            // Atualizar lista de conversas quando receber nova mensagem
+            loadConversationsList();
+            
+            // Se estivermos na conversa certa, atualizar as mensagens
+            if (selectedUser && conversationId === getConversationId(currentUser.uid, selectedUser.id)) {
+                loadConversationMessages();
+                
+                // Marcar como lida automaticamente quando estamos na conversa
+                if (isReceivedMessage) {
+                    markConversationAsRead(conversationId);
+                }
+            } else if (isReceivedMessage) {
+                // Se não estamos na conversa e é uma mensagem recebida
+                // Tocar som de notificação se configurado
+                if (userSettings.soundNotification) {
+                    playNotificationSound();
+                }
+                
+                // Mostrar notificação visual se configurado
+                if (userSettings.tabNotification) {
+                    showDesktopNotification(lastMessage, conversationId);
+                }
+            }
+            
+            updateUnreadMessagesIndicator();
+        }
+    });
+    
+    userConversationsRef.on('child_added', snapshot => {
+        const conversationId = snapshot.key;
+        if (conversationId.includes(currentUser.uid)) {
+            const messages = snapshot.val();
+            
+            // Encontrar a última mensagem
+            const messageKeys = Object.keys(messages);
+            const lastMessageKey = messageKeys[messageKeys.length - 1];
+            const lastMessage = messages[lastMessageKey];
+            
+            // Verificar se é uma mensagem recebida (não enviada pelo usuário atual)
+            const isReceivedMessage = lastMessage && lastMessage.senderId !== currentUser.uid;
+            
+            // Atualizar lista de conversas quando nova conversa é iniciada
+            loadConversationsList();
+            
+            // Se estivermos na conversa certa, atualizar as mensagens
+            if (selectedUser && conversationId === getConversationId(currentUser.uid, selectedUser.id)) {
+                loadConversationMessages();
+                
+                // Marcar como lida automaticamente quando estamos na conversa
+                if (isReceivedMessage) {
+                    markConversationAsRead(conversationId);
+                }
+            } else if (isReceivedMessage) {
+                // Se não estamos na conversa e é uma mensagem recebida
+                // Tocar som de notificação se configurado
+                if (userSettings.soundNotification) {
+                    playNotificationSound();
+                }
+                
+                // Mostrar notificação visual se configurado
+                if (userSettings.tabNotification) {
+                    showDesktopNotification(lastMessage, conversationId);
+                }
+            }
+            
+            updateUnreadMessagesIndicator();
+        }
+    });
+    
+    // Escutar por remoção de conversas
+    userConversationsRef.on('child_removed', snapshot => {
+        const conversationId = snapshot.key;
+        if (conversationId.includes(currentUser.uid)) {
+            // Atualizar lista de conversas quando uma conversa é removida
+            loadConversationsList();
+            updateUnreadMessagesIndicator();
+        }
+    });
+}
+
+        // Carregar usuários bloqueados
+        function loadBlockedUsers() {
+            const blockedRef = database.ref(`users/${currentUser.uid}/blockedUsers`);
+            
+            blockedRef.on('value', snapshot => {
+                blockedUsers = snapshot.val() || [];
+                updateBlockedUsersList();
+            });
+        }
+
+        // Atualizar lista de usuários bloqueados
+        function updateBlockedUsersList() {
+            blockedUsersList.innerHTML = '';
+            
+            if (blockedUsers.length === 0) {
+                blockedUsersList.innerHTML = `
+                    <div class="empty-state">
+                        <span class="material-icons">block</span>
+                        <p>Nenhum usuário bloqueado</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Buscar informações dos usuários bloqueados
+            usersRef.once('value').then(snapshot => {
+                const allUsers = snapshot.val();
+                
+                blockedUsers.forEach(userId => {
+                    if (allUsers[userId]) {
+                        const user = allUsers[userId];
+                        const blockedUserElement = document.createElement('div');
+                        blockedUserElement.className = 'blocked-user';
                         
-                        // Lógica de contagem de não lidas (simplificada)
-                        if(lastMessage.senderId !== appState.currentUser.uid && !lastMessage.read) {
+                        blockedUserElement.innerHTML = `
+                            <div>
+                                <div class="user-name">${user.nome || 'Usuário'}</div>
+                                <div class="user-details">${user.bloco ? `Bloco ${user.bloco}, AP ${user.apartamento}` : 'Portaria'}</div>
+                            </div>
+                            <button class="unblock-btn" data-user-id="${userId}">Desbloquear</button>
+                        `;
+                        
+                        blockedUsersList.appendChild(blockedUserElement);
+                    }
+                });
+                
+                // Adicionar event listeners aos botões de desbloquear
+                document.querySelectorAll('.unblock-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const userIdToUnblock = this.dataset.userId;
+                        unblockUser(userIdToUnblock);
+                    });
+                });
+            });
+        }
+
+        // Bloquear usuário
+function blockUser(userId) {
+    if (!currentUser) return;
+    
+    // Confirmar com o usuário
+    if (!confirm('Tem certeza que deseja bloquear este usuário?\n\nUsuários bloqueados não poderão:\n• Enviar mensagens para você\n• Ver seu status online\n• Iniciar novas conversas')) {
+        return;
+    }
+    
+    if (!blockedUsers.includes(userId)) {
+        blockedUsers.push(userId);
+        database.ref(`users/${currentUser.uid}/blockedUsers`).set(blockedUsers)
+            .then(() => {
+                // Atualizar a interface
+                updateBlockedUsersList();
+                loadUsersList(); // Recarregar lista de usuários
+                loadConversationsList(); // Recarregar lista de conversas
+                
+                // Se estiver conversando com este usuário, fechar a conversa
+                if (selectedUser && selectedUser.id === userId) {
+                    switchTab('users');
+                    selectedUser = null;
+                    messageInput.disabled = true;
+                    sendMessage.disabled = true;
+                }
+                
+                // Mostrar confirmação
+                showNotification('Usuário bloqueado com sucesso!', 'success');
+            })
+            .catch(error => {
+                console.error('Erro ao bloquear usuário:', error);
+                showNotification('Erro ao bloquear usuário. Tente novamente.', 'error');
+            });
+    } else {
+        showNotification('Este usuário já está bloqueado.', 'info');
+    }
+}
+
+// Função para mostrar notificações
+function showNotification(message, type = 'info') {
+    // Remover notificação anterior se existir
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <span class="material-icons">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}</span>
+        <span>${message}</span>
+    `;
+    
+    // Estilos para a notificação
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remover automaticamente após 3 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 3000);
+}
+
+// Adicione estas animações ao CSS
+const notificationStyles = `
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+`;
+
+// Adicione ao documento
+const notificationStyleSheet = document.createElement('style');
+notificationStyleSheet.textContent = notificationStyles;
+document.head.appendChild(notificationStyleSheet);
+
+        // Desbloquear usuário
+        function unblockUser(userId) {
+            blockedUsers = blockedUsers.filter(id => id !== userId);
+            database.ref(`users/${currentUser.uid}/blockedUsers`).set(blockedUsers)
+                .then(() => {
+                    alert('Usuário desbloqueado com sucesso.');
+                    updateBlockedUsersList();
+                })
+                .catch(error => {
+                    console.error('Erro ao desbloquear usuário:', error);
+                    alert('Erro ao desbloquear usuário. Tente novamente.');
+                });
+        }
+
+        // Funções auxiliares
+        function getConversationId(user1, user2) {
+            return [user1, user2].sort().join('_');
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function updateUnreadMessagesIndicator() {
+    if (!currentUser) return;
+    
+    const userConversationsRef = database.ref('conversations');
+    let unreadCount = 0;
+    
+    userConversationsRef.once('value').then(snapshot => {
+        const conversations = snapshot.val();
+        
+        if (!conversations) {
+            removeUnreadIndicator();
+            return;
+        }
+        
+        // Buscar a última vez que o usuário visualizou as conversas
+        const lastSeenRef = database.ref(`users/${currentUser.uid}/lastSeenConversations`);
+        
+        lastSeenRef.once('value').then(lastSeenSnapshot => {
+            const lastSeenTimes = lastSeenSnapshot.val() || {};
+            
+            Object.keys(conversations).forEach(conversationId => {
+                // Verificar se esta conversa é do usuário atual
+                if (conversationId.includes(currentUser.uid)) {
+                    const messages = conversations[conversationId];
+                    
+                    if (!messages) return;
+                    
+                    // Encontrar a mensagem mais recente
+                    const messageKeys = Object.keys(messages);
+                    const lastMessageKey = messageKeys[messageKeys.length - 1];
+                    const lastMessage = messages[lastMessageKey];
+                    
+                    // Verificar se é uma mensagem recebida (não enviada pelo usuário atual)
+                    if (lastMessage && lastMessage.senderId !== currentUser.uid) {
+                        const conversationLastSeen = lastSeenTimes[conversationId] || 0;
+                        
+                        // Se a mensagem é mais recente que a última visualização, contar como não lida
+                        if (lastMessage.timestamp > conversationLastSeen) {
                             unreadCount++;
                         }
                     }
                 }
             });
             
-            // Ordena por mais recente
-            userConversations.sort((a, b) => b.lastMessage.timestamp - a.lastMessage.timestamp);
-            
-            renderConversationsList(userConversations);
-            updateUnreadBadge(unreadCount);
+            // Atualizar o indicador
+            updateBadge(unreadCount);
+        });
+    }).catch(error => {
+        console.error('Erro ao verificar mensagens não lidas:', error);
+    });
+}
+
+function updateBadge(count) {
+    // Remover badge existente
+    removeUnreadIndicator();
+    
+    if (count > 0) {
+        // Criar ou atualizar o badge
+        let badge = chatToggle.querySelector('.unread-badge');
+        
+        if (!badge) {
+            badge = document.createElement('div');
+            badge.className = 'unread-badge';
+            chatToggle.appendChild(badge);
         }
         
-        function loadMessagesForConversation(userId1, userId2) {
-            const convoId = [userId1, userId2].sort().join('_');
-            const messagesRef = db.ref(`conversations/${convoId}`);
-            
-            messagesRef.orderByChild('timestamp').on('value', snapshot => {
-                const messages = snapshot.val() || {};
-                renderMessages(Object.values(messages));
-            }, handleFirebaseError);
-
-            appState.firebaseListeners.push({ ref: messagesRef, event: 'value' });
-        }
+        badge.textContent = count > 9 ? '9+' : count;
+        badge.style.display = 'flex';
         
-        function sendMessage() {
-            const text = dom.messageInput.value.trim();
-            if (!text || !appState.selectedUser) return;
+        // Adicionar animação de pulsação para novas mensagens
+        if (count > (parseInt(badge.textContent) || 0)) {
+            badge.classList.add('pulse');
+            setTimeout(() => badge.classList.remove('pulse'), 1000);
+        }
+    }
+}
 
-            const convoId = [appState.currentUser.uid, appState.selectedUser.id].sort().join('_');
-            const messageRef = db.ref(`conversations/${convoId}`).push();
+function removeUnreadIndicator() {
+    const badge = chatToggle.querySelector('.unread-badge');
+    if (badge) {
+        badge.style.display = 'none';
+    }
+}
+
+// Marcar conversa como lida quando o usuário visualiza
+function markConversationAsRead(conversationId) {
+    if (!currentUser) return;
+    
+    const lastSeenRef = database.ref(`users/${currentUser.uid}/lastSeenConversations/${conversationId}`);
+    lastSeenRef.set(Date.now())
+        .then(() => {
+            // Atualizar cache local se existir
+            if (lastSeenConversationsCache) {
+                lastSeenConversationsCache[conversationId] = Date.now();
+            }
+            updateUnreadMessagesIndicator();
+        })
+        .catch(error => {
+            console.error('Erro ao marcar conversa como lida:', error);
+        });
+}
+
+function listenForMessagesOptimized() {
+    const userConversationsRef = database.ref('conversations');
+    let updateTimeout;
+    
+    const handleConversationUpdate = (snapshot, eventType) => {
+        const conversationId = snapshot.key;
+        if (conversationId.includes(currentUser.uid)) {
+            const messages = snapshot.val();
             
-            const messageData = {
-                text,
-                senderId: appState.currentUser.uid,
-                receiverId: appState.selectedUser.id,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+            // Encontrar a última mensagem
+            const messageKeys = Object.keys(messages || {});
+            if (messageKeys.length === 0) return;
+            
+            const lastMessageKey = messageKeys[messageKeys.length - 1];
+            const lastMessage = messages[lastMessageKey];
+            
+            // Verificar se é uma mensagem recebida (não enviada pelo usuário atual)
+            const isReceivedMessage = lastMessage && lastMessage.senderId !== currentUser.uid;
+            const isCurrentConversation = selectedUser && conversationId === getConversationId(currentUser.uid, selectedUser.id);
+            
+            // Debounce para atualizações frequentes
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                // Atualizar lista de conversas
+                loadConversationsList();
+                
+                // Se estivermos na conversa certa, atualizar as mensagens
+                if (isCurrentConversation) {
+                    loadConversationMessages();
+                    
+                    // Marcar como lida automaticamente quando estamos na conversa
+                    if (isReceivedMessage) {
+                        markConversationAsRead(conversationId);
+                    }
+                } else if (isReceivedMessage && eventType === 'child_changed') {
+                    // Só notificar para mensagens novas, não para conversas existentes
+                    handleNewMessageNotification(lastMessage, conversationId);
+                }
+                
+                updateUnreadMessagesIndicator();
+            }, 100); // Debounce de 100ms
+        }
+    };
+    
+    userConversationsRef.on('child_changed', snapshot => {
+        handleConversationUpdate(snapshot, 'child_changed');
+    });
+    
+    userConversationsRef.on('child_added', snapshot => {
+        handleConversationUpdate(snapshot, 'child_added');
+    });
+    
+    userConversationsRef.on('child_removed', snapshot => {
+        const conversationId = snapshot.key;
+        if (conversationId.includes(currentUser.uid)) {
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                loadConversationsList();
+                updateUnreadMessagesIndicator();
+            }, 100);
+        }
+    });
+    
+    // Retornar função para limpar event listeners se necessário
+    return () => {
+        userConversationsRef.off();
+        clearTimeout(updateTimeout);
+    };
+}
+
+function handleNewMessageNotification(lastMessage, conversationId) {
+    // Tocar som de notificação se configurado
+    if (userSettings.soundNotification) {
+        playNotificationSound();
+    }
+    
+    // Mostrar notificação visual se configurado
+    if (userSettings.tabNotification) {
+        showDesktopNotification(lastMessage, conversationId);
+    }
+    
+    // Adicionar efeito visual no badge
+    const badge = chatToggle.querySelector('.unread-badge');
+    if (badge) {
+        badge.classList.add('pulse');
+        setTimeout(() => badge.classList.remove('pulse'), 1000);
+    }
+}
+
+// Chamar quando o usuário abre uma conversa
+function onConversationOpened(conversationId) {
+    markConversationAsRead(conversationId);
+}
+
+// Atualizar a função selectUser para marcar como lida
+function selectUser(userId, userData) {
+    // Verificar se o usuário está bloqueado
+    if (blockedUsers.includes(userId)) {
+        alert('Este usuário está bloqueado. Desbloqueie-o nas configurações para enviar mensagens.');
+        return;
+    }
+    
+    selectedUser = {
+        id: userId,
+        ...userData
+    };
+    
+    currentUserName.textContent = userData.nome || 'Usuário';
+    
+    // Verificar se o usuário está online
+    const isOnline = userData.lastSeen && (Date.now() - userData.lastSeen) < 300000;
+    currentUserStatus.className = `user-status ${isOnline ? '' : 'offline'}`;
+    
+    // Ativar a aba de conversa
+    switchTab('conversation');
+    
+    // Carregar mensagens da conversa
+    loadConversationMessages();
+    
+    // Habilitar campo de mensagem
+    messageInput.disabled = false;
+    sendMessage.disabled = false;
+    
+    // Marcar conversa como lida
+    const conversationId = getConversationId(currentUser.uid, selectedUser.id);
+    onConversationOpened(conversationId);
+}
+
+// Adicionar estilos CSS para o badge
+const badgeStyles = `
+.unread-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #f44336;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    animation: pulse 1s infinite;
+}
+
+.unread-badge.pulse {
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.chat-toggle {
+    position: relative;
+}
+`;
+
+// Adicionar os estilos ao documento
+const styleSheet = document.createElement('style');
+styleSheet.textContent = badgeStyles;
+document.head.appendChild(styleSheet);
+
+// Atualizar o indicador periodicamente
+setInterval(updateUnreadMessagesIndicator, 30000); // A cada 30 segundos
+
+// Atualizar quando o chat é aberto/fechado
+chatToggle.addEventListener('click', function() {
+    if (chatContainer.classList.contains('active')) {
+        // Quando o chat é aberto, atualizar o indicador após um pequeno delay
+        setTimeout(updateUnreadMessagesIndicator, 1000);
+    }
+});
+
+// Inicializar o indicador quando o usuário faz login
+auth.onAuthStateChanged(user => {
+    if (user) {
+        currentUser = user;
+        initializeChat();
+        
+        // Aguardar um pouco e então verificar mensagens não lidas
+        setTimeout(updateUnreadMessagesIndicator, 2000);
+    } else {
+        // Se não estiver autenticado, remover indicador
+        removeUnreadIndicator();
+        usersList.innerHTML = `
+            <div class="empty-state">
+                <span class="material-icons">login</span>
+                <p>Faça login para usar o interfone virtual</p>
+            </div>
+        `;
+    }
+});
+
+        // Controles da interface
+        function toggleChat() {
+            chatContainer.classList.toggle('active');
+            chatToggle.classList.toggle('active');
+        }
+
+        function minimizeChatWindow() {
+            chatContainer.classList.remove('active');
+        }
+
+        function closeChatWindow() {
+            chatContainer.classList.remove('active');
+            chatToggle.classList.remove('active');
+        }
+
+        function switchTab(tabName) {
+            // Atualizar abas
+            chatTabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+            
+            // Atualizar conteúdo
+            tabContents.forEach(content => {
+                content.classList.toggle('active', content.id === `${tabName}Tab`);
+            });
+        }
+
+        // Atualizar último acesso do usuário
+        function updateUserLastSeen() {
+            if (currentUser) {
+                database.ref(`users/${currentUser.uid}/lastSeen`).set(Date.now());
+            }
+        }
+
+        // Atualizar último acesso quando a página for carregada e periodicamente
+        window.addEventListener('load', updateUserLastSeen);
+        setInterval(updateUserLastSeen, 60000); // Atualizar a cada minuto
+    </script>
+<script>
+// ====================================================
+// ============ SCRIPT WEBRTC CORRIGIDO ==============
+// ====================================================
+
+// --- Variáveis Globais da Chamada ---
+let localStream = null;
+let remoteStream = null;
+let peerConnection = null;
+let currentCallerId = null;
+let currentCalleeId = null;
+let isSpeakerOn = false;
+let isMuted = false;
+let proximitySensorEnabled = false;
+let isNearEar = false;
+let audioContext = null;
+let gainNode = null;
+let callStartTime = null;
+let callTimerInterval = null;
+let reconnectAttempts = 0;
+let reconnectTimeout = null;
+const MAX_RECONNECT_ATTEMPTS = 3;
+const db = firebase.database();
+
+// --- Configuração dos servidores STUN ---
+const configuration = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' }
+    ],
+    iceCandidatePoolSize: 10
+};
+
+// =================================================================
+// FUNÇÃO PRINCIPAL: INICIAR UMA CHAMADA
+// =================================================================
+async function initiateCall(calleeId, calleeName) {
+    if (!currentUser) {
+        alert('Você precisa estar logado para ligar.');
+        return;
+    }
+
+    try {
+        const permission = await requestMicrophonePermission();
+        if (!permission) {
+            alert('Permissão do microfone é necessária para fazer chamadas.');
+            return;
+        }
+
+        currentCalleeId = calleeId;
+        showCallUI('outgoing', calleeName);
+        
+        // Mostrar controles de chamada
+        showCallControls();
+
+        // Criar PeerConnection
+        peerConnection = new RTCPeerConnection(configuration);
+        
+        // Configurar todas as melhorias
+        registerPeerConnectionListeners(calleeId);
+        setupReconnectionLogic();
+        setupCallQualityMonitoring();
+        setupAudioControls();
+        setupProximitySensor();
+
+        // Configurar áudio
+        const audioConstraints = {
+            audio: {
+                channelCount: 1,
+                sampleRate: 48000,
+                sampleSize: 16,
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+                latency: 0.01
+            },
+            video: false
+        };
+
+        localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+        
+        // Configurar processamento de áudio
+        await setupAudioProcessing();
+        
+        // Adicionar tracks ao PeerConnection
+        localStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, localStream);
+        });
+
+        // Criar oferta
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        // Enviar dados da chamada
+        const callData = {
+            offer: {
+                type: offer.type,
+                sdp: offer.sdp,
+            },
+            callerId: currentUser.uid,
+            callerName: currentUser.displayName || 'Usuário',
+            timestamp: Date.now()
+        };
+
+        await db.ref(`calls/${calleeId}`).set(callData);
+        
+        // Iniciar timer
+        startCallTimer();
+
+        // Escutar por resposta
+        setupAnswerListener();
+        setupCallStateListener();
+
+    } catch (error) {
+        console.error('Erro ao iniciar chamada:', error);
+        alert('Erro ao iniciar chamada. Tente novamente.');
+        cleanupCall();
+    }
+}
+
+function setupAnswerListener() {
+    db.ref(`calls/${currentUser.uid}/answer`).on('value', async (snapshot) => {
+        if (snapshot.exists()) {
+            const answer = snapshot.val();
+            if (peerConnection.currentRemoteDescription) return;
+            
+            try {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                updateCallStatus('Conectado');
+            } catch (error) {
+                console.error('Erro ao definir resposta:', error);
+            }
+        }
+    });
+}
+
+function setupCallStateListener() {
+    db.ref(`calls/${currentCalleeId}`).on('value', (snapshot) => {
+        if (!snapshot.exists()) {
+            console.log("Chamada finalizada pelo outro usuário.");
+            cleanupCall();
+        }
+    });
+}
+
+// =================================================================
+// ESCUTA POR CHAMADAS RECEBIDAS
+// =================================================================
+function listenForIncomingCalls(userId) {
+    const userCallRef = db.ref(`calls/${userId}`);
+    userCallRef.on('value', async (snapshot) => {
+        const callData = snapshot.val();
+        if (callData && callData.offer && !currentCallerId) {
+            currentCallerId = callData.callerId;
+            currentCalleeId = userId;
+
+            showCallUI('incoming', callData.callerName);
+
+            // Configurar botões
+            setupCallButtons(callData);
+        }
+    });
+}
+
+function setupCallButtons(callData) {
+    // Botão Atender
+    document.getElementById('answerCallBtn').onclick = async () => {
+        try {
+            peerConnection = new RTCPeerConnection(configuration);
+            registerPeerConnectionListeners(callData.callerId);
+
+            // Obter stream local
+            const audioConstraints = {
+                audio: {
+                    channelCount: 1,
+                    sampleRate: 48000,
+                    echoCancellation: true,
+                    noiseSuppression: true
+                },
+                video: false
             };
 
-            messageRef.set(messageData).catch(handleFirebaseError);
-            dom.messageInput.value = '';
-        }
-        
-        function blockUser(userId, userName) {
-            if (confirm(`Tem certeza que deseja bloquear ${userName}?`)) {
-                if (!appState.blockedUsers.includes(userId)) {
-                    const updatedBlocked = [...appState.blockedUsers, userId];
-                    db.ref(`users/${appState.currentUser.uid}/blockedUsers`).set(updatedBlocked)
-                        .then(() => {
-                            console.log('Usuário bloqueado');
-                            if (appState.selectedUser && appState.selectedUser.id === userId) {
-                                showListView();
-                            }
-                        })
-                        .catch(handleFirebaseError);
-                }
-            }
-        }
-        
-        function unblockUser(userId) {
-            const updatedBlocked = appState.blockedUsers.filter(id => id !== userId);
-            db.ref(`users/${appState.currentUser.uid}/blockedUsers`).set(updatedBlocked)
-                .catch(handleFirebaseError);
-        }
-
-        // =======================================================
-        // 5. RENDERIZAÇÃO (ATUALIZAÇÃO DA UI)
-        // =======================================================
-        
-        function renderLoggedOutView() {
-            const message = `<div class="empty-state"><span class="material-icons">login</span><p>Faça login para usar o chat.</p></div>`;
-            dom.usersList.innerHTML = message;
-            dom.conversationsList.innerHTML = message;
-        }
-
-        function renderUsersList() {
-            if (!appState.currentUser) return;
-            dom.usersList.innerHTML = '';
+            localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
             
-            const userIds = Object.keys(appState.users);
-            if(userIds.length <= 1) {
-                 dom.usersList.innerHTML = `<div class="empty-state"><span class="material-icons">people</span><p>Nenhum outro usuário encontrado.</p></div>`;
-                 return;
-            }
-
-            userIds.forEach(userId => {
-                if (userId === appState.currentUser.uid || appState.blockedUsers.includes(userId)) return;
-
-                const user = appState.users[userId];
-                const userItem = document.createElement('div');
-                userItem.className = 'user-item';
-                userItem.innerHTML = `
-                    <div class="user-avatar">${user.nome ? user.nome.charAt(0).toUpperCase() : 'U'}</div>
-                    <div class="user-info">
-                        <div class="user-name">${user.nome || 'Usuário'}</div>
-                    </div>
-                    <div class="user-actions">
-                        <div class="user-status ${user.online ? '' : 'offline'}"></div>
-                    </div>
-                `;
-                userItem.addEventListener('click', () => showConversationView({ id: userId, ...user }));
-                dom.usersList.appendChild(userItem);
-            });
-        }
-        
-        function renderConversationsList(conversations = []) {
-             if (!appState.currentUser) return;
-             dom.conversationsList.innerHTML = '';
-             
-             if(conversations.length === 0) {
-                 dom.conversationsList.innerHTML = `<div class="empty-state"><span class="material-icons">chat</span><p>Nenhuma conversa iniciada. Vá para a aba "Usuários".</p></div>`;
-                 return;
-             }
-             
-             conversations.forEach(convo => {
-                 const isSentByMe = convo.lastMessage.senderId === appState.currentUser.uid;
-                 const preview = (isSentByMe ? "Você: " : "") + convo.lastMessage.text;
-                 
-                 const convoItem = document.createElement('div');
-                 convoItem.className = 'conversation-item';
-                 convoItem.innerHTML = `
-                    <div class="conversation-avatar">${convo.user.nome ? convo.user.nome.charAt(0).toUpperCase() : 'U'}</div>
-                    <div class="conversation-info">
-                        <div class="conversation-header">
-                            <div class="conversation-name">${convo.user.nome || 'Usuário'}</div>
-                            <div class="conversation-time">${formatTimestamp(convo.lastMessage.timestamp)}</div>
-                        </div>
-                        <div class="conversation-preview">${preview}</div>
-                    </div>
-                 `;
-                 convoItem.addEventListener('click', () => showConversationView({ id: convo.id, ...convo.user }));
-                 dom.conversationsList.appendChild(convoItem);
-             });
-        }
-        
-        function renderMessages(messages) {
-            dom.messagesContainer.innerHTML = '';
-            messages.forEach(msg => {
-                const isSent = msg.senderId === appState.currentUser.uid;
-                const msgEl = document.createElement('div');
-                msgEl.className = `message ${isSent ? 'sent' : 'received'}`;
-                msgEl.innerHTML = `
-                    <div class="message-text">${msg.text}</div>
-                    <div class="message-time">${formatTimestamp(msg.timestamp)}</div>
-                `;
-                dom.messagesContainer.appendChild(msgEl);
-            });
-            dom.messagesContainer.scrollTop = dom.messagesContainer.scrollHeight;
-        }
-
-        function updateUnreadBadge(count) {
-            if (count > 0) {
-                dom.unreadBadge.textContent = count > 9 ? '9+' : count;
-                dom.unreadBadge.style.display = 'flex';
-                dom.unreadBadge.classList.add('pulse');
-                setTimeout(() => dom.unreadBadge.classList.remove('pulse'), 500);
-            } else {
-                dom.unreadBadge.style.display = 'none';
-            }
-        }
-        
-        // =======================================================
-        // 6. CONFIGURAÇÕES
-        // =======================================================
-
-        function loadSettings() {
-            const settingsRef = db.ref(`users/${appState.currentUser.uid}/settings`);
-            settingsRef.once('value').then(snapshot => {
-                const savedSettings = snapshot.val();
-                if (savedSettings) {
-                    appState.settings = { ...appState.settings, ...savedSettings };
-                }
-                applySettings();
-            });
-        }
-
-        function saveSettings() {
-             appState.settings.soundNotification = dom.soundNotificationSwitch.checked;
-             appState.settings.onlineStatus = dom.onlineStatusSwitch.checked;
-             appState.settings.darkTheme = dom.darkThemeSwitch.checked;
-
-             db.ref(`users/${appState.currentUser.uid}/settings`).set(appState.settings);
-             applySettings();
-        }
-
-        function applySettings() {
-            // Aplica tema escuro
-            document.body.classList.toggle('dark-theme', appState.settings.darkTheme);
+            // Processar áudio
+            await setupAudioProcessing();
             
-            // Atualiza os controles na UI
-            dom.soundNotificationSwitch.checked = appState.settings.soundNotification;
-            dom.onlineStatusSwitch.checked = appState.settings.onlineStatus;
-            dom.darkThemeSwitch.checked = appState.settings.darkTheme;
+            // Adicionar tracks
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+
+            // Configurar oferta recebida
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
+
+            // Criar resposta
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+
+            // Enviar resposta
+            await db.ref(`calls/${callData.callerId}/answer`).set({
+                type: answer.type,
+                sdp: answer.sdp,
+            });
+
+            // Mostrar controles
+            showCallControls();
+            startCallTimer();
+            updateCallStatus('Conectado');
+
+        } catch (error) {
+            console.error("Erro ao atender chamada: ", error);
+            alert("Erro ao atender chamada.");
+            rejectCall();
+        }
+    };
+
+    // Botão Rejeitar
+    document.getElementById('rejectCallBtn').onclick = rejectCall;
+}
+
+// =================================================================
+// CONTROLES DE ÁUDIO E VIVA-VOZ
+// =================================================================
+async function setupAudioProcessing() {
+    try {
+        if (!window.AudioContext && !window.webkitAudioContext) {
+            console.log('AudioContext não suportado');
+            return;
         }
 
-        // =======================================================
-        // 7. LÓGICA DE CHAMADA DE VOZ (WEBRTC)
-        // =======================================================
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        await audioContext.resume();
         
-        // --- Estado do WebRTC ---
-        const rtcState = {
-            localStream: null,
-            peerConnection: null,
-            currentCallerId: null,
-            currentCalleeId: null,
-            isCallActive: false
-        };
+        const source = audioContext.createMediaStreamSource(localStream);
+        gainNode = audioContext.createGain();
+        
+        // Filtro para melhorar qualidade
+        const filter = audioContext.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 800;
+        filter.Q.value = 1;
+        
+        source.connect(filter);
+        filter.connect(gainNode);
+        
+        const destination = audioContext.createMediaStreamDestination();
+        gainNode.connect(destination);
+        
+        // Parar tracks originais e usar as processadas
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = destination.stream;
+        
+    } catch (error) {
+        console.log('Processamento de áudio não disponível:', error);
+    }
+}
 
-        const rtcConfig = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
-        };
+function setupAudioControls() {
+    createCallControlsUI();
+}
+
+function createCallControlsUI() {
+    // Verificar se já existe para não duplicar
+    if (document.getElementById('callControls')) return;
+
+    const controlsHTML = `
+        <div class="call-controls" id="callControls" style="display: none;">
+            <button class="call-control-btn speaker" id="speakerBtn" title="Viva-voz">
+                <span class="material-icons">volume_up</span>
+            </button>
+            <button class="call-control-btn mute" id="muteBtn" title="Silenciar">
+                <span class="material-icons">mic</span>
+            </button>
+            <button class="call-control-btn hangup" id="hangupControlBtn" title="Desligar">
+                <span class="material-icons">call_end</span>
+            </button>
+        </div>
         
-        async function getMicStream() {
+        <div class="call-status-bar" id="callStatusBar" style="display: none;">
+            <div class="quality-indicator">
+                <span id="callQuality">Qualidade: Boa</span>
+                <div class="quality-dot" id="qualityDot"></div>
+            </div>
+            <span id="callTimer">00:00</span>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', controlsHTML);
+    
+    // Event listeners
+    document.getElementById('speakerBtn').addEventListener('click', toggleSpeaker);
+    document.getElementById('muteBtn').addEventListener('click', toggleMute);
+    document.getElementById('hangupControlBtn').addEventListener('click', hangUp);
+}
+
+function showCallControls() {
+    const callControls = document.getElementById('callControls');
+    const callStatusBar = document.getElementById('callStatusBar');
+    if (callControls) callControls.style.display = 'flex';
+    if (callStatusBar) callStatusBar.style.display = 'flex';
+}
+
+function toggleSpeaker() {
+    isSpeakerOn = !isSpeakerOn;
+    const speakerBtn = document.getElementById('speakerBtn');
+    
+    if (isSpeakerOn) {
+        enableSpeaker();
+        speakerBtn.classList.add('active');
+        speakerBtn.innerHTML = '<span class="material-icons">volume_up</span>';
+    } else {
+        disableSpeaker();
+        speakerBtn.classList.remove('active');
+        speakerBtn.innerHTML = '<span class="material-icons">volume_off</span>';
+    }
+}
+
+function enableSpeaker() {
+    if (gainNode) {
+        gainNode.gain.value = 1.5;
+    }
+    
+    // Configurar saída de áudio para alto-falante
+    setAudioOutput('speaker');
+}
+
+function disableSpeaker() {
+    if (gainNode) {
+        gainNode.gain.value = 1.0;
+    }
+    setAudioOutput('earpiece');
+}
+
+function toggleMute() {
+    isMuted = !isMuted;
+    const muteBtn = document.getElementById('muteBtn');
+    
+    if (localStream) {
+        localStream.getAudioTracks().forEach(track => {
+            track.enabled = !isMuted;
+        });
+    }
+    
+    if (isMuted) {
+        muteBtn.classList.add('active');
+        muteBtn.innerHTML = '<span class="material-icons">mic_off</span>';
+    } else {
+        muteBtn.classList.remove('active');
+        muteBtn.innerHTML = '<span class="material-icons">mic</span>';
+    }
+}
+
+function setAudioOutput(outputType) {
+    if (!remoteStream) return;
+    
+    const audioElements = document.querySelectorAll('audio[srcObject]');
+    audioElements.forEach(audio => {
+        if (audio.setSinkId) {
+            const sinkId = outputType === 'speaker' ? '' : 'earpiece';
+            audio.setSinkId(sinkId).catch(err => {
+                console.log('Erro ao configurar saída de áudio:', err);
+            });
+        }
+        
+        audio.volume = outputType === 'speaker' ? 1.0 : 0.7;
+    });
+}
+
+// =================================================================
+// SENSOR DE PROXIMIDADE (OUVIDO)
+// =================================================================
+function setupProximitySensor() {
+    if ('ondeviceproximity' in window || 'onuserproximity' in window) {
+        enableProximitySensor();
+    } else {
+        console.log('Sensor de proximidade não disponível');
+        setupAudioBasedProximity();
+    }
+}
+
+function enableProximitySensor() {
+    if ('ondeviceproximity' in window) {
+        window.addEventListener('deviceproximity', handleProximityEvent);
+    }
+    
+    if ('onuserproximity' in window) {
+        window.addEventListener('userproximity', handleProximityEvent);
+    }
+    
+    proximitySensorEnabled = true;
+}
+
+function handleProximityEvent(event) {
+    const wasNearEar = isNearEar;
+    isNearEar = event.near;
+    
+    if (wasNearEar !== isNearEar) {
+        toggleAudioOutput(isNearEar);
+    }
+}
+
+function setupAudioBasedProximity() {
+    let lastTouchTime = 0;
+    
+    document.addEventListener('touchstart', (e) => {
+        lastTouchTime = Date.now();
+        if (e.touches[0].clientY < window.innerHeight * 0.3) {
+            toggleAudioOutput(true);
+        }
+    });
+    
+    document.addEventListener('touchend', () => {
+        setTimeout(() => {
+            if (Date.now() - lastTouchTime > 1000) {
+                toggleAudioOutput(false);
+            }
+        }, 1500);
+    });
+    
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', handleOrientation);
+    }
+}
+
+function handleOrientation(event) {
+    const gamma = Math.abs(event.gamma);
+    const beta = Math.abs(event.beta);
+    
+    if (gamma > 45 && beta > 45) {
+        toggleAudioOutput(true);
+    } else {
+        toggleAudioOutput(false);
+    }
+}
+
+function toggleAudioOutput(nearEar) {
+    if (nearEar) {
+        disableSpeaker();
+        setAudioOutput('earpiece');
+    } else {
+        enableSpeaker();
+        setAudioOutput('speaker');
+    }
+}
+
+// =================================================================
+// RECONEXÃO E MONITORAMENTO
+// =================================================================
+function setupReconnectionLogic() {
+    if (peerConnection) {
+        peerConnection.onconnectionstatechange = () => {
+            console.log('Estado da conexão:', peerConnection.connectionState);
+            
+            switch(peerConnection.connectionState) {
+                case 'disconnected':
+                case 'failed':
+                    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                        reconnectTimeout = setTimeout(() => {
+                            reconnectCall();
+                            reconnectAttempts++;
+                        }, 2000);
+                    } else {
+                        alert('Falha na conexão. Chamada será encerrada.');
+                        hangUp();
+                    }
+                    break;
+                case 'connected':
+                    reconnectAttempts = 0;
+                    updateCallStatus('Conectado');
+                    break;
+            }
+        };
+    }
+}
+
+async function reconnectCall() {
+    if (!currentCalleeId || !peerConnection) return;
+    
+    try {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        
+        await db.ref(`calls/${currentCalleeId}`).update({
+            offer: {
+                type: offer.type,
+                sdp: offer.sdp,
+            },
+            reconnect: true,
+            timestamp: Date.now()
+        });
+        
+        updateCallStatus('Reconectando...');
+    } catch (error) {
+        console.error('Erro na reconexão:', error);
+    }
+}
+
+function setupCallQualityMonitoring() {
+    if (!peerConnection) return;
+    
+    setInterval(async () => {
+        if (peerConnection.iceConnectionState === 'connected') {
             try {
-                return await navigator.mediaDevices.getUserMedia({
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
+                const stats = await peerConnection.getStats();
+                let audioLevel = 0;
+                let packetsLost = 0;
+                let packetsTotal = 0;
+                
+                stats.forEach(report => {
+                    if (report.type === 'inbound-rtp' && report.mediaType === 'audio') {
+                        audioLevel = report.audioLevel || 0;
+                        packetsLost += report.packetsLost || 0;
+                        packetsTotal += report.packetsReceived || 1;
                     }
                 });
+                
+                updateCallQualityIndicator(audioLevel, packetsLost, packetsTotal);
             } catch (error) {
-                console.error("Erro ao acessar microfone:", error);
-                alert("Não foi possível acessar o microfone. Verifique as permissões do navegador.");
-                return null;
+                console.log('Erro ao obter estatísticas:', error);
             }
         }
-        
-        async function initiateCall(calleeId, calleeName) {
-            if (rtcState.isCallActive) return;
+    }, 3000);
+}
 
-            rtcState.localStream = await getMicStream();
-            if (!rtcState.localStream) return;
-            
-            rtcState.isCallActive = true;
-            rtcState.currentCalleeId = calleeId;
-            showCallUI('outgoing', calleeName);
-            
-            setupPeerConnection(calleeId);
-            
-            rtcState.localStream.getTracks().forEach(track => {
-                rtcState.peerConnection.addTrack(track, rtcState.localStream);
+function updateCallQualityIndicator(level, packetsLost, packetsTotal) {
+    const qualityElement = document.getElementById('callQuality');
+    const qualityDot = document.getElementById('qualityDot');
+    
+    if (!qualityElement || !qualityDot) return;
+    
+    const packetLoss = packetsTotal > 0 ? (packetsLost / packetsTotal) * 100 : 0;
+    let quality = 'Boa';
+    let qualityClass = '';
+    
+    if (packetLoss > 10 || level < 0.05) {
+        quality = 'Fraca';
+        qualityClass = 'poor';
+    } else if (packetLoss > 5 || level < 0.1) {
+        quality = 'Média';
+    }
+    
+    qualityElement.textContent = `Qualidade: ${quality}`;
+    qualityDot.className = `quality-dot ${qualityClass}`;
+}
+
+// =================================================================
+// TIMER DA CHAMADA
+// =================================================================
+function startCallTimer() {
+    callStartTime = Date.now();
+    callTimerInterval = setInterval(updateCallTimer, 1000);
+}
+
+function updateCallTimer() {
+    const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+    const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const seconds = (elapsed % 60).toString().padStart(2, '0');
+    
+    const callTimer = document.getElementById('callTimer');
+    if (callTimer) {
+        callTimer.textContent = `${minutes}:${seconds}`;
+    }
+}
+
+function stopCallTimer() {
+    if (callTimerInterval) {
+        clearInterval(callTimerInterval);
+        callTimerInterval = null;
+    }
+    
+    const callTimer = document.getElementById('callTimer');
+    if (callTimer) {
+        callTimer.textContent = '00:00';
+    }
+}
+
+// =================================================================
+// WEBRTC EVENT HANDLERS
+// =================================================================
+function registerPeerConnectionListeners(otherUserId) {
+    if (!peerConnection) return;
+
+    // ICE Candidates
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            db.ref(`calls/${otherUserId}/iceCandidates`).push(event.candidate.toJSON());
+        }
+    };
+
+    // Receber ICE Candidates
+    db.ref(`calls/${currentUser.uid}/iceCandidates`).on('child_added', (snapshot) => {
+        if (snapshot.exists() && peerConnection) {
+            const candidate = new RTCIceCandidate(snapshot.val());
+            peerConnection.addIceCandidate(candidate).catch(error => {
+                console.log('Erro ao adicionar ICE candidate:', error);
             });
-            
-            const offer = await rtcState.peerConnection.createOffer();
-            await rtcState.peerConnection.setLocalDescription(offer);
-
-            const callData = {
-                offer: { type: offer.type, sdp: offer.sdp },
-                callerId: appState.currentUser.uid,
-                callerName: appState.currentUser.displayName,
-            };
-
-            await db.ref(`calls/${calleeId}`).set(callData);
-            
-            // Listener para a resposta
-            const answerRef = db.ref(`calls/${appState.currentUser.uid}/answer`);
-            answerRef.on('value', snapshot => {
-                if (snapshot.exists()) {
-                    const answer = snapshot.val();
-                    if (rtcState.peerConnection && !rtcState.peerConnection.currentRemoteDescription) {
-                        rtcState.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-                    }
-                    answerRef.off(); // Remove o listener após receber a resposta
-                }
-            });
+            snapshot.ref.remove();
         }
+    });
+
+    // Stream remota
+    peerConnection.ontrack = (event) => {
+        remoteStream = event.streams[0];
+        const remoteAudio = new Audio();
+        remoteAudio.srcObject = remoteStream;
+        remoteAudio.autoplay = true;
+        remoteAudio.controls = false;
         
-        function listenForIncomingCalls(userId) {
-            const callRef = db.ref(`calls/${userId}`);
-            callRef.on('value', async (snapshot) => {
-                const callData = snapshot.val();
-                if (callData && callData.offer && !rtcState.isCallActive) {
-                    rtcState.isCallActive = true;
-                    rtcState.currentCallerId = callData.callerId;
-                    showCallUI('incoming', callData.callerName);
+        // Adicionar ao DOM para funcionar em mobile
+        document.body.appendChild(remoteAudio);
+    };
 
-                    dom.answerCallBtn.onclick = async () => {
-                        rtcState.localStream = await getMicStream();
-                        if (!rtcState.localStream) {
-                            cleanupCall();
-                            return;
-                        }
-                        
-                        showCallUI('outgoing', callData.callerName); // Muda a UI para chamada em andamento
-                        dom.outgoingCallStatus.textContent = 'Conectado';
+    // Eventos de estado
+    peerConnection.oniceconnectionstatechange = () => {
+        console.log('ICE Connection State:', peerConnection.iceConnectionState);
+    };
+}
 
-                        setupPeerConnection(callData.callerId);
-                        
-                        rtcState.localStream.getTracks().forEach(track => {
-                            rtcState.peerConnection.addTrack(track, rtcState.localStream);
-                        });
+// =================================================================
+// CONTROLES DA CHAMADA
+// =================================================================
+function rejectCall() {
+    if (currentCallerId) {
+        db.ref(`calls/${currentCalleeId}`).remove();
+    }
+    cleanupCall();
+}
 
-                        await rtcState.peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
-                        
-                        const answer = await rtcState.peerConnection.createAnswer();
-                        await rtcState.peerConnection.setLocalDescription(answer);
+function hangUp() {
+    const userToRemove = currentCallerId || currentCalleeId;
+    if (userToRemove) {
+        db.ref(`calls/${userToRemove}`).remove();
+    }
+    cleanupCall();
+}
 
-                        await db.ref(`calls/${callData.callerId}/answer`).set({
-                            type: answer.type, sdp: answer.sdp
-                        });
-                        
-                        // Limpa a oferta para não ser atendida de novo
-                        callRef.remove();
-                    };
+// =================================================================
+// LIMPEZA DE RECURSOS - FUNÇÃO PRINCIPAL CORRIGIDA
+// =================================================================
+function cleanupCall() {
+    // 1. Parar timer
+    stopCallTimer();
+    
+    // 2. Esconder controles
+    hideCallControls();
+    
+    // 3. Limpar áudio
+    cleanupAudio();
+    
+    // 4. Resetar variáveis
+    resetCallVariables();
+    
+    // 5. Fechar PeerConnection
+    closePeerConnection();
+    
+    // 6. Parar streams
+    stopMediaStreams();
+    
+    // 7. Remover listeners
+    removeFirebaseListeners();
+    
+    // 8. Limpar dados do Firebase
+    cleanupFirebaseData();
+    
+    // 9. Remover sensores
+    removeSensorListeners();
+    
+    // 10. Esconder UI
+    hideCallUI();
+    
+    console.log('Chamada finalizada - recursos liberados');
+}
 
-                    dom.rejectCallBtn.onclick = () => {
-                        callRef.remove();
-                        cleanupCall();
-                    };
-                    
-                     dom.hangUpBtn.onclick = () => {
-                        callRef.remove();
-                        cleanupCall();
-                    };
-                }
-            });
-        }
+function hideCallControls() {
+    const callControls = document.getElementById('callControls');
+    const callStatusBar = document.getElementById('callStatusBar');
+    if (callControls) callControls.style.display = 'none';
+    if (callStatusBar) callStatusBar.style.display = 'none';
+}
+
+function cleanupAudio() {
+    if (audioContext) {
+        audioContext.close().catch(error => {
+            console.log('Erro ao fechar audio context:', error);
+        });
+        audioContext = null;
+        gainNode = null;
+    }
+}
+
+function resetCallVariables() {
+    isSpeakerOn = false;
+    isMuted = false;
+    reconnectAttempts = 0;
+    isNearEar = false;
+    currentCallerId = null;
+    currentCalleeId = null;
+}
+
+function closePeerConnection() {
+    if (peerConnection) {
+        peerConnection.onconnectionstatechange = null;
+        peerConnection.onicecandidate = null;
+        peerConnection.ontrack = null;
+        peerConnection.onnegotiationneeded = null;
+        peerConnection.oniceconnectionstatechange = null;
         
-        function setupPeerConnection(otherUserId) {
-            rtcState.peerConnection = new RTCPeerConnection(rtcConfig);
+        peerConnection.close();
+        peerConnection = null;
+    }
+}
 
-            // Coleta e envia ICE candidates
-            rtcState.peerConnection.onicecandidate = event => {
-                if (event.candidate) {
-                    db.ref(`calls/${otherUserId}/iceCandidates`).push(event.candidate.toJSON());
-                }
-            };
-            
-            // Escuta por ICE candidates do outro par
-            const iceRef = db.ref(`calls/${appState.currentUser.uid}/iceCandidates`);
-            iceRef.on('child_added', snapshot => {
-                if (snapshot.exists()) {
-                    rtcState.peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-                    snapshot.ref.remove(); // Remove o candidate depois de usar
-                }
-            });
+function stopMediaStreams() {
+    if (localStream) {
+        localStream.getTracks().forEach(track => {
+            track.stop();
+            track.enabled = true;
+        });
+        localStream = null;
+    }
+    
+    if (remoteStream) {
+        remoteStream.getTracks().forEach(track => track.stop());
+        remoteStream = null;
+    }
+    
+    // Remover elementos de áudio
+    const remoteAudioElements = document.querySelectorAll('audio[srcObject]');
+    remoteAudioElements.forEach(audio => {
+        audio.srcObject = null;
+        audio.remove();
+    });
+}
 
-            // Adiciona a stream remota a um elemento de áudio
-            rtcState.peerConnection.ontrack = event => {
-                const remoteAudio = document.createElement('audio');
-                remoteAudio.autoplay = true;
-                remoteAudio.srcObject = event.streams[0];
-                document.body.appendChild(remoteAudio);
-            };
+function removeFirebaseListeners() {
+    if (currentCallerId) {
+        db.ref(`calls/${currentCallerId}/answer`).off();
+        db.ref(`calls/${currentCallerId}/iceCandidates`).off();
+    }
+    if (currentCalleeId) {
+        db.ref(`calls/${currentCalleeId}`).off();
+        db.ref(`calls/${currentCalleeId}/iceCandidates`).off();
+    }
+}
 
-            // Monitora o estado da conexão
-            rtcState.peerConnection.onconnectionstatechange = () => {
-                if (['disconnected', 'failed', 'closed'].includes(rtcState.peerConnection.connectionState)) {
-                    cleanupCall();
-                }
-            };
-        }
-
-        function cleanupCall() {
-            if (!rtcState.isCallActive) return;
-            
-            // Parar tracks
-            if (rtcState.localStream) {
-                rtcState.localStream.getTracks().forEach(track => track.stop());
-                rtcState.localStream = null;
+function cleanupFirebaseData() {
+    const cleanupPromises = [];
+    if (currentCallerId) {
+        cleanupPromises.push(db.ref(`calls/${currentCallerId}`).remove());
+    }
+    if (currentCalleeId) {
+        cleanupPromises.push(db.ref(`calls/${currentCalleeId}`).remove());
+    }
+    
+    Promise.allSettled(cleanupPromises).then(results => {
+        results.forEach((result, index) => {
+            if (result.status === 'rejected') {
+                console.warn(`Falha ao limpar dados ${index}:`, result.reason);
             }
+        });
+    });
+}
 
-            // Fechar PeerConnection
-            if (rtcState.peerConnection) {
-                rtcState.peerConnection.close();
-                rtcState.peerConnection = null;
-            }
-            
-            // Limpar dados do Firebase
-            const otherUserId = rtcState.currentCalleeId || rtcState.currentCallerId;
-            if(otherUserId) {
-                db.ref(`calls/${otherUserId}`).remove();
-            }
-             db.ref(`calls/${appState.currentUser.uid}`).remove();
+function removeSensorListeners() {
+    if (proximitySensorEnabled) {
+        window.removeEventListener('deviceproximity', handleProximityEvent);
+        window.removeEventListener('userproximity', handleProximityEvent);
+        window.removeEventListener('deviceorientation', handleOrientation);
+        proximitySensorEnabled = false;
+    }
+}
 
-            // Limpar UI e estado
-            document.querySelectorAll('audio[srcObject]').forEach(el => el.remove());
-            hideCallUI();
-            rtcState.currentCallerId = null;
-            rtcState.currentCalleeId = null;
-            rtcState.isCallActive = false;
-        }
+// =================================================================
+// INTERFACE DO USUÁRIO
+// =================================================================
+function showCallUI(type, userName) {
+    const callModal = document.getElementById('callModal');
+    if (!callModal) return;
+    
+    callModal.classList.add('active');
 
-        function showCallUI(type, userName) {
-            dom.callModal.classList.add('active');
-            const initial = userName.charAt(0).toUpperCase();
+    const initial = userName ? userName.charAt(0).toUpperCase() : 'U';
 
-            if (type === 'incoming') {
-                dom.incomingCallUI.style.display = 'block';
-                dom.outgoingCallUI.style.display = 'none';
-                dom.incomingCallName.textContent = userName;
-                dom.incomingCallAvatar.textContent = initial;
-            } else { // outgoing ou em andamento
-                dom.incomingCallUI.style.display = 'none';
-                dom.outgoingCallUI.style.display = 'block';
-                dom.outgoingCallName.textContent = userName;
-                dom.outgoingCallAvatar.textContent = initial;
-                dom.outgoingCallStatus.textContent = 'Chamando...';
-            }
-        }
-        
-        function hideCallUI() {
-             dom.callModal.classList.remove('active');
-        }
-        
-        async function testMicrophone() {
-            const stream = await getMicStream();
-            if (stream) {
-                alert("Microfone funcionando! Você pode parar o acesso na barra de endereço do navegador.");
-                // Opcional: parar o stream após um tempo
-                setTimeout(() => stream.getTracks().forEach(track => track.stop()), 3000);
-            }
-        }
+    if (type === 'incoming') {
+        document.getElementById('incomingCallUI').style.display = 'block';
+        document.getElementById('outgoingCallUI').style.display = 'none';
+        document.getElementById('incomingCallName').textContent = userName;
+        document.getElementById('incomingCallAvatar').textContent = initial;
+    } else {
+        document.getElementById('outgoingCallUI').style.display = 'block';
+        document.getElementById('incomingCallUI').style.display = 'none';
+        document.getElementById('outgoingCallName').textContent = userName;
+        document.getElementById('outgoingCallAvatar').textContent = initial;
+        updateCallStatus(`Chamando ${userName}...`);
+    }
+}
 
-        // =======================================================
-        // 8. FUNÇÕES UTILITÁRIAS
-        // =======================================================
+function hideCallUI() {
+    const callModal = document.getElementById('callModal');
+    if (callModal) {
+        callModal.classList.remove('active');
+    }
+}
 
-        function formatTimestamp(timestamp) {
-            if (!timestamp) return '';
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        }
-        
-    })(); // Fim da IIFE
-    </script>
+function updateCallStatus(status) {
+    const outgoingCallStatus = document.getElementById('outgoingCallStatus');
+    if (outgoingCallStatus) {
+        outgoingCallStatus.textContent = status;
+    }
+}
+
+// =================================================================
+// INICIALIZAÇÃO
+// =================================================================
+// Adicione esta linha no seu initializeChat() existente:
+// listenForIncomingCalls(currentUser.uid);
+
+// Limpar timeout global ao sair
+window.addEventListener('beforeunload', function() {
+    if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+    }
+    cleanupCall();
+});
+</script>
 </body>
-</html>
+    </html>
