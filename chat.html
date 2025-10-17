@@ -2366,6 +2366,7 @@ let callTimerInterval = null;
 let reconnectAttempts = 0;
 let reconnectTimeout = null;
 const MAX_RECONNECT_ATTEMPTS = 3;
+let iceCandidateBuffer = [];
 const db = firebase.database();
 
 // Configuração dos servidores STUN
@@ -2470,29 +2471,45 @@ async function initiateCall(calleeId, calleeName) {
 }
 
 function setupAnswerListener() {
-    console.log('Configurando listener de resposta...');
+    console.log('Configurando listener para a resposta da chamada...');
+    
+    // Fica ouvindo a "resposta" do usuário que atendeu
     db.ref(`calls/${currentUser.uid}/answer`).on('value', async (snapshot) => {
         if (snapshot.exists()) {
             const answer = snapshot.val();
             console.log('Resposta recebida:', answer);
             
+            // Ignorar se a conexão já estiver totalmente estabelecida e a resposta for a mesma
             if (peerConnection.currentRemoteDescription) {
-                console.log('Já tem remote description, ignorando...');
+                console.log('Já existe uma remote description. Ignorando resposta duplicada.');
                 return;
             }
             
             try {
+                // Define a resposta recebida como a descrição remota da conexão
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-                console.log('Remote description definida com sucesso');
+
+                // --- INÍCIO DA CORREÇÃO ---
+                // Processa qualquer ICE candidate que tenha chegado antes da resposta
+                console.log('Processando candidates do buffer após definir a resposta...');
+                iceCandidateBuffer.forEach(candidate => {
+                    peerConnection.addIceCandidate(candidate).catch(e => console.error("Erro ao adicionar candidate do buffer:", e));
+                });
+                iceCandidateBuffer = []; // Limpa o buffer
+                // --- FIM DA CORREÇÃO ---
+                
+                console.log('Remote description (resposta) definida com sucesso.');
                 updateCallStatus('Conectado');
                 showNotification('Chamada conectada!', 'success');
+                
             } catch (error) {
-                console.error('Erro ao definir resposta:', error);
-                showNotification('Erro ao conectar chamada.', 'error');
+                console.error('Erro ao definir a resposta:', error);
+                showNotification('Erro ao conectar a chamada.', 'error');
             }
         }
     });
 }
+
 
 function setupCallStateListener() {
     console.log('Configurando listener de estado da chamada...');
@@ -2579,13 +2596,13 @@ function setupCallButtons(callData) {
     // Botão Atender
     document.getElementById('answerCallBtn').onclick = async () => {
         try {
-            // Parar som de chamada
+            // Parar som de chamada recebida
             stopIncomingCallSound();
             
             peerConnection = new RTCPeerConnection(configuration);
             registerPeerConnectionListeners(callData.callerId);
 
-            // Obter stream local
+            // Obter stream local de áudio
             const audioConstraints = {
                 audio: {
                     channelCount: 1,
@@ -2598,25 +2615,34 @@ function setupCallButtons(callData) {
 
             localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
             
-            // Adicionar tracks
+            // Adicionar tracks de áudio à conexão
             localStream.getTracks().forEach(track => {
                 peerConnection.addTrack(track, localStream);
             });
 
-            // Configurar oferta recebida
+            // Configurar a oferta recebida do outro usuário
             await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
 
-            // Criar resposta
+            // --- INÍCIO DA CORREÇÃO ---
+            // Processa qualquer ICE candidate que tenha chegado antes da hora
+            console.log('Processando candidates do buffer após definir a oferta...');
+            iceCandidateBuffer.forEach(candidate => {
+                peerConnection.addIceCandidate(candidate).catch(e => console.error("Erro ao adicionar candidate do buffer:", e));
+            });
+            iceCandidateBuffer = []; // Limpa o buffer para a próxima chamada
+            // --- FIM DA CORREÇÃO ---
+
+            // Criar a resposta para a oferta
             const answer = await peerConnection.createAnswer();
             await peerConnection.setLocalDescription(answer);
 
-            // Enviar resposta
+            // Enviar a resposta para quem originou a chamada
             await db.ref(`calls/${callData.callerId}/answer`).set({
                 type: answer.type,
                 sdp: answer.sdp,
             });
 
-            // Mostrar controles
+            // Atualizar a interface do usuário
             showCallControls();
             startCallTimer();
             updateCallStatus('Conectado');
@@ -2635,6 +2661,7 @@ function setupCallButtons(callData) {
         rejectCall();
     };
 }
+
 
 // CONTROLES DE ÁUDIO E VIVA-VOZ
 async function setupAudioProcessing() {
@@ -2988,25 +3015,34 @@ function stopCallTimer() {
 function registerPeerConnectionListeners(otherUserId) {
     if (!peerConnection) return;
 
-    // ICE Candidates
+    // Envia os ICE candidates gerados localmente para o outro usuário
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
             db.ref(`calls/${otherUserId}/iceCandidates`).push(event.candidate.toJSON());
         }
     };
 
-    // Receber ICE Candidates
+    // Recebe e processa os ICE candidates do outro usuário (JÁ CORRIGIDO)
     db.ref(`calls/${currentUser.uid}/iceCandidates`).on('child_added', (snapshot) => {
-        if (snapshot.exists() && peerConnection) {
+        if (snapshot.exists()) {
             const candidate = new RTCIceCandidate(snapshot.val());
-            peerConnection.addIceCandidate(candidate).catch(error => {
-                console.log('Erro ao adicionar ICE candidate:', error);
-            });
+
+            // Se a conexão já estiver pronta (com remote description), adiciona o candidate
+            if (peerConnection && peerConnection.currentRemoteDescription) {
+                peerConnection.addIceCandidate(candidate).catch(error => {
+                    console.error('Erro ao adicionar ICE candidate recebido:', error);
+                });
+            } else {
+                // Se não, armazena temporariamente no buffer
+                iceCandidateBuffer.push(candidate);
+                console.log('Candidate guardado no buffer para uso posterior.');
+            }
+            // Remove o candidate do Firebase para não processá-lo novamente
             snapshot.ref.remove();
         }
     });
 
-    // Stream remota
+    // Quando o stream de áudio remoto chegar, toca o áudio
     peerConnection.ontrack = (event) => {
         remoteStream = event.streams[0];
         const remoteAudio = new Audio();
@@ -3014,15 +3050,16 @@ function registerPeerConnectionListeners(otherUserId) {
         remoteAudio.autoplay = true;
         remoteAudio.controls = false;
         
-        // Adicionar ao DOM para funcionar em mobile
+        // Adiciona o elemento de áudio ao corpo do documento para garantir a reprodução
         document.body.appendChild(remoteAudio);
     };
 
-    // Eventos de estado
+    // Monitora o estado da conexão para depuração
     peerConnection.oniceconnectionstatechange = () => {
         console.log('ICE Connection State:', peerConnection.iceConnectionState);
     };
 }
+
 
 // CONTROLES DA CHAMADA
 function rejectCall() {
@@ -3106,6 +3143,7 @@ function resetCallVariables() {
     isNearEar = false;
     currentCallerId = null;
     currentCalleeId = null;
+    iceCandidateBuffer = [];
 }
 
 function closePeerConnection() {
@@ -3838,4 +3876,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
     </script>
 </body>
-    </html>
+</html>
