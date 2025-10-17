@@ -2889,8 +2889,7 @@ async function initiateCall(calleeId, calleeName) {
                 sampleSize: 16,
                 echoCancellation: true,
                 noiseSuppression: true,
-                autoGainControl: true,
-                latency: 0.01
+                autoGainControl: true
             },
             video: false
         };
@@ -3065,7 +3064,7 @@ async function setupAudioProcessing() {
         const destination = audioContext.createMediaStreamDestination();
         gainNode.connect(destination);
         
-        // Parar tracks originais e usar as processadas
+        // Substituir stream local pelo processado
         localStream.getTracks().forEach(track => track.stop());
         localStream = destination.stream;
         
