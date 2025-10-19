@@ -37,13 +37,11 @@
             -webkit-font-smoothing: antialiased;
         }
         body {
-  margin: 0;
-  padding: 0;
- 
-  background-size: contain; /* Ajusta sem cortar */
-  
-  height: 100vh;
-  width: 100vw;
+            margin: 0;
+            padding: 0;
+            background-size: contain;
+            height: 100vh;
+            width: 100vw;
         }
         /* --- Layout --- */
         .app-header { background-color: var(--md-sys-color-surface); box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
@@ -107,6 +105,86 @@
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--md-sys-color-primary); }
         input:checked + .slider:before { transform: translateX(20px); }
+
+        /* --- Upload de Imagens --- */
+        .image-upload-container { margin-bottom: 24px; }
+        .image-upload-area {
+            border: 2px dashed var(--md-sys-color-outline);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: var(--md-sys-color-background);
+        }
+        .image-upload-area:hover {
+            border-color: var(--md-sys-color-primary);
+            background-color: color-mix(in srgb, var(--md-sys-color-primary) 5%, transparent);
+        }
+        .image-upload-area.dragover {
+            border-color: var(--md-sys-color-primary);
+            background-color: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent);
+        }
+        .image-upload-icon {
+            font-size: 48px;
+            color: var(--md-sys-color-outline);
+            margin-bottom: 16px;
+        }
+        .image-upload-text {
+            color: var(--md-sys-color-on-surface-variant);
+            margin-bottom: 8px;
+        }
+        .image-upload-hint {
+            font-size: 0.8rem;
+            color: var(--md-sys-color-outline);
+        }
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .image-preview {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--md-sys-elevation-1);
+        }
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .image-preview-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .upload-progress {
+            margin-top: 12px;
+            width: 100%;
+            height: 6px;
+            background-color: var(--md-sys-color-surface-variant);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .upload-progress-bar {
+            height: 100%;
+            background-color: var(--md-sys-color-primary);
+            transition: width 0.3s ease;
+        }
 
         /* --- Login Page --- */
         .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; background-color: var(--md-sys-color-background); }
@@ -191,7 +269,24 @@
                     <h2>Informações da Loja</h2>
                     <div class="form-field"><input type="text" id="store-name" placeholder=" "><label for="store-name">Nome da Loja</label></div>
                     <div class="form-field"><textarea id="store-description" placeholder=" "></textarea><label for="store-description">Descrição da Loja</label></div>
-                    <div class="form-field"><input type="text" id="store-logo" placeholder=" "><label for="store-logo">URL do Banner Principal</label></div>
+                    
+                    <!-- Upload do Banner Principal -->
+                    <div class="image-upload-container">
+                        <label style="position:static; font-size:0.75rem; margin-bottom:4px; display:block;">Banner Principal</label>
+                        <div id="banner-upload-area" class="image-upload-area">
+                            <div class="image-upload-icon">
+                                <i class="material-icons-outlined">image</i>
+                            </div>
+                            <div class="image-upload-text">Clique ou arraste uma imagem aqui</div>
+                            <div class="image-upload-hint">Tamanho recomendado: 1200x400px</div>
+                            <input type="file" id="banner-upload-input" accept="image/*" style="display: none;">
+                        </div>
+                        <div id="banner-preview-container" class="image-preview-container"></div>
+                        <div id="banner-upload-progress" class="upload-progress" style="display: none;">
+                            <div id="banner-progress-bar" class="upload-progress-bar"></div>
+                        </div>
+                    </div>
+                    
                     <div class="form-field"><input type="tel" id="store-whatsapp" placeholder=" "><label for="store-whatsapp">Nº do WhatsApp (ex: 5521999999999)</label></div>
                     <div class="form-field"><label style="position:static; font-size:0.75rem; margin-bottom:4px;">Cor Principal da Loja</label><input type="color" id="store-color" value="#6750A4" style="width:100%; height:48px; padding:5px; border-radius:8px;"></div>
                     <button id="save-store-btn" class="btn">Salvar Informações</button>
@@ -229,7 +324,24 @@
                     <div class="form-field"><input type="text" id="product-name" placeholder=" "><label for="product-name">Nome do Produto</label></div>
                     <div class="form-field"><textarea id="product-description" placeholder=" "></textarea><label for="product-description">Descrição</label></div>
                     <div class="form-field"><input type="number" id="product-price" step="0.01" placeholder=" "><label for="product-price">Preço (R$)</label></div>
-                    <div class="form-field"><input type="text" id="product-image" placeholder=" "><label for="product-image">URL da Imagem</label></div>
+                    
+                    <!-- Upload de Imagem do Produto -->
+                    <div class="image-upload-container">
+                        <label style="position:static; font-size:0.75rem; margin-bottom:4px; display:block;">Imagem do Produto</label>
+                        <div id="product-image-upload-area" class="image-upload-area">
+                            <div class="image-upload-icon">
+                                <i class="material-icons-outlined">image</i>
+                            </div>
+                            <div class="image-upload-text">Clique ou arraste uma imagem aqui</div>
+                            <div class="image-upload-hint">Tamanho recomendado: 600x600px</div>
+                            <input type="file" id="product-image-upload-input" accept="image/*" style="display: none;">
+                        </div>
+                        <div id="product-image-preview-container" class="image-preview-container"></div>
+                        <div id="product-image-upload-progress" class="upload-progress" style="display: none;">
+                            <div id="product-image-progress-bar" class="upload-progress-bar"></div>
+                        </div>
+                    </div>
+                    
                     <div class="form-field">
                         <select id="product-category" value=""><option value="" disabled selected></option></select>
                         <label for="product-category">Categoria</label>
@@ -264,7 +376,24 @@
                 <div class="form-field"><input type="text" id="edit-product-name" placeholder=" "><label for="edit-product-name">Nome</label></div>
                 <div class="form-field"><textarea id="edit-product-description" placeholder=" "></textarea><label for="edit-product-description">Descrição</label></div>
                 <div class="form-field"><input type="number" id="edit-product-price" step="0.01" placeholder=" "><label for="edit-product-price">Preço (R$)</label></div>
-                <div class="form-field"><input type="text" id="edit-product-image" placeholder=" "><label for="edit-product-image">URL da Imagem</label></div>
+                
+                <!-- Upload de Imagem na Edição -->
+                <div class="image-upload-container">
+                    <label style="position:static; font-size:0.75rem; margin-bottom:4px; display:block;">Imagem do Produto</label>
+                    <div id="edit-product-image-upload-area" class="image-upload-area">
+                        <div class="image-upload-icon">
+                            <i class="material-icons-outlined">image</i>
+                        </div>
+                        <div class="image-upload-text">Clique ou arraste uma imagem aqui</div>
+                        <div class="image-upload-hint">Tamanho recomendado: 600x600px</div>
+                        <input type="file" id="edit-product-image-upload-input" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="edit-product-image-preview-container" class="image-preview-container"></div>
+                    <div id="edit-product-image-upload-progress" class="upload-progress" style="display: none;">
+                        <div id="edit-product-image-progress-bar" class="upload-progress-bar"></div>
+                    </div>
+                </div>
+                
                 <div class="form-field">
                     <select id="edit-product-category"><option value="" disabled selected></option></select>
                     <label for="edit-product-category">Categoria</label>
@@ -299,8 +428,10 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { getDatabase, ref, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Firebase configuration
             const firebaseConfig = {
                 apiKey: "AIzaSyD8FxHqt1g2V-mmureRPQyYe6QCuRSieGI",
                 authDomain: "marketplaceconnect-af26d.firebaseapp.com",
@@ -311,14 +442,21 @@
                 appId: "1:768552546759:web:4367fc4a161ecf90c469e2",
                 measurementId: "G-7HHR78MHDP"
             };
+            
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getDatabase(app);
+            const storage = getStorage(app);
 
             let currentUser = null;
             let allAdminProducts = [];
             const authContainer = document.getElementById('auth-container');
             const appContainer = document.getElementById('app-container');
+
+            // Variáveis para armazenar URLs de imagens
+            let currentBannerUrl = '';
+            let currentProductImageUrl = '';
+            let currentEditProductImageUrl = '';
 
             const showToast = (message, duration = 3000) => {
                 const toastContainer = document.getElementById('toast-container');
@@ -365,15 +503,165 @@
             });
 
             function getDbRef(path = '') { return ref(db, `stores/${currentUser.uid}/${path}`); }
+            function getStorageRef(path = '') { return storageRef(storage, `stores/${currentUser.uid}/${path}`); }
+
+            // Configuração de upload de imagens
+            function setupImageUpload(uploadAreaId, fileInputId, previewContainerId, progressContainerId, progressBarId, onUploadComplete) {
+                const uploadArea = document.getElementById(uploadAreaId);
+                const fileInput = document.getElementById(fileInputId);
+                const previewContainer = document.getElementById(previewContainerId);
+                const progressContainer = document.getElementById(progressContainerId);
+                const progressBar = document.getElementById(progressBarId);
+                
+                // Clique para selecionar arquivo
+                uploadArea.addEventListener('click', () => fileInput.click());
+                
+                // Arrastar e soltar
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+                
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('dragover');
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    if (e.dataTransfer.files.length) {
+                        fileInput.files = e.dataTransfer.files;
+                        handleFileSelect(e.dataTransfer.files[0]);
+                    }
+                });
+                
+                // Seleção de arquivo via input
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length) {
+                        handleFileSelect(e.target.files[0]);
+                    }
+                });
+                
+                function handleFileSelect(file) {
+                    if (!file.type.match('image.*')) {
+                        showToast('Por favor, selecione apenas imagens.');
+                        return;
+                    }
+                    
+                    // Limpar preview anterior
+                    previewContainer.innerHTML = '';
+                    
+                    // Criar preview local
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const preview = document.createElement('div');
+                        preview.className = 'image-preview';
+                        preview.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <div class="image-preview-remove">
+                                <i class="material-icons-outlined">close</i>
+                            </div>
+                        `;
+                        
+                        preview.querySelector('.image-preview-remove').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            preview.remove();
+                            fileInput.value = '';
+                            onUploadComplete(''); // Limpar URL
+                        });
+                        
+                        previewContainer.appendChild(preview);
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Fazer upload para Firebase Storage
+                    uploadImage(file, progressContainer, progressBar, onUploadComplete);
+                }
+            }
+            
+            function uploadImage(file, progressContainer, progressBar, onUploadComplete) {
+                const fileName = `${Date.now()}_${file.name}`;
+                const imageRef = getStorageRef(`images/${fileName}`);
+                const uploadTask = uploadBytesResumable(imageRef, file);
+                
+                progressContainer.style.display = 'block';
+                progressBar.style.width = '0%';
+                
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressBar.style.width = `${progress}%`;
+                    },
+                    (error) => {
+                        showToast('Erro no upload da imagem: ' + error.message);
+                        progressContainer.style.display = 'none';
+                    },
+                    () => {
+                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                            progressContainer.style.display = 'none';
+                            onUploadComplete(downloadURL);
+                            showToast('Imagem enviada com sucesso!');
+                        });
+                    }
+                );
+            }
+            
+            // Configurar uploads
+            setupImageUpload(
+                'banner-upload-area', 
+                'banner-upload-input', 
+                'banner-preview-container', 
+                'banner-upload-progress', 
+                'banner-progress-bar', 
+                (url) => { currentBannerUrl = url; }
+            );
+            
+            setupImageUpload(
+                'product-image-upload-area', 
+                'product-image-upload-input', 
+                'product-image-preview-container', 
+                'product-image-upload-progress', 
+                'product-image-progress-bar', 
+                (url) => { currentProductImageUrl = url; }
+            );
+            
+            setupImageUpload(
+                'edit-product-image-upload-area', 
+                'edit-product-image-upload-input', 
+                'edit-product-image-preview-container', 
+                'edit-product-image-upload-progress', 
+                'edit-product-image-progress-bar', 
+                (url) => { currentEditProductImageUrl = url; }
+            );
 
             function loadStoreData() {
                 onValue(getDbRef(), snapshot => {
                     const data = snapshot.val() || {};
                     document.getElementById('store-name').value = data.name || '';
                     document.getElementById('store-description').value = data.description || '';
-                    document.getElementById('store-logo').value = data.logo || '';
                     document.getElementById('store-whatsapp').value = data.whatsapp || '';
                     document.getElementById('store-color').value = data.color || '#6750A4';
+                    
+                    // Carregar banner se existir
+                    if (data.logo) {
+                        currentBannerUrl = data.logo;
+                        const previewContainer = document.getElementById('banner-preview-container');
+                        previewContainer.innerHTML = '';
+                        const preview = document.createElement('div');
+                        preview.className = 'image-preview';
+                        preview.innerHTML = `
+                            <img src="${data.logo}" alt="Banner Preview">
+                            <div class="image-preview-remove">
+                                <i class="material-icons-outlined">close</i>
+                            </div>
+                        `;
+                        preview.querySelector('.image-preview-remove').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            preview.remove();
+                            currentBannerUrl = '';
+                        });
+                        previewContainer.appendChild(preview);
+                    }
                     
                     renderTags('categories', data.categories || {}, document.getElementById('categories-list'));
                     renderTags('paymentMethods', data.paymentMethods || {}, document.getElementById('payment-methods-list'));
@@ -396,7 +684,7 @@
                 update(getDbRef(), {
                     name: document.getElementById('store-name').value,
                     description: document.getElementById('store-description').value,
-                    logo: document.getElementById('store-logo').value,
+                    logo: currentBannerUrl,
                     whatsapp: document.getElementById('store-whatsapp').value,
                     color: document.getElementById('store-color').value
                 }).then(() => showToast('Informações da loja salvas!'));
@@ -440,15 +728,17 @@
                     name: document.getElementById('product-name').value,
                     description: document.getElementById('product-description').value,
                     price: parseFloat(document.getElementById('product-price').value) || 0,
-                    image: document.getElementById('product-image').value,
+                    image: currentProductImageUrl,
                     category: document.getElementById('product-category').value,
                     available: document.getElementById('product-available').checked
                 };
                 if(product.name && product.price > 0) {
                     push(getDbRef('products'), product).then(() => {
-                        ['product-name', 'product-description', 'product-price', 'product-image'].forEach(id => document.getElementById(id).value = '');
+                        ['product-name', 'product-description', 'product-price'].forEach(id => document.getElementById(id).value = '');
                         document.getElementById('product-category').value = "";
                         document.getElementById('product-available').checked = true;
+                        document.getElementById('product-image-preview-container').innerHTML = '';
+                        currentProductImageUrl = '';
                         showToast('Produto adicionado com sucesso!');
                     });
                 } else { showToast('Nome e preço são obrigatórios.'); }
@@ -497,6 +787,13 @@
                     card.querySelector('.delete-btn').onclick = () => {
                         confirmAction(`Excluir "${product.name}"? Esta ação não pode ser desfeita.`, () => {
                             remove(getDbRef(`products/${product.id}`));
+                            // Opcional: deletar a imagem do storage também
+                            if (product.image && product.image.includes('firebasestorage')) {
+                                const imageRef = storageRef(storage, product.image);
+                                deleteObject(imageRef).catch(error => {
+                                    console.log('Erro ao deletar imagem:', error);
+                                });
+                            }
                         });
                     };
                     grid.appendChild(card);
@@ -509,9 +806,31 @@
                 document.getElementById('edit-product-name').value = product.name;
                 document.getElementById('edit-product-description').value = product.description;
                 document.getElementById('edit-product-price').value = product.price;
-                document.getElementById('edit-product-image').value = product.image;
                 document.getElementById('edit-product-category').value = product.category || '';
                 document.getElementById('edit-product-available').checked = product.available;
+                
+                // Configurar preview da imagem existente
+                const previewContainer = document.getElementById('edit-product-image-preview-container');
+                previewContainer.innerHTML = '';
+                currentEditProductImageUrl = product.image || '';
+                
+                if (product.image) {
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview';
+                    preview.innerHTML = `
+                        <img src="${product.image}" alt="Preview">
+                        <div class="image-preview-remove">
+                            <i class="material-icons-outlined">close</i>
+                        </div>
+                    `;
+                    preview.querySelector('.image-preview-remove').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        preview.remove();
+                        currentEditProductImageUrl = '';
+                    });
+                    previewContainer.appendChild(preview);
+                }
+                
                 editModal.classList.add('show');
             }
             document.getElementById('cancel-edit-btn').onclick = () => editModal.classList.remove('show');
@@ -521,7 +840,7 @@
                     name: document.getElementById('edit-product-name').value,
                     description: document.getElementById('edit-product-description').value,
                     price: parseFloat(document.getElementById('edit-product-price').value) || 0,
-                    image: document.getElementById('edit-product-image').value,
+                    image: currentEditProductImageUrl,
                     category: document.getElementById('edit-product-category').value,
                     available: document.getElementById('edit-product-available').checked
                 };
@@ -536,5 +855,3 @@
     </script>
 </body>
 </html>
-
-
