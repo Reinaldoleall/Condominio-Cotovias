@@ -636,31 +636,46 @@
             }
 
             function updateCheckoutLink() {
-                const phone = storeData.whatsapp, btn = document.getElementById('checkout-btn');
-                if (!phone || cart.length === 0) {
-                    btn.setAttribute('disabled', true);
-                    btn.href = '#';
-                    return;
-                }
-                btn.removeAttribute('disabled');
-                
-                const name = document.getElementById('customer-name').value;
-                const address = document.getElementById('customer-address').value;
-                const delivery = document.getElementById('delivery-option').value;
-                const payment = document.getElementById('payment-method').value;
+    const phone = storeData.whatsapp, btn = document.getElementById('checkout-btn');
+    if (!phone || cart.length === 0) {
+        btn.setAttribute('disabled', true);
+        btn.href = '#';
+        return;
+    }
+    btn.removeAttribute('disabled');
+    
+    const name = document.getElementById('customer-name').value;
+    const address = document.getElementById('customer-address').value;
+    const delivery = document.getElementById('delivery-option').value;
+    const payment = document.getElementById('payment-method').value;
 
-                let message = `Olá, *${storeData.name}*! Gostaria de fazer o seguinte pedido:\n\n`, total = 0;
-                cart.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    total += itemTotal;
-                    message += `*${item.quantity}x* ${item.name} - _R$ ${itemTotal.toFixed(2).replace('.', ',')}_\n`;
-                });
-                message += `\n*Total do Pedido: R$ ${total.toFixed(2).replace('.', ',')}*`;
-                message += `\n\n*Dados para Entrega:*\n*Nome:* ${name}\n*Endereço:* ${address}`;
-                message += `\n\n*Preferências:*\n*Entrega:* ${delivery}\n*Pagamento:* ${payment}`;
+    let message = `🛒 *PEDIDO - ${storeData.name}* 🛒\n\n`;
+    message += `*Cliente:* ${name || 'Não informado'}\n`;
+    message += `*Endereço:* ${address || 'Não informado'}\n`;
+    message += `*Entrega:* ${delivery}\n`;
+    message += `*Pagamento:* ${payment}\n\n`;
+    message += `*ITENS DO PEDIDO:*\n`;
+    message += '─'.repeat(30) + '\n';
+    
+    let total = 0;
+    cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        message += `\n*${item.quantity}x* ${item.name}\n`;
+        message += `   R$ ${item.price.toFixed(2).replace('.', ',')} (un)\n`;
+        message += `   *Subtotal: R$ ${itemTotal.toFixed(2).replace('.', ',')}*\n`;
+        
+        if (index < cart.length - 1) {
+            message += '   ───────────────────\n';
+        }
+    });
+    
+    message += '\n' + '─'.repeat(30) + '\n';
+    message += `\n💰 *VALOR TOTAL: R$ ${total.toFixed(2).replace('.', ',')}* 💰\n\n`;
+    message += `_Pedido gerado automaticamente via loja virtual_`;
 
-                btn.href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            }
+    btn.href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
 
             function openProductModal(product) {
                 if(!product.available) return;
