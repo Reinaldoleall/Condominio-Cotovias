@@ -1020,6 +1020,26 @@
     from { transform: translateX(0); opacity: 1; }
     to { transform: translateX(100%); opacity: 0; }
   }
+  /* Notificação DENTRO da página do chat */
+.on-page-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10001;
+  display: none;
+  cursor: pointer;
+  max-width: 300px;
+  animation: slideIn 0.3s ease-out;
+}
+.on-page-notification.show {
+  display: block;
+}
+
 </style>
 
 <body>
@@ -1381,6 +1401,39 @@ function showNotification(message, type = 'info') {
         }
     }, 3000);
 }
+
+// Função para mostrar notificação DENTRO da página
+function showOnPageNotification(title, body, onClickCallback) {
+  // Remove notificação anterior, se houver
+  const oldNotif = document.getElementById('onPageNotification');
+  if (oldNotif) oldNotif.remove();
+
+  const notification = document.createElement('div');
+  notification.id = 'onPageNotification';
+  notification.className = 'on-page-notification';
+  notification.innerHTML = `
+    <div style="font-weight: 500; margin-bottom: 4px;">${title}</div>
+    <div>${body}</div>
+  `;
+
+  // Adiciona evento de clique
+  notification.onclick = () => {
+    if (onClickCallback) onClickCallback();
+    notification.remove();
+  };
+
+  document.body.appendChild(notification);
+  notification.classList.add('show');
+
+  // Remove automaticamente após 5 segundos
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.style.animation = 'slideOut 0.3s ease-in';
+      setTimeout(() => notification.remove(), 300);
+    }
+  }, 5000);
+}
+
     </script>
     <script>
       // Variáveis do chat
@@ -1999,8 +2052,31 @@ function handleNewMessageNotification(lastMessage, conversationId) {
     
     // Mostrar notificação visual se configurado
     if (userSettings.tabNotification) {
-        showDesktopNotification(lastMessage, conversationId);
+        showDesktopNotification(lastMessage, conversationId); // Esta é a notificação do navegador
     }
+
+    // --- ADIÇÃO: MOSTRAR NOTIFICAÇÃO NA PÁGINA ---
+    // (Vamos buscar o nome do remetente para a notificação)
+    usersRef.child(lastMessage.senderId).once('value').then(snapshot => {
+        const sender = snapshot.val();
+        const senderName = sender ? sender.nome || 'Usuário' : 'Usuário';
+        
+        showOnPageNotification(
+            `Nova Mensagem de ${senderName}`,
+            lastMessage.text,
+            () => {
+                // Ao clicar, abre o chat e a conversa
+                if (chatContainer) {
+                    chatContainer.classList.add('active');
+                    chatToggle.classList.add('active');
+                    if (sender) {
+                        selectUser(lastMessage.senderId, sender);
+                    }
+                }
+            }
+        );
+    });
+    // --- FIM DA ADIÇÃO ---
     
     // Adicionar efeito visual no badge
     const badge = document.getElementById('unreadBadge');
