@@ -1144,10 +1144,12 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+
     
     <!-- JavaScript -->
     <script>
@@ -1169,6 +1171,8 @@ const database = firebase.database();
     </script>
     <script>
       // Variáveis globais
+let messaging = null;
+let currentFCMToken = null;
 let currentUser = null;
 let userSettings = {
     soundNotification: true,
@@ -1297,6 +1301,182 @@ async function checkMicrophonePermission() {
     }
 }
 
+// Inicializar FCM
+// Inicializar FCM - VERSÃO CORRIGIDA
+async function initializeFCM() {
+    try {
+        messaging = firebase.messaging();
+        
+        // Solicitar permissão para notificações
+        console.log('Solicitando permissão de notificação...');
+        const permission = await Notification.requestPermission();
+        
+        if (permission === 'granted') {
+            console.log('Permissão de notificação concedida');
+            
+            // Obter token FCM
+            const token = await getFCMToken();
+            
+            if (token) {
+                console.log('FCM inicializado com sucesso');
+                
+                // Monitorar atualizações de token
+                messaging.onTokenRefresh(async () => {
+                    try {
+                        console.log('Token FCM sendo atualizado...');
+                        const newToken = await getFCMToken();
+                        if (newToken && newToken !== currentFCMToken) {
+                            // Remover token antigo
+                            if (currentFCMToken) {
+                                await removeFCMToken(currentFCMToken);
+                            }
+                            currentFCMToken = newToken;
+                            console.log('Token FCM atualizado:', newToken);
+                        }
+                    } catch (error) {
+                        console.error('Erro ao atualizar token FCM:', error);
+                    }
+                });
+                
+                // Configurar handler para mensagens em foreground
+                messaging.onMessage((payload) => {
+                    console.log('Mensagem recebida em foreground:', payload);
+                    handleForegroundMessage(payload);
+                });
+                
+            } else {
+                console.log('Falha ao obter token FCM, notificações não funcionarão');
+            }
+            
+        } else {
+            console.log('Permissão de notificação negada:', permission);
+            showNotification('Notificações desativadas. Ative-as nas configurações do navegador.', 'error');
+        }
+    } catch (error) {
+        console.error('Erro crítico ao inicializar FCM:', error);
+        showNotification('Erro na configuração de notificações.', 'error');
+    }
+}
+
+// Obter token FCM
+// Obter token FCM
+// Obter token FCM - VERSÃO CORRIGIDA
+async function getFCMToken() {
+    try {
+        console.log('Tentando registrar service worker...');
+        
+        // Verificar se service workers são suportados
+        if (!('serviceWorker' in navigator)) {
+            console.error('Service Workers não são suportados');
+            return null;
+        }
+
+        // Tentar registrar o service worker
+        let registration;
+        try {
+            registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            console.log('Service Worker registrado com sucesso:', registration);
+        } catch (swError) {
+            console.error('Falha ao registrar Service Worker:', swError);
+            
+            // Fallback: tentar sem service worker
+            console.log('Tentando obter token sem service worker...');
+            currentFCMToken = await messaging.getToken({
+                vapidKey: 'BHmNn0G5BuOLrgMATfxYk3axhhXyfaF39Vb11bDJY4Z6smlDgTV8ushbiLvTiOeR8pAJ5AiGkQ5VnPic-eUxSxc'
+            });
+            
+            if (currentFCMToken) {
+                console.log('Token FCM obtido (sem service worker):', currentFCMToken);
+                await saveFCMToken(currentFCMToken);
+                return currentFCMToken;
+            }
+            return null;
+        }
+
+        // Aguardar o service worker estar ativo
+        await navigator.serviceWorker.ready;
+        console.log('Service Worker pronto');
+
+        // Obter token COM VAPID KEY
+        currentFCMToken = await messaging.getToken({
+            vapidKey: 'BHmNn0G5BuOLrgMATfxYk3axhhXyfaF39Vb11bDJY4Z6smlDgTV8ushbiLvTiOeR8pAJ5AiGkQ5VnPic-eUxSxc',
+            serviceWorkerRegistration: registration
+        });
+        
+        if (currentFCMToken) {
+            console.log('FCM Token obtido:', currentFCMToken);
+            // Salvar token no banco de dados
+            await saveFCMToken(currentFCMToken);
+            return currentFCMToken;
+        } else {
+            console.log('Não foi possível obter o token FCM');
+            return null;
+        }
+    } catch (error) {
+        console.error('Erro ao obter token FCM:', error);
+        
+        // Tentativa alternativa sem service worker
+        try {
+            console.log('Tentando método alternativo...');
+            currentFCMToken = await messaging.getToken();
+            if (currentFCMToken) {
+                console.log('Token FCM obtido (método alternativo):', currentFCMToken);
+                await saveFCMToken(currentFCMToken);
+                return currentFCMToken;
+            }
+        } catch (fallbackError) {
+            console.error('Método alternativo também falhou:', fallbackError);
+        }
+        
+        return null;
+    }
+}
+
+// Salvar token FCM no banco de dados
+async function saveFCMToken(token) {
+    if (!currentUser) return;
+    
+    try {
+        await database.ref(`users/${currentUser.uid}/fcmTokens/${token}`).set(true);
+        console.log('Token FCM salvo no banco de dados');
+    } catch (error) {
+        console.error('Erro ao salvar token FCM:', error);
+    }
+}
+
+// Remover token FCM (quando usuário faz logout)
+async function removeFCMToken(token) {
+    if (!currentUser || !token) return;
+    
+    try {
+        await database.ref(`users/${currentUser.uid}/fcmTokens/${token}`).remove();
+        console.log('Token FCM removido do banco de dados');
+    } catch (error) {
+        console.error('Erro ao remover token FCM:', error);
+    }
+}
+
+// Handler para mensagens em foreground
+function handleForegroundMessage(payload) {
+    const { title, body, senderId, conversationId } = payload.data;
+    
+    // Mostrar notificação local
+    if (userSettings.soundNotification) {
+        playNotificationSound();
+    }
+    
+    // Mostrar notificação na UI
+    showNotification(body, 'info');
+    
+    // Atualizar contador de mensagens não lidas
+    updateUnreadMessagesIndicator();
+    
+    // Se não estiver na conversa atual, mostrar notificação
+    if (selectedUser && selectedUser.id !== senderId) {
+        showDesktopNotification(payload.data);
+    }
+}
+
 // Controles da interface
 function toggleChat() {
     chatContainer.classList.toggle('active');
@@ -1403,11 +1583,13 @@ const startCallBtn = document.getElementById('startCallBtn');
 const blockCurrentUser = document.getElementById('blockCurrentUser');
 
 // Inicializar o chat
-// Inicializar o chat
-function initializeChat() {
+async function initializeChat() {
     // Referências do Firebase
     usersRef = database.ref('users');
     messagesRef = database.ref('messages');
+    
+    // Inicializar FCM
+    await initializeFCM();
     
     listenForIncomingCalls(currentUser.uid);
     
@@ -1423,8 +1605,11 @@ function initializeChat() {
     // Carregar configurações
     loadSettings();
     
-    // INICIALIZAR CONFIGURAÇÕES - ADICIONE ESTA LINHA
+    // INICIALIZAR CONFIGURAÇÕES
     initializeSettings();
+    
+    // 🆕 ADICIONE ESTA LINHA - Escutar notificações pendentes
+    listenForPendingNotifications();
     
     // Escutar por novas mensagens
     const cleanupListeners = listenForMessagesOptimized();
@@ -1735,7 +1920,7 @@ function loadConversationMessages() {
 }
 
 // Enviar mensagem
-function sendNewMessage() {
+async function sendNewMessage() {
     if (!selectedUser || !messageInput.value.trim()) return;
     
     const messageText = messageInput.value.trim();
@@ -1749,16 +1934,90 @@ function sendNewMessage() {
         timestamp: Date.now()
     };
     
-    messageRef.set(messageData)
-        .then(() => {
-            messageInput.value = '';
-            // Atualizar a lista de conversas após enviar mensagem
-            loadConversationsList();
-        })
-        .catch(error => {
-            console.error('Erro ao enviar mensagem:', error);
-            alert('Erro ao enviar mensagem. Tente novamente.');
-        });
+    try {
+        await messageRef.set(messageData);
+        messageInput.value = '';
+        
+        // Enviar notificação FCM
+        await sendFCMNotification(selectedUser.id, messageText);
+        
+        // Atualizar a lista de conversas após enviar mensagem
+        loadConversationsList();
+        
+    } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+        alert('Erro ao enviar mensagem. Tente novamente.');
+    }
+}
+
+// Enviar notificação FCM (versão simplificada sem Cloud Functions)
+async function sendFCMNotification(receiverId, messageText) {
+    try {
+        // Buscar tokens FCM do destinatário
+        const tokensSnapshot = await database.ref(`users/${receiverId}/fcmTokens`).once('value');
+        const tokens = tokensSnapshot.val();
+        
+        if (!tokens) {
+            console.log('Usuário não tem tokens FCM registrados');
+            return;
+        }
+        
+        // Buscar informações do remetente
+        const senderSnapshot = await database.ref(`users/${currentUser.uid}`).once('value');
+        const senderData = senderSnapshot.val();
+        const senderName = senderData?.nome || 'Usuário';
+        
+        // Para cada token, criar uma notificação local no database
+        // O próprio app vai verificar notificações pendentes
+        const notificationData = {
+            title: `Nova mensagem de ${senderName}`,
+            body: messageText.length > 50 ? messageText.substring(0, 50) + '...' : messageText,
+            senderId: currentUser.uid,
+            receiverId: receiverId,
+            timestamp: Date.now(),
+            read: false
+        };
+        
+        // Salvar notificação no database
+        const notificationRef = database.ref(`notifications/${receiverId}`).push();
+        await notificationRef.set(notificationData);
+        
+        console.log('Notificação salva no database para verificação posterior');
+        
+    } catch (error) {
+        console.error('Erro ao enviar notificação:', error);
+    }
+}
+
+// Verificar notificações pendentes
+function listenForPendingNotifications() {
+    if (!currentUser) return;
+    
+    const notificationsRef = database.ref(`notifications/${currentUser.uid}`);
+    
+    notificationsRef.on('child_added', (snapshot) => {
+        const notification = snapshot.val();
+        
+        if (!notification.read) {
+            // Mostrar notificação local
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(notification.title, {
+                    body: notification.body,
+                    icon: '/favicon.ico',
+                    badge: '/favicon.ico'
+                });
+            }
+            
+            // Mostrar também notificação na UI do chat
+            showNotification(notification.body, 'info');
+            
+            // Atualizar contador de mensagens não lidas
+            updateUnreadMessagesIndicator();
+            
+            // Marcar como lida
+            snapshot.ref.update({ read: true });
+        }
+    });
 }
 
 // Carregar lista de conversas
