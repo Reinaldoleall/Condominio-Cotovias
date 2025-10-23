@@ -359,202 +359,526 @@
 
 <script>
 // =============================================
-// RECEPTOR DE NOTIFICAÇÕES DO CHAT
+// SISTEMA RECEPTOR DE NOTIFICAÇÕES CROSS-SITE
+// Para colocar em outros sites que receberão notificações
 // =============================================
 (function() {
     'use strict';
     
-    let notificationCount = 0;
-    let lastNotification = null;
-    let widgetTimeout = null;
-    
-    const widget = document.getElementById('chatNotificationWidget');
-    const badge = document.getElementById('chatNotificationBadge');
-    
-    function initializeNotificationReceiver() {
-        console.log('🎧 Iniciando receptor de notificações do chat...');
-        
-        // Método 1: Escutar localStorage
-        setupLocalStorageListener();
-        
-        // Método 2: Escutar postMessage
-        setupPostMessageListener();
-        
-        // Método 3: Escutar BroadcastChannel
-        setupBroadcastChannelListener();
-        
-        // Método 4: Polling como fallback
-        setupPollingListener();
-        
-        console.log('✅ Receptor de notificações ativo');
-    }
-    
-    function setupLocalStorageListener() {
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'crossSiteChatNotification' && e.newValue) {
-                try {
-                    const notification = JSON.parse(e.newValue);
-                    if (notification.source === 'chat_app') {
-                        handleIncomingNotification(notification.data);
-                    }
-                } catch (error) {
-                    console.log('❌ Erro ao processar localStorage notification');
-                }
-            }
-        });
-    }
-    
-    function setupPostMessageListener() {
-        window.addEventListener('message', (event) => {
-            // Verificar se a mensagem é do nosso sistema
-            if (event.data && event.data.type === 'CHAT_NOTIFICATION' && event.data.source === 'chat_app') {
-                handleIncomingNotification(event.data.data);
-            }
-        });
-    }
-    
-    function setupBroadcastChannelListener() {
-        if ('BroadcastChannel' in window) {
-            try {
-                const channel = new BroadcastChannel('chat_notifications');
-                channel.addEventListener('message', (event) => {
-                    if (event.data && event.data.type === 'CHAT_NOTIFICATION') {
-                        handleIncomingNotification(event.data.data);
-                    }
-                });
-            } catch (error) {
-                console.log('❌ BroadcastChannel não disponível');
-            }
-        }
-    }
-    
-    function setupPollingListener() {
-        // Polling a cada 3 segundos como fallback
-        setInterval(() => {
-            try {
-                const stored = localStorage.getItem('crossSiteChatNotification');
-                if (stored) {
-                    const notification = JSON.parse(stored);
-                    if (notification.source === 'chat_app' && 
-                        notification.timestamp > (Date.now() - 10000)) { // Últimos 10 segundos
-                        handleIncomingNotification(notification.data);
-                    }
-                }
-            } catch (error) {
-                // Ignorar erros
-            }
-        }, 3000);
-    }
-    
-    function handleIncomingNotification(notificationData) {
-        console.log('📨 Notificação recebida:', notificationData);
-        
-        notificationCount++;
-        lastNotification = notificationData;
-        
-        // Mostrar badge
-        showNotificationBadge();
-        
-        // Mostrar widget automaticamente (apenas primeira notificação)
-        if (notificationCount === 1) {
-            showNotificationWidget();
-        }
-        
-        // Atualizar título da página
-        updatePageTitle();
-    }
-    
-    function showNotificationBadge() {
-        if (!badge) return;
-        
-        const badgeCount = document.getElementById('badgeCount');
-        if (badgeCount) {
-            badgeCount.textContent = notificationCount > 9 ? '9+' : notificationCount;
-        }
-        
-        badge.style.display = 'flex';
-    }
-    
-    function hideNotificationBadge() {
-        if (!badge) return;
-        badge.style.display = 'none';
-        notificationCount = 0;
-        updatePageTitle();
-    }
-    
-    function showNotificationWidget() {
-        if (!widget || !lastNotification) return;
-        
-        // Atualizar conteúdo do widget
-        document.getElementById('notificationTitle').textContent = getNotificationTitle(lastNotification);
-        document.getElementById('notificationMessage').textContent = lastNotification.message || 'Nova mensagem';
-        document.getElementById('notificationTime').textContent = formatTime(lastNotification.timestamp);
-        
-        // Mostrar widget
-        widget.style.display = 'flex';
-        
-        // Auto-esconder após 8 segundos
-        clearTimeout(widgetTimeout);
-        widgetTimeout = setTimeout(hideNotificationWidget, 8000);
-    }
-    
-    function hideNotificationWidget() {
-        if (!widget) return;
-        widget.style.display = 'none';
-    }
-    
-    function getNotificationTitle(notification) {
-        switch(notification.type) {
-            case 'NEW_MESSAGE':
-                return '💬 Nova Mensagem';
-            case 'INCOMING_CALL':
-                return '📞 Chamada Recebida';
-            default:
-                return '🔔 Notificação';
-        }
-    }
-    
-    function formatTime(timestamp) {
-        const now = Date.now();
-        const diff = now - timestamp;
-        
-        if (diff < 60000) return 'Agora mesmo';
-        if (diff < 3600000) return `${Math.floor(diff / 60000)} min atrás`;
-        
-        const date = new Date(timestamp);
-        return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    }
-    
-    function updatePageTitle() {
-        const baseTitle = document.title.replace(/^\(\d+\)\s*/, '') || 'Meu Site';
-        
-        if (notificationCount > 0) {
-            document.title = `(${notificationCount}) ${baseTitle}`;
-        } else {
-            document.title = baseTitle;
-        }
-    }
-    
-    // Funções globais para controle
-    window.showNotificationWidget = showNotificationWidget;
-    window.hideNotificationWidget = hideNotificationWidget;
-    
-    // Teste manual
-    window.testChatNotification = function() {
-        handleIncomingNotification({
-            type: 'NEW_MESSAGE',
-            message: 'Esta é uma mensagem de teste do sistema de notificações!',
-            timestamp: Date.now()
-        });
+    // Configurações do receptor
+    const receiverConfig = {
+        isInitialized: false,
+        notificationSoundEnabled: true,
+        showDesktopNotifications: true,
+        notificationHistory: [],
+        notificationContainer: null
     };
     
-    // Inicializar automaticamente
-    document.addEventListener('DOMContentLoaded', initializeNotificationReceiver);
+    // Inicialização do sistema receptor
+    function initializeNotificationReceiver() {
+        if (receiverConfig.isInitialized) return;
+        
+        console.log('📥 Iniciando receptor de notificações cross-site...');
+        
+        // Criar container para notificações
+        createNotificationContainer();
+        
+        // Configurar listeners para receber notificações
+        setupNotificationListeners();
+        
+        // Configurar service worker para notificações push (se suportado)
+        setupPushNotifications();
+        
+        receiverConfig.isInitialized = true;
+        
+        // Mostrar notificação de sistema pronto
+        showWelcomeNotification();
+    }
     
-    console.log('🎉 Receptor de notificações do chat carregado!');
+    // Criar container HTML para notificações
+    function createNotificationContainer() {
+        // Verificar se já existe
+        receiverConfig.notificationContainer = document.getElementById('crossSiteNotifications');
+        
+        if (!receiverConfig.notificationContainer) {
+            receiverConfig.notificationContainer = document.createElement('div');
+            receiverConfig.notificationContainer.id = 'crossSiteNotifications';
+            receiverConfig.notificationContainer.className = 'cross-site-notifications';
+            
+            // Adicionar estilos inline
+            receiverConfig.notificationContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                max-width: 350px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            `;
+            
+            document.body.appendChild(receiverConfig.notificationContainer);
+        }
+        
+        console.log('✅ Container de notificações criado');
+    }
+    
+    // Configurar todos os listeners para receber notificações
+    function setupNotificationListeners() {
+        // 1. Escutar localStorage (para abas do mesmo domínio)
+        window.addEventListener('storage', handleStorageNotification);
+        
+        // 2. Escutar postMessage (para iframes e janelas)
+        window.addEventListener('message', handlePostMessageNotification);
+        
+        // 3. Escutar BroadcastChannel (moderno, entre abas)
+        setupBroadcastChannelListener();
+        
+        // 4. Escutar eventos de visibilidade da página
+        document.addEventListener('visibilitychange', handlePageVisibility);
+        
+        console.log('✅ Listeners de notificação configurados');
+    }
+    
+    // Handler para notificações via localStorage
+    function handleStorageNotification(e) {
+        if (e.key === 'crossSiteChatNotification' && e.newValue) {
+            try {
+                const notification = JSON.parse(e.newValue);
+                if (notification.source === 'chat_app' && notification.data) {
+                    processIncomingNotification(notification.data);
+                }
+            } catch (error) {
+                console.log('❌ Erro ao processar notificação do localStorage');
+            }
+        }
+    }
+    
+    // Handler para notificações via postMessage
+    function handlePostMessageNotification(event) {
+        // Verificar origem se necessário (pode ajustar o domínio permitido)
+        // if (event.origin !== 'https://seu-dominio.com') return;
+        
+        if (event.data && 
+            event.data.type === 'CHAT_NOTIFICATION' && 
+            event.data.source === 'chat_app' &&
+            event.data.data) {
+            processIncomingNotification(event.data.data);
+        }
+    }
+    
+    // Configurar listener para BroadcastChannel
+    function setupBroadcastChannelListener() {
+        try {
+            if ('BroadcastChannel' in window) {
+                const channel = new BroadcastChannel('chat_notifications');
+                channel.addEventListener('message', (event) => {
+                    if (event.data && 
+                        event.data.type === 'CHAT_NOTIFICATION' && 
+                        event.data.source === 'chat_app' &&
+                        event.data.data) {
+                        processIncomingNotification(event.data.data);
+                    }
+                });
+                console.log('✅ BroadcastChannel listener configurado');
+            }
+        } catch (error) {
+            console.log('❌ BroadcastChannel não disponível');
+        }
+    }
+    
+    // Processar notificação recebida
+    function processIncomingNotification(notificationData) {
+        console.log('📨 Notificação recebida:', notificationData);
+        
+        // Adicionar ao histórico
+        receiverConfig.notificationHistory.push({
+            ...notificationData,
+            receivedAt: new Date().toISOString()
+        });
+        
+        // Manter apenas as últimas 50 notificações
+        if (receiverConfig.notificationHistory.length > 50) {
+            receiverConfig.notificationHistory = receiverConfig.notificationHistory.slice(-50);
+        }
+        
+        // Mostrar notificação baseada no tipo
+        switch (notificationData.type) {
+            case 'NEW_MESSAGE':
+                showNewMessageNotification(notificationData);
+                break;
+                
+            case 'TEST_MESSAGE':
+                showTestNotification(notificationData);
+                break;
+                
+            default:
+                showGenericNotification(notificationData);
+                break;
+        }
+        
+        // Tocar som de notificação
+        if (receiverConfig.notificationSoundEnabled) {
+            playNotificationSound();
+        }
+        
+        // Mostrar notificação desktop se permitido
+        if (receiverConfig.showDesktopNotifications && document.hidden) {
+            showDesktopNotification(notificationData);
+        }
+        
+        // Atualizar badge do título
+        updateTitleBadge();
+    }
+    
+    // Mostrar notificação de nova mensagem
+    function showNewMessageNotification(data) {
+        const notificationElement = createNotificationElement({
+            title: '💬 Nova Mensagem',
+            message: data.message || 'Você recebeu uma nova mensagem',
+            sender: data.senderId ? `De: ${data.senderId.substring(0, 8)}...` : '',
+            timestamp: data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : 'Agora',
+            type: 'message',
+            autoClose: 5000
+        });
+        
+        showNotification(notificationElement);
+    }
+    
+    // Mostrar notificação de teste
+    function showTestNotification(data) {
+        const notificationElement = createNotificationElement({
+            title: '🧪 Notificação de Teste',
+            message: data.message || 'Teste do sistema de notificações',
+            timestamp: 'Sistema',
+            type: 'test',
+            autoClose: 3000
+        });
+        
+        showNotification(notificationElement);
+    }
+    
+    // Mostrar notificação genérica
+    function showGenericNotification(data) {
+        const notificationElement = createNotificationElement({
+            title: '📢 Notificação',
+            message: data.message || 'Nova notificação recebida',
+            timestamp: data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : 'Agora',
+            type: 'generic',
+            autoClose: 4000
+        });
+        
+        showNotification(notificationElement);
+    }
+    
+    // Criar elemento de notificação
+    function createNotificationElement(options) {
+        const {
+            title,
+            message,
+            sender = '',
+            timestamp,
+            type = 'generic',
+            autoClose = 5000
+        } = options;
+        
+        const notificationId = 'notif_' + Date.now();
+        const notification = document.createElement('div');
+        notification.id = notificationId;
+        notification.className = `notification notification-${type}`;
+        
+        notification.style.cssText = `
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-left: 4px solid #007bff;
+            max-width: 350px;
+            animation: slideInRight 0.3s ease-out;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        `;
+        
+        if (type === 'message') {
+            notification.style.borderLeftColor = '#28a745';
+        } else if (type === 'test') {
+            notification.style.borderLeftColor = '#ffc107';
+        }
+        
+        notification.innerHTML = `
+            <div style="display: flex; justify-content: between; align-items: flex-start; margin-bottom: 4px;">
+                <strong style="flex: 1; font-size: 14px; color: #333;">${title}</strong>
+                <button onclick="document.getElementById('${notificationId}').remove()" 
+                        style="background: none; border: none; font-size: 16px; cursor: pointer; color: #666; padding: 0; margin-left: 8px;">
+                    ×
+                </button>
+            </div>
+            <div style="font-size: 13px; color: #666; line-height: 1.4; margin-bottom: 4px;">${message}</div>
+            ${sender ? `<div style="font-size: 12px; color: #888; margin-bottom: 2px;">${sender}</div>` : ''}
+            <div style="font-size: 11px; color: #999; text-align: right;">${timestamp}</div>
+        `;
+        
+        // Fechar automaticamente
+        if (autoClose > 0) {
+            setTimeout(() => {
+                if (document.getElementById(notificationId)) {
+                    closeNotification(notificationId);
+                }
+            }, autoClose);
+        }
+        
+        // Click para fechar
+        notification.addEventListener('click', () => {
+            closeNotification(notificationId);
+        });
+        
+        return notification;
+    }
+    
+    // Mostrar notificação no container
+    function showNotification(notificationElement) {
+        if (!receiverConfig.notificationContainer) {
+            createNotificationContainer();
+        }
+        
+        // Adicionar no topo do container
+        receiverConfig.notificationContainer.insertBefore(
+            notificationElement, 
+            receiverConfig.notificationContainer.firstChild
+        );
+        
+        // Limitar a 5 notificações visíveis
+        const notifications = receiverConfig.notificationContainer.children;
+        if (notifications.length > 5) {
+            for (let i = 5; i < notifications.length; i++) {
+                notifications[i].remove();
+            }
+        }
+    }
+    
+    // Fechar notificação com animação
+    function closeNotification(notificationId) {
+        const element = document.getElementById(notificationId);
+        if (element) {
+            element.style.transform = 'translateX(100%)';
+            element.style.opacity = '0';
+            setTimeout(() => {
+                if (element.parentNode) {
+                    element.remove();
+                }
+            }, 200);
+        }
+    }
+    
+    // Tocar som de notificação
+    function playNotificationSound() {
+        try {
+            // Usar Web Audio API para som simples
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+        } catch (error) {
+            console.log('🔇 Web Audio API não disponível para som');
+        }
+    }
+    
+    // Mostrar notificação desktop
+    function showDesktopNotification(notificationData) {
+        if (!('Notification' in window)) {
+            console.log('❌ Notificações desktop não suportadas');
+            return;
+        }
+        
+        if (Notification.permission === 'granted') {
+            const title = getDesktopNotificationTitle(notificationData);
+            const options = {
+                body: notificationData.message || 'Nova notificação',
+                icon: '/favicon.ico', // Ajuste para o ícone do seu site
+                badge: '/favicon.ico',
+                tag: 'chat_notification',
+                requireInteraction: false
+            };
+            
+            new Notification(title, options);
+            
+        } else if (Notification.permission !== 'denied') {
+            // Pedir permissão
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    showDesktopNotification(notificationData);
+                }
+            });
+        }
+    }
+    
+    // Obter título para notificação desktop
+    function getDesktopNotificationTitle(notificationData) {
+        switch (notificationData.type) {
+            case 'NEW_MESSAGE':
+                return '💬 Nova Mensagem';
+            case 'TEST_MESSAGE':
+                return '🧪 Teste de Notificação';
+            default:
+                return '📢 Nova Notificação';
+        }
+    }
+    
+    // Atualizar badge no título da página
+    function updateTitleBadge() {
+        if (document.hidden) {
+            const baseTitle = document.title.replace(/^\(\d+\)\s*/, '');
+            const unreadCount = receiverConfig.notificationHistory.filter(
+                n => n.type === 'NEW_MESSAGE' && !n.read
+            ).length;
+            
+            if (unreadCount > 0) {
+                document.title = `(${unreadCount}) ${baseTitle}`;
+            } else {
+                document.title = baseTitle;
+            }
+        }
+    }
+    
+    // Handler para mudança de visibilidade da página
+    function handlePageVisibility() {
+        if (!document.hidden) {
+            // Quando a página fica visível, limpar badge do título
+            document.title = document.title.replace(/^\(\d+\)\s*/, '');
+        }
+    }
+    
+    // Configurar notificações push (Service Worker)
+    function setupPushNotifications() {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                console.log('✅ Service Worker registrado:', registration);
+            }).catch(function(error) {
+                console.log('❌ Falha no Service Worker:', error);
+            });
+        }
+    }
+    
+    // Mostrar notificação de boas-vindas
+    function showWelcomeNotification() {
+        const welcomeElement = createNotificationElement({
+            title: '🔔 Sistema de Notificações',
+            message: 'Sistema receptor ativo! Você receberá notificações de outros sites.',
+            timestamp: 'Sistema',
+            type: 'test',
+            autoClose: 6000
+        });
+        
+        showNotification(welcomeElement);
+    }
+    
+    // Adicionar estilos CSS para animações
+    function injectStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            .notification:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            }
+            
+            .cross-site-notifications {
+                pointer-events: none;
+            }
+            
+            .cross-site-notifications .notification {
+                pointer-events: auto;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // =============================================
+    // API PÚBLICA PARA O SITE RECEPTOR
+    // =============================================
+    
+    window.NotificationReceiver = {
+        // Inicialização
+        init: initializeNotificationReceiver,
+        
+        // Configurações
+        enableSound: function() {
+            receiverConfig.notificationSoundEnabled = true;
+        },
+        disableSound: function() {
+            receiverConfig.notificationSoundEnabled = false;
+        },
+        enableDesktopNotifications: function() {
+            receiverConfig.showDesktopNotifications = true;
+        },
+        disableDesktopNotifications: function() {
+            receiverConfig.showDesktopNotifications = false;
+        },
+        
+        // Controle de notificações
+        clearAll: function() {
+            if (receiverConfig.notificationContainer) {
+                receiverConfig.notificationContainer.innerHTML = '';
+            }
+            receiverConfig.notificationHistory = [];
+            document.title = document.title.replace(/^\(\d+\)\s*/, '');
+        },
+        
+        // Informações
+        getHistory: function() {
+            return [...receiverConfig.notificationHistory];
+        },
+        
+        getUnreadCount: function() {
+            return receiverConfig.notificationHistory.filter(n => !n.read).length;
+        },
+        
+        // Teste
+        testNotification: function() {
+            showTestNotification({
+                message: 'Esta é uma notificação de teste do receptor',
+                timestamp: Date.now()
+            });
+        }
+    };
+    
+    // Inicialização automática
+    document.addEventListener('DOMContentLoaded', function() {
+        injectStyles();
+        initializeNotificationReceiver();
+    });
+    
+    // Também inicializar se o DOM já estiver pronto
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeNotificationReceiver);
+    } else {
+        setTimeout(initializeNotificationReceiver, 100);
+    }
+    
+    console.log('🎉 Sistema receptor de notificações carregado!');
     
 })();
-            </script>
+</script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
