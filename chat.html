@@ -1301,131 +1301,142 @@ async function checkMicrophonePermission() {
     }
 }
 
-// Inicializar FCM
-// Inicializar FCM - VERSÃO CORRIGIDA
+// Inicializar FCM - VERSÃO COMPLETAMENTE CORRIGIDA
 async function initializeFCM() {
     try {
+        console.log('🚀 Iniciando configuração do FCM...');
+        
+        // Verificar se Firebase Messaging está disponível
+        if (!firebase.messaging.isSupported()) {
+            console.log('❌ Firebase Messaging não é suportado neste navegador');
+            showNotification('Seu navegador não suporta notificações push', 'error');
+            return;
+        }
+
         messaging = firebase.messaging();
         
-        // Solicitar permissão para notificações
-        console.log('Solicitando permissão de notificação...');
+        // Verificar se já temos permissão
         const permission = await Notification.requestPermission();
+        console.log('📋 Status da permissão:', permission);
         
         if (permission === 'granted') {
-            console.log('Permissão de notificação concedida');
+            console.log('✅ Permissão de notificação concedida');
             
-            // Obter token FCM
-            const token = await getFCMToken();
-            
-            if (token) {
-                console.log('FCM inicializado com sucesso');
+            try {
+                // Obter token FCM
+                console.log('🔑 Solicitando token FCM...');
+                const token = await getFCMToken();
                 
-                // Monitorar atualizações de token
-                messaging.onTokenRefresh(async () => {
-                    try {
-                        console.log('Token FCM sendo atualizado...');
-                        const newToken = await getFCMToken();
-                        if (newToken && newToken !== currentFCMToken) {
-                            // Remover token antigo
-                            if (currentFCMToken) {
-                                await removeFCMToken(currentFCMToken);
+                if (token) {
+                    console.log('✅ Token FCM obtido com sucesso');
+                    showNotification('Notificações configuradas com sucesso!', 'success');
+                    
+                    // Configurar listener para mensagens em foreground
+                    messaging.onMessage((payload) => {
+                        console.log('📨 Mensagem recebida em foreground:', payload);
+                        handleForegroundMessage(payload);
+                    });
+                    
+                    // Configurar atualização de token
+                    messaging.onTokenRefresh(async () => {
+                        console.log('🔄 Atualizando token FCM...');
+                        try {
+                            const newToken = await getFCMToken();
+                            if (newToken && newToken !== currentFCMToken) {
+                                if (currentFCMToken) {
+                                    await removeFCMToken(currentFCMToken);
+                                }
+                                currentFCMToken = newToken;
+                                console.log('✅ Token FCM atualizado');
                             }
-                            currentFCMToken = newToken;
-                            console.log('Token FCM atualizado:', newToken);
+                        } catch (error) {
+                            console.error('❌ Erro ao atualizar token:', error);
                         }
-                    } catch (error) {
-                        console.error('Erro ao atualizar token FCM:', error);
-                    }
-                });
+                    });
+                    
+                } else {
+                    console.log('❌ Falha ao obter token FCM');
+                    showNotification('Falha ao configurar notificações', 'error');
+                }
                 
-                // Configurar handler para mensagens em foreground
-                messaging.onMessage((payload) => {
-                    console.log('Mensagem recebida em foreground:', payload);
-                    handleForegroundMessage(payload);
-                });
-                
-            } else {
-                console.log('Falha ao obter token FCM, notificações não funcionarão');
+            } catch (tokenError) {
+                console.error('❌ Erro ao obter token FCM:', tokenError);
+                showNotification('Erro na configuração: ' + tokenError.message, 'error');
             }
             
+        } else if (permission === 'default') {
+            console.log('ℹ️ Usuário ainda não decidiu sobre notificações');
+            // Não mostrar erro, o usuário pode permitir depois
         } else {
-            console.log('Permissão de notificação negada:', permission);
-            showNotification('Notificações desativadas. Ative-as nas configurações do navegador.', 'error');
+            console.log('❌ Permissão de notificação negada');
+            showNotification('Notificações bloqueadas. Permita nas configurações do site.', 'error');
         }
+        
     } catch (error) {
-        console.error('Erro crítico ao inicializar FCM:', error);
-        showNotification('Erro na configuração de notificações.', 'error');
+        console.error('💥 Erro crítico no FCM:', error);
+        showNotification('Erro nas notificações: ' + error.message, 'error');
     }
 }
 
-// Obter token FCM
-// Obter token FCM
-// Obter token FCM - VERSÃO CORRIGIDA
+// Obter token FCM - VERSÃO ROBUSTA
 async function getFCMToken() {
     try {
-        console.log('Tentando registrar service worker...');
+        console.log('🛠️ Iniciando obtenção do token FCM...');
         
-        // Verificar se service workers são suportados
-        if (!('serviceWorker' in navigator)) {
-            console.error('Service Workers não são suportados');
-            return null;
-        }
-
-        // Tentar registrar o service worker
-        let registration;
-        try {
-            registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-            console.log('Service Worker registrado com sucesso:', registration);
-        } catch (swError) {
-            console.error('Falha ao registrar Service Worker:', swError);
-            
-            // Fallback: tentar sem service worker
-            console.log('Tentando obter token sem service worker...');
-            currentFCMToken = await messaging.getToken({
-                vapidKey: 'BHmNn0G5BuOLrgMATfxYk3axhhXyfaF39Vb11bDJY4Z6smlDgTV8ushbiLvTiOeR8pAJ5AiGkQ5VnPic-eUxSxc'
-            });
-            
-            if (currentFCMToken) {
-                console.log('Token FCM obtido (sem service worker):', currentFCMToken);
-                await saveFCMToken(currentFCMToken);
-                return currentFCMToken;
+        // Método principal: tentar com service worker
+        if ('serviceWorker' in navigator) {
+            try {
+                console.log('🔧 Tentando registrar service worker...');
+                
+                // IMPORTANTE: Não tentar registrar se já estiver registrado
+                const registration = await navigator.serviceWorker.ready;
+                console.log('✅ Service Worker já está pronto');
+                
+                currentFCMToken = await messaging.getToken({
+                    vapidKey: 'BHmNn0G5BuOLrgMATfxYk3axhhXyfaF39Vb11bDJY4Z6smlDgTV8ushbiLvTiOeR8pAJ5AiGkQ5VnPic-eUxSxc',
+                    serviceWorkerRegistration: registration
+                });
+                
+            } catch (swError) {
+                console.log('⚠️ Service Worker não disponível, usando método alternativo:', swError);
+                
+                // Fallback: sem service worker
+                currentFCMToken = await messaging.getToken({
+                    vapidKey: 'BHmNn0G5BuOLrgMATfxYk3axhhXyfaF39Vb11bDJY4Z6smlDgTV8ushbiLvTiOeR8pAJ5AiGkQ5VnPic-eUxSxc'
+                });
             }
-            return null;
+        } else {
+            console.log('⚠️ Service Worker não suportado, usando método básico');
+            // Método mais básico
+            currentFCMToken = await messaging.getToken();
         }
-
-        // Aguardar o service worker estar ativo
-        await navigator.serviceWorker.ready;
-        console.log('Service Worker pronto');
-
-        // Obter token COM VAPID KEY
-        currentFCMToken = await messaging.getToken({
-            vapidKey: 'BHmNn0G5BuOLrgMATfxYk3axhhXyfaF39Vb11bDJY4Z6smlDgTV8ushbiLvTiOeR8pAJ5AiGkQ5VnPic-eUxSxc',
-            serviceWorkerRegistration: registration
-        });
         
         if (currentFCMToken) {
-            console.log('FCM Token obtido:', currentFCMToken);
-            // Salvar token no banco de dados
+            console.log('✅ Token FCM obtido:', currentFCMToken.substring(0, 20) + '...');
+            
+            // Salvar no banco de dados
             await saveFCMToken(currentFCMToken);
+            
             return currentFCMToken;
         } else {
-            console.log('Não foi possível obter o token FCM');
+            console.log('❌ Token FCM é nulo/indefinido');
             return null;
         }
-    } catch (error) {
-        console.error('Erro ao obter token FCM:', error);
         
-        // Tentativa alternativa sem service worker
+    } catch (error) {
+        console.error('💥 Erro ao obter token FCM:', error);
+        
+        // Tentativa de emergência
         try {
-            console.log('Tentando método alternativo...');
+            console.log('🆘 Tentativa de emergência...');
             currentFCMToken = await messaging.getToken();
             if (currentFCMToken) {
-                console.log('Token FCM obtido (método alternativo):', currentFCMToken);
+                console.log('✅ Token obtido na tentativa de emergência');
                 await saveFCMToken(currentFCMToken);
                 return currentFCMToken;
             }
-        } catch (fallbackError) {
-            console.error('Método alternativo também falhou:', fallbackError);
+        } catch (emergencyError) {
+            console.error('💥 Falha até na tentativa de emergência:', emergencyError);
         }
         
         return null;
@@ -1457,23 +1468,51 @@ async function removeFCMToken(token) {
 }
 
 // Handler para mensagens em foreground
+// Handler para mensagens em foreground - VERSÃO TOLERANTE
 function handleForegroundMessage(payload) {
-    const { title, body, senderId, conversationId } = payload.data;
-    
-    // Mostrar notificação local
-    if (userSettings.soundNotification) {
-        playNotificationSound();
-    }
-    
-    // Mostrar notificação na UI
-    showNotification(body, 'info');
-    
-    // Atualizar contador de mensagens não lidas
-    updateUnreadMessagesIndicator();
-    
-    // Se não estiver na conversa atual, mostrar notificação
-    if (selectedUser && selectedUser.id !== senderId) {
-        showDesktopNotification(payload.data);
+    try {
+        console.log('📨 Processando mensagem foreground:', payload);
+        
+        if (!payload || !payload.data) {
+            console.log('⚠️ Payload inválido');
+            return;
+        }
+        
+        const { title, body, senderId, conversationId } = payload.data;
+        
+        // Verificar dados mínimos
+        if (!body) {
+            console.log('⚠️ Mensagem sem corpo');
+            return;
+        }
+        
+        // Tocar som se configurado
+        if (userSettings.soundNotification) {
+            try {
+                playNotificationSound();
+            } catch (soundError) {
+                console.log('⚠️ Erro no som:', soundError);
+            }
+        }
+        
+        // Mostrar notificação na UI
+        const messageText = body || 'Nova mensagem';
+        showNotification(messageText, 'info');
+        
+        // Atualizar contador
+        updateUnreadMessagesIndicator();
+        
+        // Mostrar notificação desktop se não for a conversa atual
+        if (selectedUser && senderId && selectedUser.id !== senderId) {
+            try {
+                showDesktopNotification(payload.data);
+            } catch (desktopError) {
+                console.log('⚠️ Erro na notificação desktop:', desktopError);
+            }
+        }
+        
+    } catch (error) {
+        console.error('💥 Erro no handler de mensagem:', error);
     }
 }
 
@@ -1951,14 +1990,22 @@ async function sendNewMessage() {
 }
 
 // Enviar notificação FCM (versão simplificada sem Cloud Functions)
+// Enviar notificação FCM - VERSÃO TOLERANTE
 async function sendFCMNotification(receiverId, messageText) {
     try {
+        console.log('📤 Enviando notificação para:', receiverId);
+        
+        if (!receiverId || !messageText) {
+            console.log('⚠️ Dados inválidos para notificação');
+            return;
+        }
+        
         // Buscar tokens FCM do destinatário
         const tokensSnapshot = await database.ref(`users/${receiverId}/fcmTokens`).once('value');
         const tokens = tokensSnapshot.val();
         
         if (!tokens) {
-            console.log('Usuário não tem tokens FCM registrados');
+            console.log('ℹ️ Usuário não tem tokens FCM registrados');
             return;
         }
         
@@ -1967,8 +2014,7 @@ async function sendFCMNotification(receiverId, messageText) {
         const senderData = senderSnapshot.val();
         const senderName = senderData?.nome || 'Usuário';
         
-        // Para cada token, criar uma notificação local no database
-        // O próprio app vai verificar notificações pendentes
+        // Criar notificação
         const notificationData = {
             title: `Nova mensagem de ${senderName}`,
             body: messageText.length > 50 ? messageText.substring(0, 50) + '...' : messageText,
@@ -1982,10 +2028,11 @@ async function sendFCMNotification(receiverId, messageText) {
         const notificationRef = database.ref(`notifications/${receiverId}`).push();
         await notificationRef.set(notificationData);
         
-        console.log('Notificação salva no database para verificação posterior');
+        console.log('✅ Notificação salva no database');
         
     } catch (error) {
-        console.error('Erro ao enviar notificação:', error);
+        console.error('❌ Erro ao enviar notificação:', error);
+        // Não mostrar erro para o usuário, é opcional
     }
 }
 
