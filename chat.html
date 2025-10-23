@@ -1020,293 +1020,8 @@
     from { transform: translateX(0); opacity: 1; }
     to { transform: translateX(100%); opacity: 0; }
   }
-/* Estilos para o sistema de sincronização */
-.auth-sync-status {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    padding: 8px 12px;
-    border-radius: 16px;
-    font-size: 12px;
-    z-index: 10000;
-    display: none;
-}
-
-.auth-sync-status.syncing {
-    background: #FF9800;
-    color: white;
-    display: block;
-}
-
-.auth-sync-status.success {
-    background: #4CAF50;
-    color: white;
-    display: block;
-}
-
-.auth-sync-status.error {
-    background: #f44336;
-    color: white;
-    display: block;
-}
-
-/* Loading durante sincronização */
-.sync-loading {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border: 2px solid #ffffff;
-    border-radius: 50%;
-    border-top-color: transparent;
-    animation: spin 1s ease-in-out infinite;
-    margin-right: 5px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.notification-badge {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #ff4444, #ff6b6b);
-    color: white;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
-    z-index: 10000;
-    cursor: pointer;
-    animation: pulse 2s infinite;
-    border: 2px solid white;
-    font-family: Arial, sans-serif;
-}
-
-.notification-badge.multiple {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-}
-
-.notification-badge:hover {
-    animation: none;
-    transform: scale(1.2);
-    transition: transform 0.2s;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-@keyframes newMessageFlash {
-    0% { transform: scale(0); opacity: 0; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.new-message-flash {
-    animation: newMessageFlash 0.6s ease-out;
-}
-
-/* Esconder badge quando chat está aberto */
-.chat-container.active ~ .notification-badge {
-    display: none !important;
-}
-
-.cross-site-chat-widget {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 350px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-    z-index: 10000;
-    font-family: 'Roboto', Arial, sans-serif;
-    display: none;
-    flex-direction: column;
-    border: 2px solid #6750A4;
-}
-
-.cross-site-chat-header {
-    background: linear-gradient(135deg, #6750A4, #8B78D6);
-    color: white;
-    padding: 15px;
-    border-radius: 10px 10px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: move;
-}
-
-.cross-site-chat-title {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.cross-site-chat-controls {
-    display: flex;
-    gap: 8px;
-}
-
-.cross-site-chat-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.cross-site-chat-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.cross-site-chat-messages {
-    flex: 1;
-    height: 300px;
-    overflow-y: auto;
-    padding: 15px;
-    background: #f8f9fa;
-}
-
-.cross-site-message {
-    margin-bottom: 12px;
-    max-width: 85%;
-}
-
-.cross-site-message.sent {
-    margin-left: auto;
-}
-
-.cross-site-message-bubble {
-    padding: 10px 14px;
-    border-radius: 18px;
-    font-size: 14px;
-    line-height: 1.4;
-}
-
-.cross-site-message.sent .cross-site-message-bubble {
-    background: #6750A4;
-    color: white;
-    border-bottom-right-radius: 6px;
-}
-
-.cross-site-message.received .cross-site-message-bubble {
-    background: white;
-    color: #333;
-    border: 1px solid #e0e0e0;
-    border-bottom-left-radius: 6px;
-}
-
-.cross-site-message-sender {
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 4px;
-    color: #666;
-}
-
-.cross-site-message-time {
-    font-size: 11px;
-    opacity: 0.7;
-    margin-top: 4px;
-    text-align: right;
-}
-
-.cross-site-chat-input-container {
-    padding: 15px;
-    border-top: 1px solid #e0e0e0;
-    background: white;
-    border-radius: 0 0 10px 10px;
-}
-
-.cross-site-chat-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #ddd;
-    border-radius: 24px;
-    outline: none;
-    font-size: 14px;
-    resize: none;
-    max-height: 100px;
-}
-
-.cross-site-chat-input:focus {
-    border-color: #6750A4;
-}
-
-.cross-site-chat-send-btn {
-    position: absolute;
-    right: 25px;
-    bottom: 25px;
-    background: #6750A4;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-.cross-site-chat-send-btn:hover {
-    background: #5a4790;
-}
-
-.cross-site-chat-minimized {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #6750A4;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 24px;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 15px rgba(103, 80, 164, 0.3);
-    z-index: 9999;
-}
-
-.cross-site-chat-badge {
-    background: #ff4444;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Responsivo */
-@media (max-width: 480px) {
-    .cross-site-chat-widget {
-        width: calc(100vw - 40px);
-        right: 20px;
-        left: 20px;
-        bottom: 20px;
-    }
-}
 </style>
+
 <body>
     <!-- Botão flutuante do chat -->
     <div class="chat-toggle" id="chatToggle">
@@ -1428,245 +1143,11 @@
             </div>
         </div>
     </div>
-<!-- Adicione isto no final do body -->
-<div id="authSyncStatus" class="auth-sync-status">
-    <span class="sync-loading"></span>
-    <span id="syncStatusText">Sincronizando...</span>
-</div>
-    <div id="globalNotificationBadge" class="notification-badge" title="Nova mensagem - Clique para abrir o chat">
-    <span id="badgeCount">1</span>
-    </div>
-    
-    <div id="crossSiteChatWidget" class="cross-site-chat-widget">
-    <div class="cross-site-chat-header" id="chatHeader">
-        <div class="cross-site-chat-title">💬 Chat em Tempo Real</div>
-        <div class="cross-site-chat-controls">
-            <button class="cross-site-chat-btn" onclick="minimizeChatWidget()">−</button>
-            <button class="cross-site-chat-btn" onclick="closeChatWidget()">×</button>
-        </div>
-    </div>
-    
-    <div class="cross-site-chat-messages" id="crossSiteMessages">
-        <div class="cross-site-message received">
-            <div class="cross-site-message-sender">Sistema</div>
-            <div class="cross-site-message-bubble">
-                Chat conectado! Você pode conversar em tempo real entre sites.
-            </div>
-            <div class="cross-site-message-time">Agora</div>
-        </div>
-    </div>
-    
-    <div class="cross-site-chat-input-container">
-        <textarea 
-            class="cross-site-chat-input" 
-            id="crossSiteChatInput" 
-            placeholder="Digite sua mensagem..."
-            rows="1"
-        ></textarea>
-        <button class="cross-site-chat-send-btn" onclick="sendCrossSiteMessage()">
-            ➤
-        </button>
-    </div>
-</div>
 
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
-<!-- SISTEMA DE NOTIFICAÇÃO PARA OUTROS SITES -->
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-
-<script>
-    
-// =============================================
-// SISTEMA DE SINCRONIZAÇÃO DE LOGIN ENTRE ABAS
-// =============================================
-
-// Verificar se já existe um usuário logado em outra aba
-function checkForExistingAuth() {
-    console.log('🔍 Verificando autenticação existente...');
-    
-    // Escutar por mudanças de auth em outras abas
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            console.log('✅ Usuário encontrado:', user.uid);
-            currentUser = user;
-            
-            // Inicializar chat com o usuário logado
-            await initializeChat();
-            
-            showNotification(`Bem-vindo de volta, ${user.displayName || 'Usuário'}!`, 'success');
-        } else {
-            console.log('❌ Nenhum usuário logado encontrado');
-            // Pode mostrar opção de login se quiser
-        }
-    });
-}
-
-// Sincronizar login entre abas
-function setupAuthSync() {
-    // Quando o auth state mudar (login/logout), outras abas serão notificadas
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            console.log('🔄 Sincronizando login entre abas...');
-            // O Firebase Auth automaticamente sincroniza entre abas do mesmo domínio
-        }
-    });
-}
-
-// Sistema de fallback: verificar localStorage compartilhado
-function setupLocalStorageSync() {
-    // Escutar por mudanças no localStorage (fallback)
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'firebaseAuthSync' && e.newValue) {
-            const authData = JSON.parse(e.newValue);
-            console.log('📦 Dados de auth recebidos via localStorage:', authData);
-            
-            if (authData.userId && !currentUser) {
-                // Tentar recuperar a sessão
-                auth.onAuthStateChanged((user) => {
-                    if (user && user.uid === authData.userId) {
-                        currentUser = user;
-                        initializeChat();
-                    }
-                });
-            }
-        }
-    });
-}
-
-// Compartilhar estado de login entre abas
-function shareAuthState() {
-    if (currentUser) {
-        const authData = {
-            userId: currentUser.uid,
-            userName: currentUser.displayName,
-            timestamp: Date.now()
-        };
-        
-        localStorage.setItem('firebaseAuthSync', JSON.stringify(authData));
-        console.log('📤 Estado de auth compartilhado:', authData);
-    }
-}
-
-// =============================================
-// INICIALIZAÇÃO AUTOMÁTICA
-// =============================================
-
-// Modificar a inicialização existente
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Iniciando sistema de sincronização...');
-    
-    // 1. Primeiro verifica se já tem alguém logado
-    checkForExistingAuth();
-    
-    // 2. Configura sincronização
-    setupAuthSync();
-    setupLocalStorageSync();
-    
-    // 3. Verificar auth state periodicamente
-    setInterval(() => {
-        if (!currentUser) {
-            checkForExistingAuth();
-        }
-    }, 5000);
-});
-
-// Modificar a função initializeChat para ser mais robusta
-async function initializeChat() {
-    if (!currentUser) {
-        console.log('⚠️ Tentando inicializar chat sem usuário...');
-        return;
-    }
-    
-    console.log('💬 Inicializando chat para:', currentUser.uid);
-    
-    try {
-        // Referências do Firebase
-        usersRef = database.ref('users');
-        messagesRef = database.ref('messages');
-        
-        // Compartilhar estado de login
-        shareAuthState();
-        
-        // Inicializar FCM
-        await initializeFCM();
-        
-        // Configurar chamadas
-        listenForIncomingCalls(currentUser.uid);
-        
-        // Carregar dados
-        loadBlockedUsers();
-        loadUsersList();
-        loadConversationsList();
-        loadSettings();
-        
-        // INICIALIZAR CONFIGURAÇÕES
-        initializeSettings();
-        
-        initializeNotificationSystem();
-        
-        // Escutar notificações pendentes
-        listenForPendingNotifications();
-        
-        // Escutar por novas mensagens
-        const cleanupListeners = listenForMessagesOptimized();
-        
-        // Atualizar último acesso
-        updateUserLastSeen();
-        
-        // Atualizar indicador
-        setTimeout(updateUnreadMessagesIndicator, 2000);
-        
-        console.log('✅ Chat inicializado com sucesso!');
-        
-    } catch (error) {
-        console.error('❌ Erro ao inicializar chat:', error);
-    }
-}
-
-// =============================================
-// DETECÇÃO DE MÚLTIPLAS ABAS
-// =============================================
-
-// Gerar ID único para esta aba
-const TAB_ID = 'tab_' + Math.random().toString(36).substr(2, 9);
-
-// Detectar se é a aba principal
-function setupTabManagement() {
-    // Tentar se tornar a aba principal
-    localStorage.setItem('mainTabId', TAB_ID);
-    
-    // Verificar se é a aba principal
-    const mainTabId = localStorage.getItem('mainTabId');
-    const isMainTab = mainTabId === TAB_ID;
-    
-    console.log(`📑 Gerenciamento de abas: ${isMainTab ? 'ABA PRINCIPAL' : 'ABA SECUNDÁRIA'}`);
-    
-    // Se não for a aba principal, verificar auth mais agressivamente
-    if (!isMainTab) {
-        setInterval(() => {
-            if (!currentUser) {
-                checkForExistingAuth();
-            }
-        }, 2000);
-    }
-    
-    // Limpar ao fechar a aba
-    window.addEventListener('beforeunload', () => {
-        if (isMainTab) {
-            localStorage.removeItem('mainTabId');
-        }
-    });
-}
-
-// Inicializar gerenciamento de abas
-setupTabManagement();
-</script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <!-- JavaScript -->
     <script>
@@ -1688,8 +1169,6 @@ const database = firebase.database();
     </script>
     <script>
       // Variáveis globais
-let messaging = null;
-let currentFCMToken = null;
 let currentUser = null;
 let userSettings = {
     soundNotification: true,
@@ -1711,97 +1190,20 @@ const tabContents = document.querySelectorAll('.chat-tab-content');
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar se o usuário está autenticado
-    // Verificar se o usuário está autenticado
-// VERIFICAÇÃO ROBUSTA DE AUTENTICAÇÃO
-auth.onAuthStateChanged(async (user) => {
-    console.log('🔄 Estado de autenticação mudou:', user ? user.uid : 'null');
-    
-    if (user) {
-        // 🔥 NOVO: Verificar se é um usuário diferente do atual
-        if (!currentUser || currentUser.uid !== user.uid) {
+    auth.onAuthStateChanged(user => {
+        if (user) {
             currentUser = user;
-            console.log('✅ Novo usuário detectado:', user.uid);
-            
-            // Compartilhar estado entre abas
-            shareAuthState();
-            
-            // Inicializar chat
-            await initializeChat();
-            
-            // Mostrar feedback visual
-            showUserWelcome(user);
-        }
-    } else {
-        currentUser = null;
-        console.log('🚪 Usuário deslogado');
-        
-        // Mostrar interface de "faça login"
-        showLoginInterface();
-    }
-});
-
-// Mostrar boas-vindas personalizadas
-function showUserWelcome(user) {
-    const userName = user.displayName || user.email || 'Usuário';
-    showNotification(`Bem-vindo(a), ${userName}!`, 'success');
-    
-    // Atualizar interface se necessário
-    updateUIForLoggedInUser();
-}
-
-// Interface quando não há usuário logado
-function showLoginInterface() {
-    const usersList = document.getElementById('usersList');
-    const conversationsList = document.getElementById('conversationsList');
-    
-    if (usersList) {
-        usersList.innerHTML = `
-            <div class="empty-state">
-                <span class="material-icons">login</span>
-                <p>Faça login para usar o interfone virtual</p>
-                <button onclick="triggerLogin()" style="
-                    margin-top: 16px;
-                    padding: 10px 20px;
-                    background: var(--md-sys-color-primary);
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    cursor: pointer;
-                ">
-                    Fazer Login
-                </button>
-            </div>
-        `;
-    }
-    
-    if (conversationsList) {
-        conversationsList.innerHTML = `
-            <div class="empty-state">
-                <span class="material-icons">forum</span>
-                <p>Faça login para ver suas conversas</p>
-            </div>
-        `;
-    }
-}
-
-// Função para forçar login (se necessário)
-function triggerLogin() {
-    // Aqui você pode implementar um modal de login
-    // ou redirecionar para página de login
-    showNotification('Recarregando para detectar login...', 'info');
-    setTimeout(() => location.reload(), 1000);
-}
-
-// Atualizar UI para usuário logado
-function updateUIForLoggedInUser() {
-    // Esconder mensagens de "faça login"
-    const emptyStates = document.querySelectorAll('.empty-state');
-    emptyStates.forEach(state => {
-        if (state.innerHTML.includes('Faça login')) {
-            state.style.display = 'none';
+            initializeChat();
+        } else {
+            // Se não estiver autenticado, mostrar mensagem
+            document.getElementById('usersList').innerHTML = `
+                <div class="empty-state">
+                    <span class="material-icons">login</span>
+                    <p>Faça login para usar o interfone virtual</p>
+                </div>
+            `;
         }
     });
-}
     
     // Solicitar permissão do microfone
     // Verificar e solicitar permissão do microfone
@@ -1892,221 +1294,6 @@ async function checkMicrophonePermission() {
     } catch (error) {
         console.log('API de Permissions não suportada:', error);
         return false;
-    }
-}
-
-// Inicializar FCM - VERSÃO COMPLETAMENTE CORRIGIDA
-async function initializeFCM() {
-    try {
-        console.log('🚀 Iniciando configuração do FCM...');
-        
-        // Verificar se Firebase Messaging está disponível
-        if (!firebase.messaging.isSupported()) {
-            console.log('❌ Firebase Messaging não é suportado neste navegador');
-            showNotification('Seu navegador não suporta notificações push', 'error');
-            return;
-        }
-
-        messaging = firebase.messaging();
-        
-        // Verificar se já temos permissão
-        const permission = await Notification.requestPermission();
-        console.log('📋 Status da permissão:', permission);
-        
-        if (permission === 'granted') {
-            console.log('✅ Permissão de notificação concedida');
-            
-            try {
-                // Obter token FCM
-                console.log('🔑 Solicitando token FCM...');
-                const token = await getFCMToken();
-                
-                if (token) {
-                    console.log('✅ Token FCM obtido com sucesso');
-                    showNotification('Notificações configuradas com sucesso!', 'success');
-                    
-                    // Configurar listener para mensagens em foreground
-                    messaging.onMessage((payload) => {
-                        console.log('📨 Mensagem recebida em foreground:', payload);
-                        handleForegroundMessage(payload);
-                    });
-                    
-                    // Configurar atualização de token
-                    messaging.onTokenRefresh(async () => {
-                        console.log('🔄 Atualizando token FCM...');
-                        try {
-                            const newToken = await getFCMToken();
-                            if (newToken && newToken !== currentFCMToken) {
-                                if (currentFCMToken) {
-                                    await removeFCMToken(currentFCMToken);
-                                }
-                                currentFCMToken = newToken;
-                                console.log('✅ Token FCM atualizado');
-                            }
-                        } catch (error) {
-                            console.error('❌ Erro ao atualizar token:', error);
-                        }
-                    });
-                    
-                } else {
-                    console.log('❌ Falha ao obter token FCM');
-                    showNotification('Falha ao configurar notificações', 'error');
-                }
-                
-            } catch (tokenError) {
-                console.error('❌ Erro ao obter token FCM:', tokenError);
-                showNotification('Erro na configuração: ' + tokenError.message, 'error');
-            }
-            
-        } else if (permission === 'default') {
-            console.log('ℹ️ Usuário ainda não decidiu sobre notificações');
-            // Não mostrar erro, o usuário pode permitir depois
-        } else {
-            console.log('❌ Permissão de notificação negada');
-            showNotification('Notificações bloqueadas. Permita nas configurações do site.', 'error');
-        }
-        
-    } catch (error) {
-        console.error('💥 Erro crítico no FCM:', error);
-        showNotification('Erro nas notificações: ' + error.message, 'error');
-    }
-}
-
-// Obter token FCM - VERSÃO ROBUSTA
-async function getFCMToken() {
-    try {
-        console.log('🛠️ Iniciando obtenção do token FCM...');
-        
-        // Método principal: tentar com service worker
-        if ('serviceWorker' in navigator) {
-            try {
-                console.log('🔧 Tentando registrar service worker...');
-                
-                // IMPORTANTE: Não tentar registrar se já estiver registrado
-                const registration = await navigator.serviceWorker.ready;
-                console.log('✅ Service Worker já está pronto');
-                
-                currentFCMToken = await messaging.getToken({
-                    vapidKey: 'BHmNn0G5BuOLrgMATfxYk3axhhXyfaF39Vb11bDJY4Z6smlDgTV8ushbiLvTiOeR8pAJ5AiGkQ5VnPic-eUxSxc',
-                    serviceWorkerRegistration: registration
-                });
-                
-            } catch (swError) {
-                console.log('⚠️ Service Worker não disponível, usando método alternativo:', swError);
-                
-                // Fallback: sem service worker
-                currentFCMToken = await messaging.getToken({
-                    vapidKey: 'BHmNn0G5BuOLrgMATfxYk3axhhXyfaF39Vb11bDJY4Z6smlDgTV8ushbiLvTiOeR8pAJ5AiGkQ5VnPic-eUxSxc'
-                });
-            }
-        } else {
-            console.log('⚠️ Service Worker não suportado, usando método básico');
-            // Método mais básico
-            currentFCMToken = await messaging.getToken();
-        }
-        
-        if (currentFCMToken) {
-            console.log('✅ Token FCM obtido:', currentFCMToken.substring(0, 20) + '...');
-            
-            // Salvar no banco de dados
-            await saveFCMToken(currentFCMToken);
-            
-            return currentFCMToken;
-        } else {
-            console.log('❌ Token FCM é nulo/indefinido');
-            return null;
-        }
-        
-    } catch (error) {
-        console.error('💥 Erro ao obter token FCM:', error);
-        
-        // Tentativa de emergência
-        try {
-            console.log('🆘 Tentativa de emergência...');
-            currentFCMToken = await messaging.getToken();
-            if (currentFCMToken) {
-                console.log('✅ Token obtido na tentativa de emergência');
-                await saveFCMToken(currentFCMToken);
-                return currentFCMToken;
-            }
-        } catch (emergencyError) {
-            console.error('💥 Falha até na tentativa de emergência:', emergencyError);
-        }
-        
-        return null;
-    }
-}
-
-// Salvar token FCM no banco de dados
-async function saveFCMToken(token) {
-    if (!currentUser) return;
-    
-    try {
-        await database.ref(`users/${currentUser.uid}/fcmTokens/${token}`).set(true);
-        console.log('Token FCM salvo no banco de dados');
-    } catch (error) {
-        console.error('Erro ao salvar token FCM:', error);
-    }
-}
-
-// Remover token FCM (quando usuário faz logout)
-async function removeFCMToken(token) {
-    if (!currentUser || !token) return;
-    
-    try {
-        await database.ref(`users/${currentUser.uid}/fcmTokens/${token}`).remove();
-        console.log('Token FCM removido do banco de dados');
-    } catch (error) {
-        console.error('Erro ao remover token FCM:', error);
-    }
-}
-
-// Handler para mensagens em foreground
-// Handler para mensagens em foreground - VERSÃO TOLERANTE
-function handleForegroundMessage(payload) {
-    try {
-        console.log('📨 Processando mensagem foreground:', payload);
-        
-        if (!payload || !payload.data) {
-            console.log('⚠️ Payload inválido');
-            return;
-        }
-        
-        const { title, body, senderId, conversationId } = payload.data;
-        
-        // Verificar dados mínimos
-        if (!body) {
-            console.log('⚠️ Mensagem sem corpo');
-            return;
-        }
-        
-        // Tocar som se configurado
-        if (userSettings.soundNotification) {
-            try {
-                playNotificationSound();
-            } catch (soundError) {
-                console.log('⚠️ Erro no som:', soundError);
-            }
-        }
-        
-        // Mostrar notificação na UI
-        const messageText = body || 'Nova mensagem';
-        showNotification(messageText, 'info');
-        
-        // Atualizar contador
-        updateUnreadMessagesIndicator();
-        
-        // Mostrar notificação desktop se não for a conversa atual
-        if (selectedUser && senderId && selectedUser.id !== senderId) {
-            try {
-                showDesktopNotification(payload.data);
-            } catch (desktopError) {
-                console.log('⚠️ Erro na notificação desktop:', desktopError);
-            }
-        }
-        
-    } catch (error) {
-        console.error('💥 Erro no handler de mensagem:', error);
     }
 }
 
@@ -2216,13 +1403,11 @@ const startCallBtn = document.getElementById('startCallBtn');
 const blockCurrentUser = document.getElementById('blockCurrentUser');
 
 // Inicializar o chat
-async function initializeChat() {
+// Inicializar o chat
+function initializeChat() {
     // Referências do Firebase
     usersRef = database.ref('users');
     messagesRef = database.ref('messages');
-    
-    // Inicializar FCM
-    await initializeFCM();
     
     listenForIncomingCalls(currentUser.uid);
     
@@ -2238,11 +1423,8 @@ async function initializeChat() {
     // Carregar configurações
     loadSettings();
     
-    // INICIALIZAR CONFIGURAÇÕES
+    // INICIALIZAR CONFIGURAÇÕES - ADICIONE ESTA LINHA
     initializeSettings();
-    
-    // 🆕 ADICIONE ESTA LINHA - Escutar notificações pendentes
-    listenForPendingNotifications();
     
     // Escutar por novas mensagens
     const cleanupListeners = listenForMessagesOptimized();
@@ -2551,46 +1733,14 @@ function loadConversationMessages() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     });
 }
-async function sendUserNotification(receiverId, notificationData) {
-    if (!firebase.database() || !currentUser) {
-        console.log('❌ Firebase não disponível ou usuário não logado');
-        return;
-    }
-    
-    try {
-        // Buscar nome do remetente
-        const userSnapshot = await firebase.database().ref(`users/${currentUser.uid}`).once('value');
-        const userData = userSnapshot.val();
-        const senderName = userData?.nome || currentUser.displayName || 'Usuário';
-        
-        const notification = {
-            ...notificationData,
-            senderId: currentUser.uid,
-            senderName: senderName,
-            timestamp: Date.now(),
-            id: 'notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
-        };
-        
-        // Salvar no caminho específico do usuário
-        const userNotificationRef = firebase.database().ref(`user_notifications/${receiverId}`).push();
-        await userNotificationRef.set(notification);
-        
-        console.log('📤 Notificação enviada para usuário:', receiverId, notification.message);
-        
-        return true;
-        
-    } catch (error) {
-        console.error('❌ Erro ao enviar notificação:', error);
-        return false;
-    }
-}
+
 // Enviar mensagem
-async function sendNewMessage() {
+function sendNewMessage() {
     if (!selectedUser || !messageInput.value.trim()) return;
     
     const messageText = messageInput.value.trim();
     const conversationId = getConversationId(currentUser.uid, selectedUser.id);
-    const messageRef = firebase.database().ref(`conversations/${conversationId}`).push();
+    const messageRef = database.ref(`conversations/${conversationId}`).push();
     
     const messageData = {
         text: messageText,
@@ -2599,206 +1749,16 @@ async function sendNewMessage() {
         timestamp: Date.now()
     };
     
-    try {
-        await messageRef.set(messageData);
-        messageInput.value = '';
-        
-        // 🆕 ENVIAR NOTIFICAÇÃO PARA O USUÁRIO
-        await sendUserNotification(selectedUser.id, {
-            type: 'NEW_MESSAGE',
-            message: messageText,
-            conversationId: conversationId
+    messageRef.set(messageData)
+        .then(() => {
+            messageInput.value = '';
+            // Atualizar a lista de conversas após enviar mensagem
+            loadConversationsList();
+        })
+        .catch(error => {
+            console.error('Erro ao enviar mensagem:', error);
+            alert('Erro ao enviar mensagem. Tente novamente.');
         });
-        
-        // Enviar notificação FCM também (se existir)
-        await sendFCMNotification(selectedUser.id, messageText);
-        
-        // Atualizar a lista de conversas após enviar mensagem
-        loadConversationsList();
-        
-    } catch (error) {
-        console.error('Erro ao enviar mensagem:', error);
-        alert('Erro ao enviar mensagem. Tente novamente.');
-    }
-}
-
-function setupMessageNotificationListener() {
-    if (!currentUser) return;
-    
-    const conversationsRef = firebase.database().ref('conversations');
-    
-    conversationsRef.on('child_changed', (snapshot) => {
-        const conversationId = snapshot.key;
-        if (!conversationId || !conversationId.includes(currentUser.uid)) return;
-        
-        const messages = snapshot.val();
-        if (!messages) return;
-        
-        // Pegar a última mensagem
-        const messageKeys = Object.keys(messages);
-        const lastMessageKey = messageKeys[messageKeys.length - 1];
-        const lastMessage = messages[lastMessageKey];
-        
-        if (!lastMessage || lastMessage.senderId === currentUser.uid) return;
-        
-        // 🆕 ENVIAR NOTIFICAÇÃO SE NÃO ESTIVER NA CONVERSA ATUAL
-        const isCurrentConversation = selectedUser && 
-                                    conversationId === getConversationId(currentUser.uid, selectedUser.id);
-        
-        if (!isCurrentConversation) {
-            sendUserNotification(currentUser.uid, {
-                type: 'NEW_MESSAGE', 
-                message: lastMessage.text,
-                senderId: lastMessage.senderId,
-                conversationId: conversationId
-            });
-            
-            console.log('🔔 Notificação de mensagem recebida enviada');
-        }
-    });
-}
-
-function isUserInCurrentConversation(conversationId) {
-    if (!selectedUser) return false;
-    
-    const currentConversationId = getConversationId(currentUser.uid, selectedUser.id);
-    return conversationId === currentConversationId;
-}
-
-async function sendMissedCallNotification(receiverId, callerName) {
-    return await sendUserNotification(receiverId, {
-        type: 'CALL_MISSED',
-        message: `${callerName} tentou te ligar`,
-        callTimestamp: Date.now()
-    });
-}
-
-async function sendCallAnsweredNotification(callerId, calleeName) {
-    return await sendUserNotification(callerId, {
-        type: 'CALL_ANSWERED', 
-        message: `${calleeName} atendeu sua chamada`,
-        callTimestamp: Date.now()
-    });
-}
-
-function setupNotificationCleanup() {
-    if (!currentUser) return;
-    
-    // Limpar notificações com mais de 1 hora
-    const oneHourAgo = Date.now() - (60 * 60 * 1000);
-    
-    const userNotificationsRef = firebase.database().ref(`user_notifications/${currentUser.uid}`);
-    
-    userNotificationsRef.orderByChild('timestamp').endAt(oneHourAgo).once('value', (snapshot) => {
-        const updates = {};
-        snapshot.forEach((childSnapshot) => {
-            updates[childSnapshot.key] = null;
-        });
-        
-        if (Object.keys(updates).length > 0) {
-            userNotificationsRef.update(updates)
-                .then(() => console.log('🧹 Notificações antigas limpas'))
-                .catch(error => console.error('Erro ao limpar notificações:', error));
-        }
-    });
-}
-
-function initializeNotificationSystem() {
-    if (!currentUser) {
-        console.log('⏳ Aguardando usuário para inicializar notificações...');
-        return;
-    }
-    
-    console.log('🚀 Inicializando sistema de notificações...');
-    
-    // Configurar listener de mensagens
-    setupMessageNotificationListener();
-    
-    // Configurar limpeza automática
-    setupNotificationCleanup();
-    
-    // Limpar a cada 30 minutos
-    setInterval(setupNotificationCleanup, 30 * 60 * 1000);
-    
-    console.log('✅ Sistema de notificações inicializado');
-}
-
-// Enviar notificação FCM (versão simplificada sem Cloud Functions)
-// Enviar notificação FCM - VERSÃO TOLERANTE
-async function sendFCMNotification(receiverId, messageText) {
-    try {
-        console.log('📤 Enviando notificação para:', receiverId);
-        
-        if (!receiverId || !messageText) {
-            console.log('⚠️ Dados inválidos para notificação');
-            return;
-        }
-        
-        // Buscar tokens FCM do destinatário
-        const tokensSnapshot = await database.ref(`users/${receiverId}/fcmTokens`).once('value');
-        const tokens = tokensSnapshot.val();
-        
-        if (!tokens) {
-            console.log('ℹ️ Usuário não tem tokens FCM registrados');
-            return;
-        }
-        
-        // Buscar informações do remetente
-        const senderSnapshot = await database.ref(`users/${currentUser.uid}`).once('value');
-        const senderData = senderSnapshot.val();
-        const senderName = senderData?.nome || 'Usuário';
-        
-        // Criar notificação
-        const notificationData = {
-            title: `Nova mensagem de ${senderName}`,
-            body: messageText.length > 50 ? messageText.substring(0, 50) + '...' : messageText,
-            senderId: currentUser.uid,
-            receiverId: receiverId,
-            timestamp: Date.now(),
-            read: false
-        };
-        
-        // Salvar notificação no database
-        const notificationRef = database.ref(`notifications/${receiverId}`).push();
-        await notificationRef.set(notificationData);
-        
-        console.log('✅ Notificação salva no database');
-        
-    } catch (error) {
-        console.error('❌ Erro ao enviar notificação:', error);
-        // Não mostrar erro para o usuário, é opcional
-    }
-}
-
-// Verificar notificações pendentes
-function listenForPendingNotifications() {
-    if (!currentUser) return;
-    
-    const notificationsRef = database.ref(`notifications/${currentUser.uid}`);
-    
-    notificationsRef.on('child_added', (snapshot) => {
-        const notification = snapshot.val();
-        
-        if (!notification.read) {
-            // Mostrar notificação local
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification(notification.title, {
-                    body: notification.body,
-                    icon: '/favicon.ico',
-                    badge: '/favicon.ico'
-                });
-            }
-            
-            // Mostrar também notificação na UI do chat
-            showNotification(notification.body, 'info');
-            
-            // Atualizar contador de mensagens não lidas
-            updateUnreadMessagesIndicator();
-            
-            // Marcar como lida
-            snapshot.ref.update({ read: true });
-        }
-    });
 }
 
 // Carregar lista de conversas
@@ -3601,10 +2561,6 @@ function setupCallButtons(callData) {
             
             peerConnection = new RTCPeerConnection(configuration);
             registerPeerConnectionListeners(callData.callerId);
-            
-                    // 🆕 ENVIAR NOTIFICAÇÃO DE CHAMADA ATENDIDA
-        const calleeName = currentUser.displayName || 'Usuário';
-        sendCallAnsweredNotification(currentCallerId, calleeName);
 
             // Obter stream local de áudio
             const audioConstraints = {
@@ -3658,9 +2614,6 @@ function setupCallButtons(callData) {
             rejectCall();
         }
     };
-    
-    
-    
 
     // Botão Rejeitar
     document.getElementById('rejectCallBtn').onclick = () => {
@@ -4071,11 +3024,7 @@ function registerPeerConnectionListeners(otherUserId) {
 // CONTROLES DA CHAMADA
 function rejectCall() {
     if (currentCallerId) {
-        // 🆕 ENVIAR NOTIFICAÇÃO DE CHAMADA PERDIDA
-        const callerName = document.getElementById('incomingCallName')?.textContent || 'Usuário';
-        sendMissedCallNotification(currentCallerId, callerName);
-        
-        firebase.database().ref(`calls/${currentCalleeId}`).remove();
+        db.ref(`calls/${currentCalleeId}`).remove();
     }
     cleanupCall();
 }
@@ -4887,4 +3836,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
     </script>
 </body>
-                        </html>
+    </html>
