@@ -1478,81 +1478,386 @@
 <!-- SISTEMA DE NOTIFICAÇÃO PARA OUTROS SITES -->
 <script>
 // =============================================
-// EMISSOR DE NOTIFICAÇÕES PARA OUTROS SITES
+// SISTEMA UNIFICADO DE NOTIFICAÇÕES
+// Combina emissor cross-site + badge inteligente
 // =============================================
 (function() {
     'use strict';
     
-    let isInitialized = false;
+    // Configurações e estado
+    const config = {
+        isInitialized: false,
+        unreadMessagesCount: 0,
+        isUserInChat: false,
+        currentUser: null,
+        notificationBadge: null,
+        badgeUpdateInterval: null
+    };
     
-    function initializeCrossSiteNotifier() {
-        if (isInitialized) return;
+    // Inicialização do sistema
+    function initializeNotificationSystem() {
+        if (config.isInitialized) return;
         
-        console.log('🚀 Iniciando emissor de notificações entre sites...');
+        console.log('🚀 Iniciando sistema unificado de notificações...');
         
-        // Escutar mensagens do Firebase
-        setupFirebaseListener();
+        // Configurar badge de notificação
+        setupNotificationBadge();
+        
+        // Configurar listeners de eventos
+        setupEventListeners();
+        
+        // Iniciar verificador de presença
+        startPresenceChecker();
+        
+        // Configurar emissor cross-site
+        setupCrossSiteNotifier();
+        
+        config.isInitialized = true;
+    }
+    
+    // =============================================
+    // BADGE DE NOTIFICAÇÃO INTELIGENTE
+    // =============================================
+    
+    function setupNotificationBadge() {
+        config.notificationBadge = document.getElementById('globalNotificationBadge');
+        if (!config.notificationBadge) {
+            console.error('❌ Elemento do badge não encontrado');
+            return;
+        }
+        
+        config.notificationBadge.addEventListener('click', openChatFromBadge);
+        console.log('✅ Badge criado e configurado');
+    }
+    
+    function setupEventListeners() {
+        // Visibilidade da página
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        // Foco da janela
+        window.addEventListener('focus', handleWindowFocus);
+        window.addEventListener('blur', handleWindowBlur);
+        
+        // Observar mudanças no chat
+        observeChatVisibility();
+        
+        // Escutar notificações cross-site
+        setupCrossSiteListeners();
+        
+        console.log('✅ Event listeners configurados');
+    }
+    
+    function observeChatVisibility() {
+        const chatContainer = document.getElementById('chatContainer');
+        if (chatContainer) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        updateUserPresence();
+                    }
+                });
+            });
+            
+            observer.observe(chatContainer, { attributes: true });
+            console.log('✅ Observador do chat ativo');
+        }
+    }
+    
+    function startPresenceChecker() {
+        config.badgeUpdateInterval = setInterval(updateUserPresence, 1000);
+    }
+    
+    function handleVisibilityChange() {
+        updateUserPresence();
+    }
+    
+    function handleWindowFocus() {
+        updateUserPresence();
+    }
+    
+    function handleWindowBlur() {
+        updateUserPresence();
+    }
+    
+    function updateUserPresence() {
+        const chatContainer = document.getElementById('chatContainer');
+        const conversationTab = document.getElementById('conversationTab');
+        
+        if (!chatContainer || !conversationTab) {
+            config.isUserInChat = false;
+            return;
+        }
+        
+        const wasInChat = config.isUserInChat;
+        
+        // Usuário está no chat se:
+        // - Chat está ativo E
+        // - Na aba de conversação E
+        // - Janela em foco
+        config.isUserInChat = (
+            chatContainer.classList.contains('active') &&
+            conversationTab.classList.contains('active') &&
+            document.hasFocus()
+        );
+        
+        // Se usuário acabou de entrar no chat, esconder badge
+        if (!wasInChat && config.isUserInChat) {
+            hideNotificationBadge();
+        }
+        
+        // Se usuário saiu do chat e há mensagens, mostrar badge
+        if (wasInChat && !config.isUserInChat && config.unreadMessagesCount > 0) {
+            showNotificationBadge();
+        }
+    }
+    
+    function showNotificationBadge() {
+        if (!config.notificationBadge || config.isUserInChat) return;
+        
+        const badgeCount = document.getElementById('badgeCount');
+        if (badgeCount) {
+            badgeCount.textContent = config.unreadMessagesCount > 9 ? '9+' : config.unreadMessagesCount;
+        }
+        
+        config.notificationBadge.style.display = 'flex';
+        config.notificationBadge.classList.add('new-message-flash');
+        
+        if (config.unreadMessagesCount > 1) {
+            config.notificationBadge.classList.add('multiple');
+        } else {
+            config.notificationBadge.classList.remove('multiple');
+        }
+        
+        // Atualizar título da aba
+        updateTabTitle();
+        
+        // Remover animação após execução
+        setTimeout(() => {
+            config.notificationBadge.classList.remove('new-message-flash');
+        }, 600);
+        
+        console.log(`🔔 Badge mostrado: ${config.unreadMessagesCount} mensagens não lidas`);
+    }
+    
+    function hideNotificationBadge() {
+        if (!config.notificationBadge) return;
+        
+        config.notificationBadge.style.display = 'none';
+        config.unreadMessagesCount = 0;
+        updateTabTitle();
+        
+        console.log('🔕 Badge escondido');
+    }
+    
+    function updateTabTitle() {
+        const baseTitle = document.title.replace(/^\(\d+\)\s*/, '') || 'Interfone Virtual';
+        
+        if (config.unreadMessagesCount > 0 && !config.isUserInChat) {
+            document.title = `(${config.unreadMessagesCount}) ${baseTitle}`;
+        } else {
+            document.title = baseTitle;
+        }
+    }
+    
+    function openChatFromBadge() {
+        console.log('🎯 Abrindo chat pelo badge...');
+        
+        // Mostrar chat container
+        const chatContainer = document.getElementById('chatContainer');
+        const chatToggle = document.getElementById('chatToggle');
+        
+        if (chatContainer) {
+            chatContainer.classList.add('active');
+        }
+        if (chatToggle) {
+            chatToggle.classList.add('active');
+        }
+        
+        // Ir para aba de conversas
+        switchToTab('conversations');
+        
+        // Esconder badge
+        hideNotificationBadge();
+        
+        // Focar no chat
+        setTimeout(() => {
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                messageInput.focus();
+            }
+        }, 500);
+    }
+    
+    function switchToTab(tabName) {
+        // Ativar aba
+        const tabs = document.querySelectorAll('.chat-tab');
+        const tabContents = document.querySelectorAll('.chat-tab-content');
+        
+        tabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === tabName);
+        });
+        
+        tabContents.forEach(content => {
+            content.classList.toggle('active', content.id === `${tabName}Tab`);
+        });
+        
+        console.log(`📁 Mudando para aba: ${tabName}`);
+    }
+    
+    function playNotificationSound() {
+        try {
+            // Som simples usando Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        } catch (error) {
+            console.log('🔇 Web Audio API não disponível para som');
+        }
+    }
+    
+    // =============================================
+    // EMISSOR DE NOTIFICAÇÕES CROSS-SITE
+    // =============================================
+    
+    function setupCrossSiteNotifier() {
+        console.log('📡 Configurando emissor cross-site...');
+        
+        // Aguardar Firebase
+        waitForFirebase().then(() => {
+            console.log('✅ Firebase detectado - Sistema completo ativo');
+            setupFirebaseListeners();
+        }).catch(() => {
+            console.log('⚠️ Firebase não detectado - Modo standalone');
+        });
         
         // Compartilhar estado via localStorage
         setupLocalStorageSync();
+    }
+    
+    function waitForFirebase() {
+        return new Promise((resolve, reject) => {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 segundos
+            
+            const checkFirebase = () => {
+                attempts++;
+                
+                // Verificar se Firebase está disponível
+                if (typeof firebase !== 'undefined' && firebase.auth && firebase.database) {
+                    // Tentar obter usuário atual
+                    try {
+                        const auth = firebase.auth();
+                        if (auth) {
+                            auth.onAuthStateChanged((user) => {
+                                config.currentUser = user;
+                                resolve();
+                            });
+                            return;
+                        }
+                    } catch (e) {
+                        // Continuar tentando
+                    }
+                }
+                
+                if (attempts < maxAttempts) {
+                    setTimeout(checkFirebase, 100);
+                } else {
+                    reject(new Error('Firebase não carregado'));
+                }
+            };
+            
+            checkFirebase();
+        });
+    }
+    
+    function setupFirebaseListeners() {
+        if (!firebase || !config.currentUser) return;
         
-        isInitialized = true;
-    }
-    
-    function setupFirebaseListener() {
-        // Aguardar Firebase
-        const checkFirebase = setInterval(() => {
-            if (typeof firebase !== 'undefined' && firebase.database && firebase.auth) {
-                clearInterval(checkFirebase);
-                startFirebaseListening();
-            }
-        }, 100);
-    }
-    
-    function startFirebaseListening() {
         const auth = firebase.auth();
         const database = firebase.database();
+        const conversationsRef = database.ref('conversations');
         
         auth.onAuthStateChanged((user) => {
+            config.currentUser = user;
             if (user) {
-                const conversationsRef = database.ref('conversations');
-                
+                // Escutar novas mensagens
                 conversationsRef.on('child_added', (snapshot) => {
-                    handleNewMessageForCrossSite(snapshot, user);
+                    handleNewMessage(snapshot);
                 });
                 
                 conversationsRef.on('child_changed', (snapshot) => {
-                    handleNewMessageForCrossSite(snapshot, user);
+                    handleNewMessage(snapshot);
                 });
                 
-                console.log('✅ Emissor: Escutando mensagens do Firebase');
+                console.log('✅ Firebase listeners configurados');
             }
         });
     }
     
-    function handleNewMessageForCrossSite(snapshot, user) {
+    function handleNewMessage(snapshot) {
         const conversationId = snapshot.key;
-        if (!conversationId || !conversationId.includes(user.uid)) return;
+        if (!conversationId || !config.currentUser || !conversationId.includes(config.currentUser.uid)) {
+            return;
+        }
         
         const messages = snapshot.val();
         if (!messages) return;
         
+        // Pegar a última mensagem
         const messageKeys = Object.keys(messages);
         const lastMessageKey = messageKeys[messageKeys.length - 1];
         const lastMessage = messages[lastMessageKey];
         
-        if (!lastMessage || lastMessage.senderId === user.uid) return;
+        if (!lastMessage) return;
         
-        // ENVIAR NOTIFICAÇÃO PARA OUTROS SITES
-        sendCrossSiteNotification({
-            type: 'NEW_MESSAGE',
-            message: lastMessage.text,
-            senderId: lastMessage.senderId,
-            timestamp: lastMessage.timestamp,
-            conversationId: conversationId
-        });
+        // Verificar se é mensagem de outro usuário
+        const isReceivedMessage = lastMessage.senderId !== config.currentUser.uid;
+        const isCurrentConversation = isUserInCurrentConversation(conversationId);
         
-        console.log('📤 Notificação enviada para outros sites:', lastMessage.text);
+        if (isReceivedMessage && !isCurrentConversation) {
+            config.unreadMessagesCount++;
+            showNotificationBadge();
+            
+            // Tocar som se possível
+            playNotificationSound();
+            
+            // ENVIAR NOTIFICAÇÃO PARA OUTROS SITES
+            sendCrossSiteNotification({
+                type: 'NEW_MESSAGE',
+                message: lastMessage.text,
+                senderId: lastMessage.senderId,
+                timestamp: lastMessage.timestamp,
+                conversationId: conversationId
+            });
+            
+            console.log('📤 Notificação enviada para outros sites:', lastMessage.text);
+        }
+    }
+    
+    function isUserInCurrentConversation(conversationId) {
+        // Verificar se usuário está na conversa que recebeu a mensagem
+        const chatContainer = document.getElementById('chatContainer');
+        const conversationTab = document.getElementById('conversationTab');
+        
+        if (!chatContainer || !conversationTab) return false;
+        
+        const isChatActive = chatContainer.classList.contains('active');
+        const isConversationActive = conversationTab.classList.contains('active');
+        const isWindowFocused = document.hasFocus();
+        
+        return isChatActive && isConversationActive && isWindowFocused;
     }
     
     function sendCrossSiteNotification(notificationData) {
@@ -1650,382 +1955,117 @@
         });
     }
     
-    // Compartilhar função globalmente
-    window.CrossSiteNotifier = {
-        init: initializeCrossSiteNotifier,
-        sendTestNotification: () => {
+    // =============================================
+    // RECEPTOR DE NOTIFICAÇÕES CROSS-SITE
+    // =============================================
+    
+    function setupCrossSiteListeners() {
+        // Escutar localStorage
+        window.addEventListener('storage', handleStorageNotification);
+        
+        // Escutar postMessage
+        window.addEventListener('message', handlePostMessageNotification);
+        
+        // Escutar BroadcastChannel
+        setupBroadcastChannelListener();
+        
+        console.log('✅ Receptores cross-site configurados');
+    }
+    
+    function handleStorageNotification(e) {
+        if (e.key === 'crossSiteChatNotification' && e.newValue) {
+            try {
+                const notification = JSON.parse(e.newValue);
+                if (notification.source === 'chat_app' && notification.data) {
+                    processIncomingNotification(notification.data);
+                }
+            } catch (error) {
+                console.log('❌ Erro ao processar notificação do localStorage');
+            }
+        }
+    }
+    
+    function handlePostMessageNotification(event) {
+        if (event.data && event.data.type === 'CHAT_NOTIFICATION' && event.data.source === 'chat_app') {
+            processIncomingNotification(event.data.data);
+        }
+    }
+    
+    function setupBroadcastChannelListener() {
+        try {
+            if ('BroadcastChannel' in window) {
+                const channel = new BroadcastChannel('chat_notifications');
+                channel.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'CHAT_NOTIFICATION' && event.data.source === 'chat_app') {
+                        processIncomingNotification(event.data.data);
+                    }
+                });
+            }
+        } catch (error) {
+            console.log('❌ BroadcastChannel não disponível para recepção');
+        }
+    }
+    
+    function processIncomingNotification(notificationData) {
+        if (notificationData.type === 'NEW_MESSAGE') {
+            config.unreadMessagesCount++;
+            
+            if (!config.isUserInChat) {
+                showNotificationBadge();
+                playNotificationSound();
+            }
+            
+            console.log('📥 Notificação recebida de outro site:', notificationData.message);
+        }
+    }
+    
+    // =============================================
+    // API PÚBLICA
+    // =============================================
+    
+    window.UnifiedNotificationSystem = {
+        init: initializeNotificationSystem,
+        
+        // Controle do badge
+        showBadge: showNotificationBadge,
+        hideBadge: hideNotificationBadge,
+        updatePresence: updateUserPresence,
+        
+        // Adicionar mensagem manualmente
+        addMessage: function() {
+            config.unreadMessagesCount++;
+            if (!config.isUserInChat) {
+                showNotificationBadge();
+            }
+        },
+        
+        // Obter contagem de mensagens não lidas
+        getUnreadCount: function() {
+            return config.unreadMessagesCount;
+        },
+        
+        // Enviar notificação de teste
+        sendTestNotification: function() {
             sendCrossSiteNotification({
                 type: 'TEST_MESSAGE',
                 message: 'Esta é uma notificação de teste!',
                 timestamp: Date.now()
             });
+        },
+        
+        // Forçar atualização do usuário
+        setCurrentUser: function(user) {
+            config.currentUser = user;
         }
     };
     
-    // Inicializar automaticamente
-    document.addEventListener('DOMContentLoaded', initializeCrossSiteNotifier);
+    // Inicializar automaticamente quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', initializeNotificationSystem);
     
-    console.log('🎉 Emissor de notificações entre sites carregado!');
+    console.log('🎉 Sistema unificado de notificações carregado!');
     
 })();
 </script>
-
-    <script>
-// =============================================
-// SISTEMA INTELIGENTE DE NOTIFICATION BADGE
-// =============================================
-(function() {
-    'use strict';
-    
-    let notificationBadge = null;
-    let unreadMessagesCount = 0;
-    let isUserInChat = false;
-    let badgeUpdateInterval = null;
-    let currentUser = null;
-    
-    // Aguardar o DOM carregar
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Iniciando sistema inteligente de notificações...');
-        initializeNotificationSystem();
-    });
-    
-    function initializeNotificationSystem() {
-        createNotificationBadge();
-        setupEventListeners();
-        startPresenceChecker();
-        
-        // Aguardar Firebase estar pronto
-        waitForFirebase().then(() => {
-            console.log('✅ Firebase detectado - Sistema de badge ativo');
-            setupFirebaseListeners();
-        }).catch(() => {
-            console.log('⚠️ Firebase não detectado - Modo standalone');
-        });
-    }
-    
-    function createNotificationBadge() {
-        notificationBadge = document.getElementById('globalNotificationBadge');
-        if (!notificationBadge) {
-            console.error('❌ Elemento do badge não encontrado');
-            return;
-        }
-        
-        notificationBadge.addEventListener('click', openChatFromBadge);
-        console.log('✅ Badge criado e configurado');
-    }
-    
-    function setupEventListeners() {
-        // Visibilidade da página
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        
-        // Foco da janela
-        window.addEventListener('focus', handleWindowFocus);
-        window.addEventListener('blur', handleWindowBlur);
-        
-        // Observar mudanças no chat
-        observeChatVisibility();
-        
-        console.log('✅ Event listeners configurados');
-    }
-    
-    function observeChatVisibility() {
-        // Observar mudanças no chat container
-        const chatContainer = document.getElementById('chatContainer');
-        if (chatContainer) {
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.attributeName === 'class') {
-                        updateUserPresence();
-                    }
-                });
-            });
-            
-            observer.observe(chatContainer, { attributes: true });
-            console.log('✅ Observador do chat ativo');
-        }
-    }
-    
-    function startPresenceChecker() {
-        badgeUpdateInterval = setInterval(updateUserPresence, 1000);
-    }
-    
-    function waitForFirebase() {
-        return new Promise((resolve, reject) => {
-            let attempts = 0;
-            const maxAttempts = 50; // 5 segundos
-            
-            const checkFirebase = () => {
-                attempts++;
-                
-                // Verificar se Firebase está disponível
-                if (typeof firebase !== 'undefined' && firebase.auth && firebase.database) {
-                    // Tentar obter usuário atual
-                    try {
-                        const auth = firebase.auth();
-                        if (auth) {
-                            auth.onAuthStateChanged((user) => {
-                                currentUser = user;
-                                resolve();
-                            });
-                            return;
-                        }
-                    } catch (e) {
-                        // Continuar tentando
-                    }
-                }
-                
-                if (attempts < maxAttempts) {
-                    setTimeout(checkFirebase, 100);
-                } else {
-                    reject(new Error('Firebase não carregado'));
-                }
-            };
-            
-            checkFirebase();
-        });
-    }
-    
-    function setupFirebaseListeners() {
-        if (!firebase || !currentUser) return;
-        
-        const database = firebase.database();
-        const conversationsRef = database.ref('conversations');
-        
-        // Escutar novas mensagens
-        conversationsRef.on('child_added', (snapshot) => {
-            handleNewMessage(snapshot);
-        });
-        
-        conversationsRef.on('child_changed', (snapshot) => {
-            handleNewMessage(snapshot);
-        });
-        
-        console.log('✅ Firebase listeners configurados');
-    }
-    
-    function handleNewMessage(snapshot) {
-        const conversationId = snapshot.key;
-        if (!conversationId || !currentUser || !conversationId.includes(currentUser.uid)) {
-            return;
-        }
-        
-        const messages = snapshot.val();
-        if (!messages) return;
-        
-        // Pegar a última mensagem
-        const messageKeys = Object.keys(messages);
-        const lastMessageKey = messageKeys[messageKeys.length - 1];
-        const lastMessage = messages[lastMessageKey];
-        
-        if (!lastMessage) return;
-        
-        // Verificar se é mensagem de outro usuário
-        const isReceivedMessage = lastMessage.senderId !== currentUser.uid;
-        const isCurrentConversation = isUserInCurrentConversation(conversationId);
-        
-        if (isReceivedMessage && !isCurrentConversation) {
-            unreadMessagesCount++;
-            showNotificationBadge();
-            
-            // Tocar som se possível
-            playNotificationSound();
-        }
-    }
-    
-    function isUserInCurrentConversation(conversationId) {
-        // Verificar se usuário está na conversa que recebeu a mensagem
-        const chatContainer = document.getElementById('chatContainer');
-        const conversationTab = document.getElementById('conversationTab');
-        
-        if (!chatContainer || !conversationTab) return false;
-        
-        const isChatActive = chatContainer.classList.contains('active');
-        const isConversationActive = conversationTab.classList.contains('active');
-        const isWindowFocused = document.hasFocus();
-        
-        return isChatActive && isConversationActive && isWindowFocused;
-    }
-    
-    function updateUserPresence() {
-        const chatContainer = document.getElementById('chatContainer');
-        const conversationTab = document.getElementById('conversationTab');
-        
-        if (!chatContainer || !conversationTab) {
-            isUserInChat = false;
-            return;
-        }
-        
-        const wasInChat = isUserInChat;
-        
-        // Usuário está no chat se:
-        // - Chat está ativo E
-        // - Na aba de conversação E
-        // - Janela em foco
-        isUserInChat = (
-            chatContainer.classList.contains('active') &&
-            conversationTab.classList.contains('active') &&
-            document.hasFocus()
-        );
-        
-        // Se usuário acabou de entrar no chat, esconder badge
-        if (!wasInChat && isUserInChat) {
-            hideNotificationBadge();
-        }
-        
-        // Se usuário saiu do chat e há mensagens, mostrar badge
-        if (wasInChat && !isUserInChat && unreadMessagesCount > 0) {
-            showNotificationBadge();
-        }
-    }
-    
-    function handleVisibilityChange() {
-        updateUserPresence();
-    }
-    
-    function handleWindowFocus() {
-        updateUserPresence();
-    }
-    
-    function handleWindowBlur() {
-        updateUserPresence();
-    }
-    
-    function showNotificationBadge() {
-        if (!notificationBadge || isUserInChat) return;
-        
-        const badgeCount = document.getElementById('badgeCount');
-        if (badgeCount) {
-            badgeCount.textContent = unreadMessagesCount > 9 ? '9+' : unreadMessagesCount;
-        }
-        
-        notificationBadge.style.display = 'flex';
-        notificationBadge.classList.add('new-message-flash');
-        
-        if (unreadMessagesCount > 1) {
-            notificationBadge.classList.add('multiple');
-        } else {
-            notificationBadge.classList.remove('multiple');
-        }
-        
-        // Atualizar título da aba
-        updateTabTitle();
-        
-        // Remover animação após execução
-        setTimeout(() => {
-            notificationBadge.classList.remove('new-message-flash');
-        }, 600);
-        
-        console.log(`🔔 Badge mostrado: ${unreadMessagesCount} mensagens não lidas`);
-    }
-    
-    function hideNotificationBadge() {
-        if (!notificationBadge) return;
-        
-        notificationBadge.style.display = 'none';
-        unreadMessagesCount = 0;
-        updateTabTitle();
-        
-        console.log('🔕 Badge escondido');
-    }
-    
-    function updateTabTitle() {
-        const baseTitle = document.title.replace(/^\(\d+\)\s*/, '') || 'Interfone Virtual';
-        
-        if (unreadMessagesCount > 0 && !isUserInChat) {
-            document.title = `(${unreadMessagesCount}) ${baseTitle}`;
-        } else {
-            document.title = baseTitle;
-        }
-    }
-    
-    function openChatFromBadge() {
-        console.log('🎯 Abrindo chat pelo badge...');
-        
-        // Mostrar chat container
-        const chatContainer = document.getElementById('chatContainer');
-        const chatToggle = document.getElementById('chatToggle');
-        
-        if (chatContainer) {
-            chatContainer.classList.add('active');
-        }
-        if (chatToggle) {
-            chatToggle.classList.add('active');
-        }
-        
-        // Ir para aba de conversas
-        switchToTab('conversations');
-        
-        // Esconder badge
-        hideNotificationBadge();
-        
-        // Focar no chat
-        setTimeout(() => {
-            const messageInput = document.getElementById('messageInput');
-            if (messageInput) {
-                messageInput.focus();
-            }
-        }, 500);
-    }
-    
-    function switchToTab(tabName) {
-        // Ativar aba
-        const tabs = document.querySelectorAll('.chat-tab');
-        const tabContents = document.querySelectorAll('.chat-tab-content');
-        
-        tabs.forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.tab === tabName);
-        });
-        
-        tabContents.forEach(content => {
-            content.classList.toggle('active', content.id === `${tabName}Tab`);
-        });
-        
-        console.log(`📁 Mudando para aba: ${tabName}`);
-    }
-    
-    function playNotificationSound() {
-        try {
-            // Som simples usando Web Audio API
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 800;
-            oscillator.type = 'sine';
-            
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.3);
-        } catch (error) {
-            console.log('🔇 Web Audio API não disponível para som');
-        }
-    }
-    
-    // Funções públicas para integração
-    window.NotificationBadge = {
-        show: showNotificationBadge,
-        hide: hideNotificationBadge,
-        updatePresence: updateUserPresence,
-        addMessage: function() {
-            unreadMessagesCount++;
-            if (!isUserInChat) {
-                showNotificationBadge();
-            }
-        },
-        getUnreadCount: function() {
-            return unreadMessagesCount;
-        }
-    };
-    
-    console.log('🎉 Sistema de notificação badge carregado com sucesso!');
-    
-})();
-    </script>
 <script>
     
 // =============================================
