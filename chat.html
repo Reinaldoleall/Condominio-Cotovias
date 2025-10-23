@@ -1020,6 +1020,51 @@
     from { transform: translateX(0); opacity: 1; }
     to { transform: translateX(100%); opacity: 0; }
   }
+/* Estilos para o sistema de sincronização */
+.auth-sync-status {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    z-index: 10000;
+    display: none;
+}
+
+.auth-sync-status.syncing {
+    background: #FF9800;
+    color: white;
+    display: block;
+}
+
+.auth-sync-status.success {
+    background: #4CAF50;
+    color: white;
+    display: block;
+}
+
+.auth-sync-status.error {
+    background: #f44336;
+    color: white;
+    display: block;
+}
+
+/* Loading durante sincronização */
+.sync-loading {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 5px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
 </style>
 
 <body>
@@ -1143,13 +1188,200 @@
             </div>
         </div>
     </div>
-
+<!-- Adicione isto no final do body -->
+<div id="authSyncStatus" class="auth-sync-status">
+    <span class="sync-loading"></span>
+    <span id="syncStatusText">Sincronizando...</span>
+</div>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+<script>
+// =============================================
+// SISTEMA DE SINCRONIZAÇÃO DE LOGIN ENTRE ABAS
+// =============================================
 
+// Verificar se já existe um usuário logado em outra aba
+function checkForExistingAuth() {
+    console.log('🔍 Verificando autenticação existente...');
+    
+    // Escutar por mudanças de auth em outras abas
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            console.log('✅ Usuário encontrado:', user.uid);
+            currentUser = user;
+            
+            // Inicializar chat com o usuário logado
+            await initializeChat();
+            
+            showNotification(`Bem-vindo de volta, ${user.displayName || 'Usuário'}!`, 'success');
+        } else {
+            console.log('❌ Nenhum usuário logado encontrado');
+            // Pode mostrar opção de login se quiser
+        }
+    });
+}
+
+// Sincronizar login entre abas
+function setupAuthSync() {
+    // Quando o auth state mudar (login/logout), outras abas serão notificadas
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            console.log('🔄 Sincronizando login entre abas...');
+            // O Firebase Auth automaticamente sincroniza entre abas do mesmo domínio
+        }
+    });
+}
+
+// Sistema de fallback: verificar localStorage compartilhado
+function setupLocalStorageSync() {
+    // Escutar por mudanças no localStorage (fallback)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'firebaseAuthSync' && e.newValue) {
+            const authData = JSON.parse(e.newValue);
+            console.log('📦 Dados de auth recebidos via localStorage:', authData);
+            
+            if (authData.userId && !currentUser) {
+                // Tentar recuperar a sessão
+                auth.onAuthStateChanged((user) => {
+                    if (user && user.uid === authData.userId) {
+                        currentUser = user;
+                        initializeChat();
+                    }
+                });
+            }
+        }
+    });
+}
+
+// Compartilhar estado de login entre abas
+function shareAuthState() {
+    if (currentUser) {
+        const authData = {
+            userId: currentUser.uid,
+            userName: currentUser.displayName,
+            timestamp: Date.now()
+        };
+        
+        localStorage.setItem('firebaseAuthSync', JSON.stringify(authData));
+        console.log('📤 Estado de auth compartilhado:', authData);
+    }
+}
+
+// =============================================
+// INICIALIZAÇÃO AUTOMÁTICA
+// =============================================
+
+// Modificar a inicialização existente
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Iniciando sistema de sincronização...');
+    
+    // 1. Primeiro verifica se já tem alguém logado
+    checkForExistingAuth();
+    
+    // 2. Configura sincronização
+    setupAuthSync();
+    setupLocalStorageSync();
+    
+    // 3. Verificar auth state periodicamente
+    setInterval(() => {
+        if (!currentUser) {
+            checkForExistingAuth();
+        }
+    }, 5000);
+});
+
+// Modificar a função initializeChat para ser mais robusta
+async function initializeChat() {
+    if (!currentUser) {
+        console.log('⚠️ Tentando inicializar chat sem usuário...');
+        return;
+    }
+    
+    console.log('💬 Inicializando chat para:', currentUser.uid);
+    
+    try {
+        // Referências do Firebase
+        usersRef = database.ref('users');
+        messagesRef = database.ref('messages');
+        
+        // Compartilhar estado de login
+        shareAuthState();
+        
+        // Inicializar FCM
+        await initializeFCM();
+        
+        // Configurar chamadas
+        listenForIncomingCalls(currentUser.uid);
+        
+        // Carregar dados
+        loadBlockedUsers();
+        loadUsersList();
+        loadConversationsList();
+        loadSettings();
+        
+        // INICIALIZAR CONFIGURAÇÕES
+        initializeSettings();
+        
+        // Escutar notificações pendentes
+        listenForPendingNotifications();
+        
+        // Escutar por novas mensagens
+        const cleanupListeners = listenForMessagesOptimized();
+        
+        // Atualizar último acesso
+        updateUserLastSeen();
+        
+        // Atualizar indicador
+        setTimeout(updateUnreadMessagesIndicator, 2000);
+        
+        console.log('✅ Chat inicializado com sucesso!');
+        
+    } catch (error) {
+        console.error('❌ Erro ao inicializar chat:', error);
+    }
+}
+
+// =============================================
+// DETECÇÃO DE MÚLTIPLAS ABAS
+// =============================================
+
+// Gerar ID único para esta aba
+const TAB_ID = 'tab_' + Math.random().toString(36).substr(2, 9);
+
+// Detectar se é a aba principal
+function setupTabManagement() {
+    // Tentar se tornar a aba principal
+    localStorage.setItem('mainTabId', TAB_ID);
+    
+    // Verificar se é a aba principal
+    const mainTabId = localStorage.getItem('mainTabId');
+    const isMainTab = mainTabId === TAB_ID;
+    
+    console.log(`📑 Gerenciamento de abas: ${isMainTab ? 'ABA PRINCIPAL' : 'ABA SECUNDÁRIA'}`);
+    
+    // Se não for a aba principal, verificar auth mais agressivamente
+    if (!isMainTab) {
+        setInterval(() => {
+            if (!currentUser) {
+                checkForExistingAuth();
+            }
+        }, 2000);
+    }
+    
+    // Limpar ao fechar a aba
+    window.addEventListener('beforeunload', () => {
+        if (isMainTab) {
+            localStorage.removeItem('mainTabId');
+        }
+    });
+}
+
+// Inicializar gerenciamento de abas
+setupTabManagement();
+</script>
     
     <!-- JavaScript -->
     <script>
@@ -1194,20 +1426,97 @@ const tabContents = document.querySelectorAll('.chat-tab-content');
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar se o usuário está autenticado
-    auth.onAuthStateChanged(user => {
-        if (user) {
+    // Verificar se o usuário está autenticado
+// VERIFICAÇÃO ROBUSTA DE AUTENTICAÇÃO
+auth.onAuthStateChanged(async (user) => {
+    console.log('🔄 Estado de autenticação mudou:', user ? user.uid : 'null');
+    
+    if (user) {
+        // 🔥 NOVO: Verificar se é um usuário diferente do atual
+        if (!currentUser || currentUser.uid !== user.uid) {
             currentUser = user;
-            initializeChat();
-        } else {
-            // Se não estiver autenticado, mostrar mensagem
-            document.getElementById('usersList').innerHTML = `
-                <div class="empty-state">
-                    <span class="material-icons">login</span>
-                    <p>Faça login para usar o interfone virtual</p>
-                </div>
-            `;
+            console.log('✅ Novo usuário detectado:', user.uid);
+            
+            // Compartilhar estado entre abas
+            shareAuthState();
+            
+            // Inicializar chat
+            await initializeChat();
+            
+            // Mostrar feedback visual
+            showUserWelcome(user);
+        }
+    } else {
+        currentUser = null;
+        console.log('🚪 Usuário deslogado');
+        
+        // Mostrar interface de "faça login"
+        showLoginInterface();
+    }
+});
+
+// Mostrar boas-vindas personalizadas
+function showUserWelcome(user) {
+    const userName = user.displayName || user.email || 'Usuário';
+    showNotification(`Bem-vindo(a), ${userName}!`, 'success');
+    
+    // Atualizar interface se necessário
+    updateUIForLoggedInUser();
+}
+
+// Interface quando não há usuário logado
+function showLoginInterface() {
+    const usersList = document.getElementById('usersList');
+    const conversationsList = document.getElementById('conversationsList');
+    
+    if (usersList) {
+        usersList.innerHTML = `
+            <div class="empty-state">
+                <span class="material-icons">login</span>
+                <p>Faça login para usar o interfone virtual</p>
+                <button onclick="triggerLogin()" style="
+                    margin-top: 16px;
+                    padding: 10px 20px;
+                    background: var(--md-sys-color-primary);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                ">
+                    Fazer Login
+                </button>
+            </div>
+        `;
+    }
+    
+    if (conversationsList) {
+        conversationsList.innerHTML = `
+            <div class="empty-state">
+                <span class="material-icons">forum</span>
+                <p>Faça login para ver suas conversas</p>
+            </div>
+        `;
+    }
+}
+
+// Função para forçar login (se necessário)
+function triggerLogin() {
+    // Aqui você pode implementar um modal de login
+    // ou redirecionar para página de login
+    showNotification('Recarregando para detectar login...', 'info');
+    setTimeout(() => location.reload(), 1000);
+}
+
+// Atualizar UI para usuário logado
+function updateUIForLoggedInUser() {
+    // Esconder mensagens de "faça login"
+    const emptyStates = document.querySelectorAll('.empty-state');
+    emptyStates.forEach(state => {
+        if (state.innerHTML.includes('Faça login')) {
+            state.style.display = 'none';
         }
     });
+}
     
     // Solicitar permissão do microfone
     // Verificar e solicitar permissão do microfone
