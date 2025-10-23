@@ -218,7 +218,343 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<!-- RECEPTOR DE NOTIFICAÇÕES DO CHAT -->
+<style>
+.chat-notification-widget {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #6750A4, #8B78D6);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(103, 80, 164, 0.3);
+    z-index: 10000;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    max-width: 300px;
+    font-family: 'Roboto', Arial, sans-serif;
+    border: 2px solid white;
+    animation: slideInRight 0.5s ease-out;
+}
 
+.chat-notification-widget:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(103, 80, 164, 0.4);
+    transition: all 0.3s ease;
+}
+
+.chat-notification-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.chat-notification-content {
+    flex: 1;
+}
+
+.chat-notification-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.chat-notification-message {
+    font-size: 13px;
+    opacity: 0.9;
+    line-height: 1.3;
+}
+
+.chat-notification-time {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 4px;
+}
+
+.chat-notification-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.chat-notification-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.chat-notification-badge {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: #ff4444;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    z-index: 10001;
+    cursor: pointer;
+    animation: pulse 2s infinite;
+    border: 2px solid white;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .chat-notification-widget {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .chat-notification-badge {
+        top: 10px;
+        right: 10px;
+    }
+}
+</style>
+
+<!-- Widget de Notificação -->
+<div id="chatNotificationWidget" class="chat-notification-widget">
+    <div class="chat-notification-icon">💬</div>
+    <div class="chat-notification-content">
+        <div class="chat-notification-title" id="notificationTitle">Nova Mensagem</div>
+        <div class="chat-notification-message" id="notificationMessage">Você recebeu uma nova mensagem</div>
+        <div class="chat-notification-time" id="notificationTime">Agora mesmo</div>
+    </div>
+    <button class="chat-notification-close" onclick="hideNotificationWidget()">×</button>
+</div>
+
+<!-- Badge Pequeno -->
+<div id="chatNotificationBadge" class="chat-notification-badge" onclick="showNotificationWidget()">
+    <span id="badgeCount">1</span>
+</div>
+
+<script>
+// =============================================
+// RECEPTOR DE NOTIFICAÇÕES DO CHAT
+// =============================================
+(function() {
+    'use strict';
+    
+    let notificationCount = 0;
+    let lastNotification = null;
+    let widgetTimeout = null;
+    
+    const widget = document.getElementById('chatNotificationWidget');
+    const badge = document.getElementById('chatNotificationBadge');
+    
+    function initializeNotificationReceiver() {
+        console.log('🎧 Iniciando receptor de notificações do chat...');
+        
+        // Método 1: Escutar localStorage
+        setupLocalStorageListener();
+        
+        // Método 2: Escutar postMessage
+        setupPostMessageListener();
+        
+        // Método 3: Escutar BroadcastChannel
+        setupBroadcastChannelListener();
+        
+        // Método 4: Polling como fallback
+        setupPollingListener();
+        
+        console.log('✅ Receptor de notificações ativo');
+    }
+    
+    function setupLocalStorageListener() {
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'crossSiteChatNotification' && e.newValue) {
+                try {
+                    const notification = JSON.parse(e.newValue);
+                    if (notification.source === 'chat_app') {
+                        handleIncomingNotification(notification.data);
+                    }
+                } catch (error) {
+                    console.log('❌ Erro ao processar localStorage notification');
+                }
+            }
+        });
+    }
+    
+    function setupPostMessageListener() {
+        window.addEventListener('message', (event) => {
+            // Verificar se a mensagem é do nosso sistema
+            if (event.data && event.data.type === 'CHAT_NOTIFICATION' && event.data.source === 'chat_app') {
+                handleIncomingNotification(event.data.data);
+            }
+        });
+    }
+    
+    function setupBroadcastChannelListener() {
+        if ('BroadcastChannel' in window) {
+            try {
+                const channel = new BroadcastChannel('chat_notifications');
+                channel.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'CHAT_NOTIFICATION') {
+                        handleIncomingNotification(event.data.data);
+                    }
+                });
+            } catch (error) {
+                console.log('❌ BroadcastChannel não disponível');
+            }
+        }
+    }
+    
+    function setupPollingListener() {
+        // Polling a cada 3 segundos como fallback
+        setInterval(() => {
+            try {
+                const stored = localStorage.getItem('crossSiteChatNotification');
+                if (stored) {
+                    const notification = JSON.parse(stored);
+                    if (notification.source === 'chat_app' && 
+                        notification.timestamp > (Date.now() - 10000)) { // Últimos 10 segundos
+                        handleIncomingNotification(notification.data);
+                    }
+                }
+            } catch (error) {
+                // Ignorar erros
+            }
+        }, 3000);
+    }
+    
+    function handleIncomingNotification(notificationData) {
+        console.log('📨 Notificação recebida:', notificationData);
+        
+        notificationCount++;
+        lastNotification = notificationData;
+        
+        // Mostrar badge
+        showNotificationBadge();
+        
+        // Mostrar widget automaticamente (apenas primeira notificação)
+        if (notificationCount === 1) {
+            showNotificationWidget();
+        }
+        
+        // Atualizar título da página
+        updatePageTitle();
+    }
+    
+    function showNotificationBadge() {
+        if (!badge) return;
+        
+        const badgeCount = document.getElementById('badgeCount');
+        if (badgeCount) {
+            badgeCount.textContent = notificationCount > 9 ? '9+' : notificationCount;
+        }
+        
+        badge.style.display = 'flex';
+    }
+    
+    function hideNotificationBadge() {
+        if (!badge) return;
+        badge.style.display = 'none';
+        notificationCount = 0;
+        updatePageTitle();
+    }
+    
+    function showNotificationWidget() {
+        if (!widget || !lastNotification) return;
+        
+        // Atualizar conteúdo do widget
+        document.getElementById('notificationTitle').textContent = getNotificationTitle(lastNotification);
+        document.getElementById('notificationMessage').textContent = lastNotification.message || 'Nova mensagem';
+        document.getElementById('notificationTime').textContent = formatTime(lastNotification.timestamp);
+        
+        // Mostrar widget
+        widget.style.display = 'flex';
+        
+        // Auto-esconder após 8 segundos
+        clearTimeout(widgetTimeout);
+        widgetTimeout = setTimeout(hideNotificationWidget, 8000);
+    }
+    
+    function hideNotificationWidget() {
+        if (!widget) return;
+        widget.style.display = 'none';
+    }
+    
+    function getNotificationTitle(notification) {
+        switch(notification.type) {
+            case 'NEW_MESSAGE':
+                return '💬 Nova Mensagem';
+            case 'INCOMING_CALL':
+                return '📞 Chamada Recebida';
+            default:
+                return '🔔 Notificação';
+        }
+    }
+    
+    function formatTime(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        
+        if (diff < 60000) return 'Agora mesmo';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)} min atrás`;
+        
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function updatePageTitle() {
+        const baseTitle = document.title.replace(/^\(\d+\)\s*/, '') || 'Meu Site';
+        
+        if (notificationCount > 0) {
+            document.title = `(${notificationCount}) ${baseTitle}`;
+        } else {
+            document.title = baseTitle;
+        }
+    }
+    
+    // Funções globais para controle
+    window.showNotificationWidget = showNotificationWidget;
+    window.hideNotificationWidget = hideNotificationWidget;
+    
+    // Teste manual
+    window.testChatNotification = function() {
+        handleIncomingNotification({
+            type: 'NEW_MESSAGE',
+            message: 'Esta é uma mensagem de teste do sistema de notificações!',
+            timestamp: Date.now()
+        });
+    };
+    
+    // Inicializar automaticamente
+    document.addEventListener('DOMContentLoaded', initializeNotificationReceiver);
+    
+    console.log('🎉 Receptor de notificações do chat carregado!');
+    
+})();
+            </script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
