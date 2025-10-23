@@ -216,35 +216,51 @@
         </button>
     </nav>
 <style>
-  .home-notification-popup {
+  .persistent-notification {
     position: fixed;
     bottom: 20px;
     left: 20px;
-    background-color: #333; /* Cor escura para destacar */
+    background-color: #005A9C; /* Um azul mais chamativo */
     color: white;
-    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     z-index: 10000;
     font-family: Arial, sans-serif;
+    width: 320px;
+    max-width: 90%;
+    
+    /* Começa escondido */
+    display: none; 
+    
+    /* Configuração para o botão 'X' */
     display: none;
-    cursor: pointer;
-    max-width: 320px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
   }
-  .home-notification-popup.show {
-    display: block;
+  
+  /* Animação de entrada */
+  .persistent-notification.show {
+    display: flex;
     animation: homeFadeIn 0.3s ease-out;
   }
   @keyframes homeFadeIn {
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
-  .home-notification-popup strong {
+
+  /* Conteúdo clicável (que leva ao chat) */
+  .notification-content {
+    padding: 16px;
+    cursor: pointer; /* Indica que é clicável */
+    flex: 1; /* Ocupa o espaço disponível */
+  }
+  .notification-content strong {
     display: block;
     font-size: 16px;
     margin-bottom: 8px;
   }
-  .home-notification-popup p {
+  .notification-content p {
     margin: 0;
     font-size: 14px;
     opacity: 0.9;
@@ -255,12 +271,34 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
   }
+  
+  /* Botão 'X' de fechar */
+  .notification-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    padding: 14px 12px; /* Ajuste para centralizar */
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    align-self: stretch; /* Estica para ter a mesma altura */
+  }
+  .notification-close:hover {
+    opacity: 1;
+  }
 </style>
 
-<div class="home-notification-popup" id="homeNotificationPopup">
-  <strong id="notificationSender">Nova Mensagem</strong>
-  <p id="notificationMessage">Você tem uma nova mensagem no Interfone Virtual.</p>
+<div class="persistent-notification" id="persistentNotification">
+    <div class="notification-content" id="notificationContent">
+        <strong id="persistentSender">Nova Mensagem</strong>
+        <p id="persistentMessage">Você tem uma nova mensagem.</p>
+    </div>
+    <button class="notification-close" id="notificationClose" title="Fechar">&times;</button>
 </div>
+
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -285,7 +323,8 @@
     // ---------------------------------------------------------------
     // IMPORTANTE: Altere esta URL para o link do seu Interfone Virtual
     // ---------------------------------------------------------------
-    const URL_DO_INTERFONE = "interfone.html"; // Ex: "chat.html" ou "https://meusite.com/interfone"
+    // Você mencionou 'bate-papo.html', então eu coloquei aqui:
+    const URL_DO_INTERFONE = "bate-papo.html";
     
     // Inicializa o Firebase
     if (!firebase.apps.length) {
@@ -299,9 +338,11 @@
     const notifiedMessageTimestamps = new Set(); // Para evitar re-notificar
 
     // Elementos da Notificação
-    const notificationPopup = document.getElementById('homeNotificationPopup');
-    const notificationSender = document.getElementById('notificationSender');
-    const notificationMessage = document.getElementById('notificationMessage');
+    const notificationPopup = document.getElementById('persistentNotification');
+    const notificationContent = document.getElementById('notificationContent');
+    const notificationClose = document.getElementById('notificationClose');
+    const notificationSender = document.getElementById('persistentSender');
+    const notificationMessage = document.getElementById('persistentMessage');
 
     // Toca um som de notificação
     function playNotificationSound() {
@@ -325,28 +366,35 @@
         notificationPopup.classList.add('show');
         playNotificationSound();
 
-        // Esconde a notificação após 5 segundos
-        setTimeout(() => {
-            notificationPopup.classList.remove('show');
-        }, 5000);
+        // IMPORTANTE: Removemos o 'setTimeout' que escondia a notificação.
+        // Ela agora ficará na tela até ser clicada.
     }
     
-    // Define o que acontece ao clicar na notificação
-    notificationPopup.onclick = () => {
-        window.open(URL_DO_INTERFONE, '_blank');
+    // --- NOVOS EVENT HANDLERS ---
+    
+    // Define o que acontece ao clicar no CONTEÚDO da notificação
+    notificationContent.onclick = () => {
+        // Abre o bate-papo (em uma nova aba, ou use window.location.href para ser na mesma)
+        window.open(URL_DO_INTERFONE, '_blank'); 
+        
+        // Opcional: Esconde a notificação SÓ DEPOIS que o usuário clicar nela
+        // notificationPopup.classList.remove('show');
+    };
+
+    // Define o que acontece ao clicar no 'X' para fechar
+    notificationClose.onclick = () => {
         notificationPopup.classList.remove('show');
     };
 
-    // Função principal para escutar novas mensagens
+    // Função principal para escutar novas mensagens (sem alterações)
     function startListeningForMessages(userId) {
         if (conversationsListener) {
-            conversationsListener.off(); // Desliga listener anterior se houver
+            conversationsListener.off(); 
         }
         
         console.log("Iniciando listener de notificações para o usuário:", userId);
         conversationsListener = database.ref('conversations');
 
-        // Escuta por conversas novas ou atualizadas
         const messageHandler = (snapshot) => {
             handleNewMessage(snapshot, userId);
         };
@@ -355,28 +403,23 @@
         conversationsListener.on('child_added', messageHandler);
     }
 
-    // Processa uma nova mensagem
+    // Processa uma nova mensagem (sem alterações)
     function handleNewMessage(snapshot, userId) {
         const conversationId = snapshot.key;
 
-        // 1. Verifica se a conversa pertence ao usuário logado
         if (conversationId.includes(userId)) {
             const messages = snapshot.val();
             if (!messages) return;
 
-            // 2. Pega a última mensagem
             const messageKeys = Object.keys(messages);
             const lastMessageKey = messageKeys[messageKeys.length - 1];
             const lastMessage = messages[lastMessageKey];
 
-            // 3. Verifica se é uma mensagem RECEBIDA (não enviada por ele)
             if (lastMessage && lastMessage.senderId !== userId) {
                 
-                // 4. Verifica se já notificamos sobre esta mensagem (pelo timestamp)
                 if (!notifiedMessageTimestamps.has(lastMessage.timestamp)) {
-                    notifiedMessageTimestamps.add(lastMessage.timestamp); // Marca como notificada
+                    notifiedMessageTimestamps.add(lastMessage.timestamp); 
 
-                    // 5. Busca o nome do remetente e mostra a notificação
                     database.ref(`users/${lastMessage.senderId}`).once('value').then(userSnapshot => {
                         const sender = userSnapshot.val();
                         const senderName = sender ? sender.nome || 'Usuário' : 'Usuário';
@@ -389,18 +432,14 @@
         }
     }
 
-    // ---------------------------------------------------------------
-    // INICIALIZAÇÃO: Verifica a autenticação do usuário
-    // ---------------------------------------------------------------
+    // INICIALIZAÇÃO: Verifica a autenticação (sem alterações)
     auth.onAuthStateChanged(user => {
         if (user) {
-            // Usuário está logado
             if (currentUserId !== user.uid) {
                 currentUserId = user.uid;
                 startListeningForMessages(currentUserId);
             }
         } else {
-            // Usuário não está logado
             console.log('Usuário não logado. Notificações desativadas.');
             if (conversationsListener) {
                 conversationsListener.off();
@@ -411,6 +450,8 @@
 
   })();
 </script>
+
+
 
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
