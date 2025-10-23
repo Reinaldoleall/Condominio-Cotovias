@@ -357,329 +357,187 @@
     <span id="badgeCount">1</span>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-
 <script>
 // =============================================
-// SISTEMA UNIFICADO DE NOTIFICAÇÕES COM FIREBASE
-// Para usar em ambos os sites (emissor e receptor)
+// SISTEMA DE NOTIFICAÇÕES PERSONALIZADAS POR USUÁRIO
+// Para colocar no OUTRO site que vai receber notificações
 // =============================================
 (function() {
     'use strict';
     
-    // Configuração do Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
-        authDomain: "rifas-c414b.firebaseapp.com",
-        databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
-        projectId: "rifas-c414b",
-        storageBucket: "rifas-c414b.appspot.com",
-        messagingSenderId: "770195193538",
-        appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
-    };
-    
-    // Estado do sistema
-    const state = {
-        isInitialized: false,
-        firebaseApp: null,
-        database: null,
-        auth: null,
+    const config = {
+        firebaseConfig: {
+            apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+            authDomain: "rifas-c414b.firebaseapp.com",
+            databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+            projectId: "rifas-c414b",
+            storageBucket: "rifas-c414b.appspot.com",
+            messagingSenderId: "770195193538",
+            appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+        },
         currentUser: null,
-        unreadMessagesCount: 0,
-        isUserInChat: false,
-        notificationBadge: null,
+        isInitialized: false,
         notificationContainer: null,
-        notificationSoundEnabled: true,
-        showDesktopNotifications: true,
-        notificationHistory: []
+        notificationSoundEnabled: true
     };
     
-    // Inicialização principal
-    function initializeNotificationSystem() {
-        if (state.isInitialized) return;
+    // Inicialização do sistema
+    function initializeUserNotificationSystem() {
+        if (config.isInitialized) return;
         
-        console.log('🚀 Iniciando sistema unificado de notificações Firebase...');
+        console.log('🔔 Iniciando sistema de notificações personalizadas...');
         
         try {
             // Inicializar Firebase
             initializeFirebase();
             
-            // Configurar interface de notificação
-            setupNotificationInterface();
+            // Criar container de notificações
+            createNotificationContainer();
             
             // Configurar listeners
-            setupEventListeners();
+            setupNotificationListeners();
             
-            state.isInitialized = true;
+            // Injetar estilos
+            injectNotificationStyles();
             
-            // Mostrar notificação de sistema pronto
-            showSystemNotification('Sistema de notificações ativo!', 'success');
+            config.isInitialized = true;
+            
+            showWelcomeNotification();
             
         } catch (error) {
             console.error('❌ Erro na inicialização:', error);
         }
     }
     
-    // =============================================
-    // FIREBASE - CONFIGURAÇÃO E LISTENERS
-    // =============================================
-    
     function initializeFirebase() {
         try {
             // Inicializar Firebase
-            state.firebaseApp = firebase.initializeApp(firebaseConfig);
-            state.database = firebase.database();
-            state.auth = firebase.auth();
+            firebase.initializeApp(config.firebaseConfig);
+            config.database = firebase.database();
+            config.auth = firebase.auth();
             
-            console.log('✅ Firebase inicializado');
+            console.log('✅ Firebase inicializado no site receptor');
             
-            // Configurar autenticação anônima
+            // Autenticação anônima
             setupAnonymousAuth();
             
         } catch (error) {
             console.error('❌ Erro ao inicializar Firebase:', error);
-            // Fallback para notificações locais
-            setupFallbackSystem();
         }
     }
     
     function setupAnonymousAuth() {
-        state.auth.signInAnonymously()
+        config.auth.signInAnonymously()
             .then(() => {
                 console.log('✅ Autenticação anônima realizada');
-                setupFirebaseListeners();
             })
             .catch(error => {
                 console.error('❌ Erro na autenticação:', error);
-                setupFallbackSystem();
             });
         
-        // Escutar mudanças de autenticação
-        state.auth.onAuthStateChanged((user) => {
-            state.currentUser = user;
+        config.auth.onAuthStateChanged((user) => {
+            config.currentUser = user;
             if (user) {
-                console.log('👤 Usuário Firebase:', user.uid);
-                setupFirebaseListeners();
+                console.log('👤 Usuário receptor:', user.uid);
+                startListeningForUserNotifications();
             }
         });
     }
     
-    function setupFirebaseListeners() {
-        if (!state.database) return;
+    // 🎯 FUNÇÃO PRINCIPAL: Escutar notificações específicas do usuário
+    function startListeningForUserNotifications() {
+        if (!config.database || !config.currentUser) return;
         
-        // Referência para notificações globais
-        const notificationsRef = state.database.ref('global_notifications');
+        console.log('👂 Escutando notificações para usuário:', config.currentUser.uid);
+        
+        // Referência para notificações do usuário atual
+        const userNotificationsRef = config.database.ref(`user_notifications/${config.currentUser.uid}`);
         
         // Escutar novas notificações
-        notificationsRef.limitToLast(1).on('child_added', (snapshot) => {
+        userNotificationsRef.orderByChild('timestamp').limitToLast(10).on('child_added', (snapshot) => {
             const notification = snapshot.val();
-            if (notification && shouldProcessNotification(notification)) {
-                processIncomingNotification(notification);
+            
+            if (notification && shouldShowNotification(notification)) {
+                console.log('📨 Notificação pessoal recebida:', notification);
+                
+                // Mostrar notificação
+                showPersonalNotification(notification);
+                
+                // Tocar som
+                if (config.notificationSoundEnabled) {
+                    playNotificationSound();
+                }
+                
+                // Marcar como visualizada (opcional)
+                markNotificationAsSeen(snapshot.key);
             }
         });
-        
-        console.log('✅ Listeners do Firebase configurados');
     }
     
-    function shouldProcessNotification(notification) {
-        // Não processar notificações muito antigas (5 minutos)
+    function shouldShowNotification(notification) {
+        // Verificar se é recente (últimos 5 minutos)
         const isRecent = Date.now() - notification.timestamp < 5 * 60 * 1000;
         
-        // Não processar própria notificação (se tiver user ID)
-        const isOwnNotification = notification.senderId === (state.currentUser?.uid || '');
+        // Verificar se não é do próprio usuário
+        const isNotOwn = notification.senderId !== config.currentUser.uid;
         
-        return isRecent && !isOwnNotification;
+        return isRecent && isNotOwn;
     }
     
-    // =============================================
-    // ENVIO DE NOTIFICAÇÕES
-    // =============================================
-    
-    function sendNotification(notificationData) {
-        if (!state.database || !state.currentUser) {
-            console.log('⚠️ Firebase não disponível, usando fallback');
-            sendNotificationFallback(notificationData);
-            return;
-        }
-        
-        const notification = {
-            ...notificationData,
-            senderId: state.currentUser.uid,
-            timestamp: Date.now(),
-            id: generateNotificationId(),
-            site: window.location.hostname
+    function showPersonalNotification(notification) {
+        const notificationData = {
+            title: getNotificationTitle(notification.type),
+            message: notification.message || 'Você tem uma nova mensagem',
+            sender: notification.senderName || `Usuário ${notification.senderId?.substring(0, 8)}...`,
+            timestamp: formatTimestamp(notification.timestamp),
+            type: 'personal',
+            conversationId: notification.conversationId,
+            autoClose: 8000
         };
         
-        // Salvar no Firebase
-        const notificationsRef = state.database.ref('global_notifications');
-        notificationsRef.push(notification)
-            .then(() => {
-                console.log('📤 Notificação enviada para Firebase:', notification.message);
-            })
-            .catch(error => {
-                console.error('❌ Erro ao enviar notificação:', error);
-                sendNotificationFallback(notification);
-            });
-    }
-    
-    function sendNotificationFallback(notificationData) {
-        // Fallback: usar métodos cross-site originais
-        broadcastViaLocalStorage(notificationData);
-        broadcastViaPostMessage(notificationData);
-        broadcastViaBroadcastChannel(notificationData);
-    }
-    
-    function generateNotificationId() {
-        return 'notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-    
-    // =============================================
-    // RECEPÇÃO E PROCESSAMENTO DE NOTIFICAÇÕES
-    // =============================================
-    
-    function processIncomingNotification(notificationData) {
-        console.log('📨 Notificação recebida:', notificationData);
+        showNotificationElement(notificationData);
         
-        // Adicionar ao histórico
-        state.notificationHistory.unshift({
-            ...notificationData,
-            receivedAt: new Date().toISOString(),
-            read: false
-        });
-        
-        // Manter apenas as últimas 50 notificações
-        if (state.notificationHistory.length > 50) {
-            state.notificationHistory = state.notificationHistory.slice(0, 50);
-        }
-        
-        // Mostrar notificação baseada no tipo
-        switch (notificationData.type) {
-            case 'NEW_MESSAGE':
-                handleNewMessageNotification(notificationData);
-                break;
-                
-            case 'CHAT_MESSAGE':
-                handleChatMessageNotification(notificationData);
-                break;
-                
-            case 'SYSTEM_ALERT':
-                handleSystemAlertNotification(notificationData);
-                break;
-                
-            case 'TEST_MESSAGE':
-                handleTestNotification(notificationData);
-                break;
-                
-            default:
-                handleGenericNotification(notificationData);
-                break;
-        }
-        
-        // Efeitos de notificação
-        triggerNotificationEffects(notificationData);
-        
-        console.log('✅ Notificação processada');
-    }
-    
-    function handleNewMessageNotification(data) {
-        showNotificationElement({
-            title: '💬 Nova Mensagem',
-            message: data.message || 'Você recebeu uma nova mensagem',
-            sender: data.senderName || `Usuário ${data.senderId?.substring(0, 8)}...`,
-            timestamp: formatTimestamp(data.timestamp),
-            type: 'message',
-            autoClose: 6000
-        });
-        
-        // Incrementar contador se não estiver no chat
-        if (!state.isUserInChat) {
-            state.unreadMessagesCount++;
-            updateNotificationBadge();
-        }
-    }
-    
-    function handleChatMessageNotification(data) {
-        showNotificationElement({
-            title: '👥 Chat',
-            message: data.message || 'Nova mensagem no chat',
-            sender: data.senderName || 'Usuário',
-            timestamp: formatTimestamp(data.timestamp),
-            type: 'chat',
-            autoClose: 5000
-        });
-    }
-    
-    function handleSystemAlertNotification(data) {
-        showNotificationElement({
-            title: '⚠️ Alerta do Sistema',
-            message: data.message || 'Alerta do sistema',
-            timestamp: formatTimestamp(data.timestamp),
-            type: 'system',
-            autoClose: 8000
-        });
-    }
-    
-    function handleTestNotification(data) {
-        showNotificationElement({
-            title: '🧪 Teste de Notificação',
-            message: data.message || 'Teste do sistema de notificações',
-            timestamp: 'Agora',
-            type: 'test',
-            autoClose: 4000
-        });
-    }
-    
-    function handleGenericNotification(data) {
-        showNotificationElement({
-            title: '📢 Notificação',
-            message: data.message || 'Nova notificação',
-            timestamp: formatTimestamp(data.timestamp),
-            type: 'generic',
-            autoClose: 5000
-        });
-    }
-    
-    function triggerNotificationEffects(notificationData) {
-        // Tocar som
-        if (state.notificationSoundEnabled) {
-            playNotificationSound();
-        }
-        
-        // Notificação desktop se página não está em foco
-        if (state.showDesktopNotifications && document.hidden) {
+        // Se a página não está em foco, mostrar notificação desktop
+        if (document.hidden) {
             showDesktopNotification(notificationData);
-        }
-        
-        // Atualizar badge do título
-        updateTitleBadge();
-        
-        // Vibração (se suportada)
-        if ('vibrate' in navigator) {
-            navigator.vibrate(200);
+            updateTitleBadge();
         }
     }
     
-    // =============================================
-    // INTERFACE DE NOTIFICAÇÃO
-    // =============================================
-    
-    function setupNotificationInterface() {
-        createNotificationContainer();
-        setupNotificationBadge();
-        injectNotificationStyles();
+    function getNotificationTitle(type) {
+        const titles = {
+            'NEW_MESSAGE': '💬 Nova Mensagem',
+            'CHAT_MESSAGE': '👥 Mensagem no Chat', 
+            'CALL_MISSED': '📞 Chamada Perdida',
+            'SYSTEM_ALERT': '⚠️ Alerta do Sistema',
+            'default': '📢 Nova Notificação'
+        };
+        
+        return titles[type] || titles.default;
     }
+    
+    function markNotificationAsSeen(notificationId) {
+        // Opcional: marcar como vista no Firebase
+        setTimeout(() => {
+            config.database.ref(`user_notifications/${config.currentUser.uid}/${notificationId}`).remove()
+                .then(() => console.log('✅ Notificação removida'))
+                .catch(error => console.error('❌ Erro ao remover notificação:', error));
+        }, 10000); // Remover após 10 segundos
+    }
+    
+    // =============================================
+    // INTERFACE DE NOTIFICAÇÕES
+    // =============================================
     
     function createNotificationContainer() {
-        state.notificationContainer = document.getElementById('globalNotificationContainer');
+        config.notificationContainer = document.getElementById('userNotificationContainer');
         
-        if (!state.notificationContainer) {
-            state.notificationContainer = document.createElement('div');
-            state.notificationContainer.id = 'globalNotificationContainer';
-            state.notificationContainer.className = 'notification-container';
+        if (!config.notificationContainer) {
+            config.notificationContainer = document.createElement('div');
+            config.notificationContainer.id = 'userNotificationContainer';
+            config.notificationContainer.className = 'user-notification-container';
             
-            state.notificationContainer.style.cssText = `
+            config.notificationContainer.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
@@ -689,55 +547,18 @@
                 pointer-events: none;
             `;
             
-            document.body.appendChild(state.notificationContainer);
-        }
-    }
-    
-    function setupNotificationBadge() {
-        state.notificationBadge = document.getElementById('globalNotificationBadge');
-        
-        if (!state.notificationBadge) {
-            state.notificationBadge = document.createElement('div');
-            state.notificationBadge.id = 'globalNotificationBadge';
-            state.notificationBadge.className = 'notification-badge';
-            
-            state.notificationBadge.style.cssText = `
-                position: fixed;
-                top: 15px;
-                left: 15px;
-                width: 24px;
-                height: 24px;
-                background: #ff4444;
-                color: white;
-                border-radius: 50%;
-                display: none;
-                justify-content: center;
-                align-items: center;
-                font-size: 12px;
-                font-weight: bold;
-                cursor: pointer;
-                z-index: 10001;
-                box-shadow: 0 2px 10px rgba(255, 68, 68, 0.3);
-                pointer-events: auto;
-            `;
-            
-            state.notificationBadge.innerHTML = `
-                <span id="badgeCount">0</span>
-            `;
-            
-            state.notificationBadge.addEventListener('click', handleBadgeClick);
-            document.body.appendChild(state.notificationBadge);
+            document.body.appendChild(config.notificationContainer);
         }
     }
     
     function showNotificationElement(options) {
-        if (!state.notificationContainer) return;
+        if (!config.notificationContainer) return;
         
         const notification = createNotificationElement(options);
-        state.notificationContainer.insertBefore(notification, state.notificationContainer.firstChild);
+        config.notificationContainer.insertBefore(notification, config.notificationContainer.firstChild);
         
-        // Limitar número de notificações visíveis
-        const notifications = state.notificationContainer.children;
+        // Limitar a 5 notificações visíveis
+        const notifications = config.notificationContainer.children;
         if (notifications.length > 5) {
             for (let i = 5; i < notifications.length; i++) {
                 notifications[i].remove();
@@ -751,64 +572,62 @@
             message,
             sender = '',
             timestamp,
-            type = 'generic',
-            autoClose = 5000
+            type = 'personal',
+            autoClose = 8000,
+            conversationId = null
         } = options;
         
-        const notificationId = 'notif_' + Date.now();
+        const notificationId = 'user_notif_' + Date.now();
         const notification = document.createElement('div');
         notification.id = notificationId;
-        notification.className = `notification notification-${type}`;
+        notification.className = `user-notification notification-${type}`;
         
-        // Estilos base
+        // Estilos da notificação
         notification.style.cssText = `
-            background: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             padding: 16px;
             margin-bottom: 10px;
-            border-left: 5px solid #007bff;
             max-width: 350px;
-            animation: notificationSlideIn 0.3s ease-out;
+            animation: userNotificationSlideIn 0.4s ease-out;
             cursor: pointer;
             transition: all 0.3s ease;
             pointer-events: auto;
-            backdrop-filter: blur(10px);
+            border-left: 4px solid #ff6b6b;
         `;
-        
-        // Cores por tipo
-        const typeColors = {
-            message: '#28a745',
-            chat: '#17a2b8', 
-            system: '#ffc107',
-            test: '#6f42c1',
-            generic: '#007bff'
-        };
-        
-        notification.style.borderLeftColor = typeColors[type] || typeColors.generic;
         
         notification.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                <strong style="flex: 1; font-size: 14px; color: #2c3e50;">${title}</strong>
-                <button onclick="window.NotificationSystem.closeNotification('${notificationId}')" 
-                        style="background: none; border: none; font-size: 18px; cursor: pointer; color: #95a5a6; padding: 0; margin-left: 8px; line-height: 1;">
+                <strong style="flex: 1; font-size: 15px; color: white;">${title}</strong>
+                <button onclick="window.UserNotificationSystem.closeNotification('${notificationId}')" 
+                        style="background: rgba(255,255,255,0.2); border: none; font-size: 18px; cursor: pointer; color: white; padding: 2px 6px; border-radius: 50%; line-height: 1;">
                     ×
                 </button>
             </div>
-            <div style="font-size: 14px; color: #34495e; line-height: 1.4; margin-bottom: 6px;">${message}</div>
-            ${sender ? `<div style="font-size: 12px; color: #7f8c8d; margin-bottom: 4px;">👤 ${sender}</div>` : ''}
-            <div style="font-size: 11px; color: #bdc3c7; text-align: right;">🕒 ${timestamp}</div>
+            <div style="font-size: 14px; line-height: 1.4; margin-bottom: 6px; opacity: 0.95;">${message}</div>
+            ${sender ? `<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">👤 De: ${sender}</div>` : ''}
+            <div style="font-size: 11px; opacity: 0.7; text-align: right;">🕒 ${timestamp}</div>
         `;
         
-        // Hover effects
+        // Efeitos de hover
         notification.addEventListener('mouseenter', () => {
-            notification.style.transform = 'translateY(-2px)';
-            notification.style.boxShadow = '0 6px 25px rgba(0,0,0,0.2)';
+            notification.style.transform = 'translateY(-2px) scale(1.02)';
+            notification.style.boxShadow = '0 12px 35px rgba(0,0,0,0.4)';
         });
         
         notification.addEventListener('mouseleave', () => {
-            notification.style.transform = 'translateY(0)';
-            notification.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+            notification.style.transform = 'translateY(0) scale(1)';
+            notification.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
+        });
+        
+        // Click para abrir o chat (se tiver conversationId)
+        notification.addEventListener('click', () => {
+            if (conversationId) {
+                openChatFromNotification(conversationId);
+            }
+            closeNotification(notificationId);
         });
         
         // Auto-close
@@ -818,20 +637,13 @@
             }, autoClose);
         }
         
-        // Click para fechar
-        notification.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON') {
-                closeNotification(notificationId);
-            }
-        });
-        
         return notification;
     }
     
     function closeNotification(notificationId) {
         const element = document.getElementById(notificationId);
         if (element) {
-            element.style.animation = 'notificationSlideOut 0.3s ease-in forwards';
+            element.style.animation = 'userNotificationSlideOut 0.3s ease-in forwards';
             setTimeout(() => {
                 if (element.parentNode) {
                     element.remove();
@@ -840,51 +652,16 @@
         }
     }
     
-    function updateNotificationBadge() {
-        if (!state.notificationBadge) return;
+    function openChatFromNotification(conversationId) {
+        console.log('🎯 Abrindo chat da notificação:', conversationId);
         
-        const badgeCount = document.getElementById('badgeCount');
-        if (badgeCount) {
-            badgeCount.textContent = state.unreadMessagesCount > 9 ? '9+' : state.unreadMessagesCount;
-        }
+        // Aqui você pode implementar a lógica para abrir o chat
+        // Por exemplo, redirecionar para a página do chat ou abrir um modal
         
-        if (state.unreadMessagesCount > 0 && !state.isUserInChat) {
-            state.notificationBadge.style.display = 'flex';
-            
-            // Animação de pulsar para novas mensagens
-            state.notificationBadge.style.animation = 'badgePulse 2s infinite';
-        } else {
-            state.notificationBadge.style.display = 'none';
-            state.notificationBadge.style.animation = 'none';
-        }
+        showNotification('Abrindo conversa...', 'info');
         
-        updateTitleBadge();
-    }
-    
-    function updateTitleBadge() {
-        const baseTitle = document.title.replace(/^\(\d+\)\s*/, '');
-        
-        if (state.unreadMessagesCount > 0 && !state.isUserInChat) {
-            document.title = `(${state.unreadMessagesCount}) ${baseTitle}`;
-        } else {
-            document.title = baseTitle;
-        }
-    }
-    
-    function handleBadgeClick() {
-        // Marcar todas como lidas
-        state.unreadMessagesCount = 0;
-        updateNotificationBadge();
-        
-        // Mostrar histórico se disponível
-        if (state.notificationHistory.length > 0) {
-            showNotificationHistory();
-        }
-    }
-    
-    function showNotificationHistory() {
-        // Implementação básica do histórico
-        alert(`Você tem ${state.notificationHistory.length} notificações no histórico.`);
+        // Exemplo: abrir em nova aba (ajuste a URL conforme seu sistema)
+        // window.open(`/chat?conversation=${conversationId}`, '_blank');
     }
     
     // =============================================
@@ -900,14 +677,15 @@
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.value = 800;
+            // Som mais suave para notificações
+            oscillator.frequency.value = 600;
             oscillator.type = 'sine';
             
-            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
             
             oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.3);
+            oscillator.stop(audioContext.currentTime + 0.4);
         } catch (error) {
             console.log('🔇 Audio não disponível');
         }
@@ -917,30 +695,36 @@
         if (!('Notification' in window)) return;
         
         if (Notification.permission === 'granted') {
-            const title = getNotificationTitle(notificationData);
-            const options = {
+            const notification = new Notification(notificationData.title, {
                 body: notificationData.message,
                 icon: '/favicon.ico',
                 badge: '/favicon.ico',
-                tag: 'firebase_notification'
-            };
+                tag: 'user_notification',
+                requireInteraction: true
+            });
             
-            new Notification(title, options);
+            notification.onclick = function() {
+                window.focus();
+                if (notificationData.conversationId) {
+                    openChatFromNotification(notificationData.conversationId);
+                }
+                notification.close();
+            };
         } else if (Notification.permission === 'default') {
             Notification.requestPermission();
         }
     }
     
-    function getNotificationTitle(notificationData) {
-        const titles = {
-            'NEW_MESSAGE': '💬 Nova Mensagem',
-            'CHAT_MESSAGE': '👥 Chat',
-            'SYSTEM_ALERT': '⚠️ Alerta',
-            'TEST_MESSAGE': '🧪 Teste',
-            'default': '📢 Notificação'
-        };
+    function updateTitleBadge() {
+        const baseTitle = document.title.replace(/^\(\d+\)\s*/, '');
+        document.title = `(1) ${baseTitle}`;
         
-        return titles[notificationData.type] || titles.default;
+        // Remover badge após 30 segundos se ainda estiver lá
+        setTimeout(() => {
+            if (document.title.startsWith('(1)')) {
+                document.title = baseTitle;
+            }
+        }, 30000);
     }
     
     function formatTimestamp(timestamp) {
@@ -959,199 +743,73 @@
         });
     }
     
-    function showSystemNotification(message, type = 'info') {
-        const types = {
-            'success': { title: '✅ Sucesso', color: '#28a745' },
-            'error': { title: '❌ Erro', color: '#dc3545' },
-            'warning': { title: '⚠️ Aviso', color: '#ffc107' },
-            'info': { title: 'ℹ️ Info', color: '#17a2b8' }
-        };
-        
-        const config = types[type] || types.info;
-        
+    function showWelcomeNotification() {
         showNotificationElement({
-            title: config.title,
-            message: message,
+            title: '🔔 Notificações Ativas',
+            message: 'Você receberá notificações quando alguém enviar mensagens para você!',
             timestamp: 'Sistema',
             type: 'system',
-            autoClose: 5000
+            autoClose: 6000
         });
     }
     
+    function showNotification(message, type = 'info') {
+        // Notificação simples no console
+        console.log(`📢 ${type.toUpperCase()}: ${message}`);
+    }
+    
     // =============================================
-    // FALLBACK SYSTEM (quando Firebase falha)
+    // CONFIGURAÇÃO DE EVENTOS
     // =============================================
     
-    function setupFallbackSystem() {
-        console.log('🔄 Usando sistema fallback');
+    function setupNotificationListeners() {
+        // Visibilidade da página
+        document.addEventListener('visibilitychange', handlePageVisibility);
         
-        // Métodos cross-site originais
-        setupCrossSiteListeners();
-    }
-    
-    function setupCrossSiteListeners() {
-        window.addEventListener('storage', handleStorageNotification);
-        window.addEventListener('message', handlePostMessageNotification);
-        setupBroadcastChannelListener();
-    }
-    
-    function handleStorageNotification(e) {
-        if (e.key === 'crossSiteChatNotification' && e.newValue) {
-            try {
-                const notification = JSON.parse(e.newValue);
-                if (notification.source === 'chat_app') {
-                    processIncomingNotification(notification.data);
-                }
-            } catch (error) {
-                console.log('❌ Erro no fallback localStorage');
-            }
-        }
-    }
-    
-    function handlePostMessageNotification(event) {
-        if (event.data?.type === 'CHAT_NOTIFICATION' && event.data.source === 'chat_app') {
-            processIncomingNotification(event.data.data);
-        }
-    }
-    
-    function setupBroadcastChannelListener() {
-        if ('BroadcastChannel' in window) {
-            const channel = new BroadcastChannel('chat_notifications');
-            channel.addEventListener('message', (event) => {
-                if (event.data?.type === 'CHAT_NOTIFICATION' && event.data.source === 'chat_app') {
-                    processIncomingNotification(event.data.data);
-                }
-            });
-        }
-    }
-    
-    function broadcastViaLocalStorage(data) {
-        try {
-            localStorage.setItem('crossSiteChatNotification', JSON.stringify({
-                id: 'fallback_' + Date.now(),
-                data: data,
-                timestamp: Date.now(),
-                source: 'chat_app'
-            }));
-            setTimeout(() => localStorage.removeItem('crossSiteChatNotification'), 5000);
-        } catch (error) {
-            console.log('❌ Fallback localStorage falhou');
-        }
-    }
-    
-    function broadcastViaPostMessage(data) {
-        try {
-            window.parent.postMessage({
-                type: 'CHAT_NOTIFICATION',
-                data: data,
-                source: 'chat_app'
-            }, '*');
-        } catch (error) {
-            // Ignorar erro
-        }
-    }
-    
-    function broadcastViaBroadcastChannel(data) {
-        try {
-            if ('BroadcastChannel' in window) {
-                const channel = new BroadcastChannel('chat_notifications');
-                channel.postMessage({
-                    type: 'CHAT_NOTIFICATION',
-                    data: data,
-                    source: 'chat_app'
-                });
-            }
-        } catch (error) {
-            // Ignorar erro
-        }
-    }
-    
-    // =============================================
-    // EVENT LISTENERS E CONTROLE DE PRESENÇA
-    // =============================================
-    
-    function setupEventListeners() {
-        document.addEventListener('visibilitychange', handleVisibilityChange);
+        // Foco da janela
         window.addEventListener('focus', handleWindowFocus);
-        window.addEventListener('blur', handleWindowBlur);
-        
-        // Observar elemento do chat se existir
-        observeChatElement();
     }
     
-    function handleVisibilityChange() {
-        state.isUserInChat = !document.hidden && isUserInChatContext();
-        updateNotificationBadge();
+    function handlePageVisibility() {
+        if (!document.hidden) {
+            // Quando a página fica visível, limpar badge do título
+            document.title = document.title.replace(/^\(\d+\)\s*/, '');
+        }
     }
     
     function handleWindowFocus() {
-        state.isUserInChat = isUserInChatContext();
-        updateNotificationBadge();
-    }
-    
-    function handleWindowBlur() {
-        state.isUserInChat = false;
-    }
-    
-    function isUserInChatContext() {
-        // Verificar se usuário está em contexto de chat
-        const chatContainer = document.getElementById('chatContainer');
-        const conversationTab = document.getElementById('conversationTab');
-        
-        if (chatContainer && conversationTab) {
-            return chatContainer.classList.contains('active') && 
-                   conversationTab.classList.contains('active') &&
-                   document.hasFocus();
-        }
-        
-        return document.hasFocus();
-    }
-    
-    function observeChatElement() {
-        const chatContainer = document.getElementById('chatContainer');
-        if (chatContainer) {
-            const observer = new MutationObserver(() => {
-                state.isUserInChat = isUserInChatContext();
-                updateNotificationBadge();
-            });
-            observer.observe(chatContainer, { attributes: true, attributeFilter: ['class'] });
-        }
+        // Limpar badge quando a janela recebe foco
+        document.title = document.title.replace(/^\(\d+\)\s*/, '');
     }
     
     function injectNotificationStyles() {
         const style = document.createElement('style');
         style.textContent = `
-            @keyframes notificationSlideIn {
+            @keyframes userNotificationSlideIn {
                 from {
-                    transform: translateX(100%);
+                    transform: translateX(100%) scale(0.8);
                     opacity: 0;
                 }
                 to {
-                    transform: translateX(0);
+                    transform: translateX(0) scale(1);
                     opacity: 1;
                 }
             }
             
-            @keyframes notificationSlideOut {
+            @keyframes userNotificationSlideOut {
                 from {
-                    transform: translateX(0);
+                    transform: translateX(0) scale(1);
                     opacity: 1;
                 }
                 to {
-                    transform: translateX(100%);
+                    transform: translateX(100%) scale(0.8);
                     opacity: 0;
                 }
             }
             
-            @keyframes badgePulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.1); }
-                100% { transform: scale(1); }
-            }
-            
-            .notification-badge:hover {
-                transform: scale(1.15) !important;
-                transition: transform 0.2s ease;
+            .user-notification:hover {
+                transform: translateY(-2px) scale(1.02) !important;
+                box-shadow: 0 12px 35px rgba(0,0,0,0.4) !important;
             }
         `;
         document.head.appendChild(style);
@@ -1161,66 +819,57 @@
     // API PÚBLICA
     // =============================================
     
-    window.NotificationSystem = {
+    window.UserNotificationSystem = {
         // Inicialização
-        init: initializeNotificationSystem,
-        
-        // Envio de notificações
-        sendNotification: sendNotification,
-        sendTest: function() {
-            sendNotification({
-                type: 'TEST_MESSAGE',
-                message: 'Esta é uma notificação de teste do sistema unificado!',
-                site: window.location.hostname
-            });
-        },
-        sendMessage: function(message, type = 'NEW_MESSAGE') {
-            sendNotification({
-                type: type,
-                message: message,
-                site: window.location.hostname
-            });
-        },
+        init: initializeUserNotificationSystem,
         
         // Controle de notificações
+        closeNotification: closeNotification,
         clearAll: function() {
-            if (state.notificationContainer) {
-                state.notificationContainer.innerHTML = '';
+            if (config.notificationContainer) {
+                config.notificationContainer.innerHTML = '';
             }
-            state.unreadMessagesCount = 0;
-            state.notificationHistory = [];
-            updateNotificationBadge();
+            document.title = document.title.replace(/^\(\d+\)\s*/, '');
         },
         
-        closeNotification: closeNotification,
-        
         // Configurações
-        enableSound: function() { state.notificationSoundEnabled = true; },
-        disableSound: function() { state.notificationSoundEnabled = false; },
-        enableDesktop: function() { state.showDesktopNotifications = true; },
-        disableDesktop: function() { state.showDesktopNotifications = false; },
+        enableSound: function() { config.notificationSoundEnabled = true; },
+        disableSound: function() { config.notificationSoundEnabled = false; },
+        
+        // Teste
+        testNotification: function() {
+            showNotificationElement({
+                title: '🧪 Teste de Notificação',
+                message: 'Esta é uma notificação de teste do sistema personalizado!',
+                sender: 'Sistema de Teste',
+                timestamp: 'Agora',
+                type: 'test',
+                autoClose: 5000
+            });
+        },
         
         // Informações
-        getHistory: function() { return [...state.notificationHistory]; },
-        getUnreadCount: function() { return state.unreadMessagesCount; },
-        getStatus: function() { 
+        getStatus: function() {
             return {
-                initialized: state.isInitialized,
-                firebaseConnected: !!state.database,
-                user: state.currentUser,
-                unreadCount: state.unreadMessagesCount
+                initialized: config.isInitialized,
+                user: config.currentUser,
+                soundEnabled: config.notificationSoundEnabled
             };
         }
     };
     
-    // Inicialização automática
+    // =============================================
+    // INICIALIZAÇÃO AUTOMÁTICA
+    // =============================================
+    
+    // Inicializar quando o DOM estiver pronto
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeNotificationSystem);
+        document.addEventListener('DOMContentLoaded', initializeUserNotificationSystem);
     } else {
-        setTimeout(initializeNotificationSystem, 1000);
+        setTimeout(initializeUserNotificationSystem, 1000);
     }
     
-    console.log('🎉 Sistema unificado Firebase carregado!');
+    console.log('🎉 Sistema de notificações personalizadas carregado!');
     
 })();
 </script>
@@ -1343,4 +992,4 @@
     </script>
 
 </body>
-    </html>
+</html>
