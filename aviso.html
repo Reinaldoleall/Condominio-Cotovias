@@ -330,7 +330,375 @@
             <div class="modal-body" id="modalConteudo"></div>
         </div>
     </div>
+<script>
+// Script de Notificação de Encomendas para Moradores
+(function() {
+    // Configuração do Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+        authDomain: "rifas-c414b.firebaseapp.com",
+        databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+        projectId: "rifas-c414b",
+        storageBucket: "rifas-c414b.firebasestorage.app",
+        messagingSenderId: "770195193538",
+        appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+    };
 
+    // Inicializa o Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    // Variáveis globais
+    let encomendasCount = 0;
+    let currentUser = null;
+
+    // Estilos CSS para o componente
+    const styles = `
+        .notification-bell {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+        
+        .bell-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        .bell-container:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+        }
+        
+        .bell-icon {
+            color: white;
+            font-size: 28px;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid white;
+            animation: bounce 1s infinite alternate;
+        }
+        
+        .notification-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .notification-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .notification-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        
+        .notification-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .encomendas-count {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        
+        .close-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .close-button:hover {
+            background: #764ba2;
+        }
+        
+        .no-encomendas {
+            font-size: 18px;
+            color: #999;
+            margin: 30px 0;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .encomenda-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+            border-left: 4px solid #667eea;
+        }
+        
+        .encomenda-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .encomenda-details {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+    `;
+
+    // Função para criar o componente
+    function createNotificationComponent() {
+        // Adiciona os estilos
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = styles;
+        document.head.appendChild(styleSheet);
+
+        // Cria o sino de notificação
+        const bellContainer = document.createElement('div');
+        bellContainer.className = 'notification-bell';
+        bellContainer.innerHTML = `
+            <div class="bell-container">
+                <i class="material-icons bell-icon">notifications</i>
+                <div class="notification-badge" id="notificationBadge" style="display: none;">0</div>
+            </div>
+        `;
+
+        // Cria o modal de notificação
+        const modalContainer = document.createElement('div');
+        modalContainer.className = 'notification-modal';
+        modalContainer.id = 'notificationModal';
+        modalContainer.innerHTML = `
+            <div class="notification-content">
+                <div class="notification-header">
+                    <i class="material-icons" style="color: #667eea; font-size: 32px;">local_shipping</i>
+                    <h2 class="notification-title">Suas Encomendas</h2>
+                </div>
+                <div id="notificationBody">
+                    <!-- Conteúdo dinâmico será inserido aqui -->
+                </div>
+                <button class="close-button">Entendi</button>
+            </div>
+        `;
+
+        // Adiciona ao body
+        document.body.appendChild(bellContainer);
+        document.body.appendChild(modalContainer);
+
+        // Configura os event listeners
+        setupEventListeners();
+    }
+
+    // Configura os event listeners
+    function setupEventListeners() {
+        const bell = document.querySelector('.notification-bell');
+        const modal = document.getElementById('notificationModal');
+        const closeBtn = modal.querySelector('.close-button');
+
+        bell.addEventListener('click', openNotificationModal);
+        closeBtn.addEventListener('click', closeNotificationModal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeNotificationModal();
+            }
+        });
+    }
+
+    // Abre o modal de notificação
+    function openNotificationModal() {
+        const modal = document.getElementById('notificationModal');
+        const notificationBody = document.getElementById('notificationBody');
+        
+        if (encomendasCount > 0) {
+            notificationBody.innerHTML = `
+                <p class="notification-message">
+                    Você tem encomendas disponíveis para retirada na portaria!
+                </p>
+                <div class="encomendas-count">${encomendasCount}</div>
+                <p style="color: #666; font-size: 14px;">
+                    ${encomendasCount === 1 ? '1 encomenda aguardando' : encomendasCount + ' encomendas aguardando'}
+                </p>
+                <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px;">
+                    <i class="material-icons" style="color: #1976d2; vertical-align: middle;">info</i>
+                    <span style="color: #1976d2; font-size: 14px;">
+                        Dirija-se à portaria para retirar suas encomendas
+                    </span>
+                </div>
+            `;
+        } else {
+            notificationBody.innerHTML = `
+                <p class="no-encomendas">
+                    <i class="material-icons" style="font-size: 48px; color: #ccc; margin-bottom: 20px;">
+                        inventory_2
+                    </i><br>
+                    Nenhuma encomenda disponível no momento
+                </p>
+            `;
+        }
+        
+        modal.style.display = 'flex';
+    }
+
+    // Fecha o modal de notificação
+    function closeNotificationModal() {
+        const modal = document.getElementById('notificationModal');
+        modal.style.display = 'none';
+    }
+
+    // Atualiza o contador de encomendas
+    function updateNotificationCount(count) {
+        encomendasCount = count;
+        const badge = document.getElementById('notificationBadge');
+        
+        if (count > 0) {
+            badge.style.display = 'flex';
+            badge.textContent = count > 99 ? '99+' : count;
+            
+            // Adiciona animação para novas encomendas
+            if (count > 0) {
+                badge.style.animation = 'bounce 0.5s ease 3';
+                setTimeout(() => {
+                    badge.style.animation = 'bounce 1s infinite alternate';
+                }, 1500);
+            }
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    // Monitora as encomendas do usuário logado
+    function monitorUserEncomendas() {
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                try {
+                    // Busca o bloco e apartamento do usuário
+                    const userSnapshot = await firebase.database().ref(`users/${user.uid}`).once('value');
+                    if (userSnapshot.exists()) {
+                        const userData = userSnapshot.val();
+                        const userBloco = userData.bloco;
+                        const userApto = userData.apartamento;
+                        
+                        if (userBloco && userApto) {
+                            // Monitora encomendas em tempo real
+                            firebase.database().ref('encomendas')
+                                .orderByChild('status')
+                                .equalTo('pendente')
+                                .on('value', (snapshot) => {
+                                    let count = 0;
+                                    
+                                    snapshot.forEach((child) => {
+                                        const encomenda = child.val();
+                                        if (encomenda.bloco === userBloco && encomenda.apartamento === userApto) {
+                                            count += parseInt(encomenda.quantidade) || 1;
+                                        }
+                                    });
+                                    
+                                    updateNotificationCount(count);
+                                });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar dados do usuário:', error);
+                }
+            }
+        });
+    }
+
+    // Inicialização
+    function init() {
+        createNotificationComponent();
+        monitorUserEncomendas();
+    }
+
+    // Aguarda o carregamento da página e inicia
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
+
+<!-- Adicione também o Material Icons se não estiver incluído -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- E o Firebase se não estiver incluído -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
