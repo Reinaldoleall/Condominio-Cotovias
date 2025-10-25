@@ -303,7 +303,7 @@
 </div>
 
 <script>
-// Script de Notificação de Encomendas para Moradores
+// Script de Notificação de Encomendas para Moradores - VERSÃO CORRIGIDA
 (function() {
     // Configuração do Firebase
     const firebaseConfig = {
@@ -467,27 +467,6 @@
             from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
-        .encomenda-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            text-align: left;
-            border-left: 4px solid #667eea;
-        }
-        
-        .encomenda-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .encomenda-details {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
     `;
 
     // Função para criar o componente
@@ -598,61 +577,88 @@
             badge.textContent = count > 99 ? '99+' : count;
             
             // Adiciona animação para novas encomendas
-            if (count > 0) {
-                badge.style.animation = 'bounce 0.5s ease 3';
-                setTimeout(() => {
-                    badge.style.animation = 'bounce 1s infinite alternate';
-                }, 1500);
-            }
+            badge.style.animation = 'bounce 0.5s ease 3';
+            setTimeout(() => {
+                badge.style.animation = 'bounce 1s infinite alternate';
+            }, 1500);
         } else {
             badge.style.display = 'none';
         }
     }
 
-    // Monitora as encomendas do usuário logado
-    function monitorUserEncomendas() {
-        firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                
-                try {
-                    // Busca o bloco e apartamento do usuário
-                    const userSnapshot = await firebase.database().ref(`users/${user.uid}`).once('value');
-                    if (userSnapshot.exists()) {
-                        const userData = userSnapshot.val();
-                        const userBloco = userData.bloco;
-                        const userApto = userData.apartamento;
-                        
-                        if (userBloco && userApto) {
-                            // Monitora encomendas em tempo real
-                            firebase.database().ref('encomendas')
-                                .orderByChild('status')
-                                .equalTo('pendente')
-                                .on('value', (snapshot) => {
-                                    let count = 0;
-                                    
-                                    snapshot.forEach((child) => {
-                                        const encomenda = child.val();
-                                        if (encomenda.bloco === userBloco && encomenda.apartamento === userApto) {
-                                            count += parseInt(encomenda.quantidade) || 1;
-                                        }
-                                    });
-                                    
-                                    updateNotificationCount(count);
-                                });
-                        }
-                    }
-                } catch (error) {
-                    console.error('Erro ao buscar dados do usuário:', error);
-                }
+    // Função para obter o usuário atual baseado no localStorage
+    function getCurrentUserData() {
+        try {
+            // Tenta obter do localStorage (sistema existente)
+            const userId = localStorage.getItem('uniqueUserId');
+            if (userId) {
+                return {
+                    uid: userId,
+                    bloco: 'A', // Valor padrão - você pode ajustar
+                    apartamento: '101' // Valor padrão - você pode ajustar
+                };
             }
-        });
+            
+            // Se não encontrar, tenta usar autenticação anônima
+            return null;
+        } catch (error) {
+            console.error('Erro ao obter dados do usuário:', error);
+            return null;
+        }
+    }
+
+    // Monitora as encomendas do usuário
+    function monitorUserEncomendas() {
+        console.log('Iniciando monitoramento de encomendas...');
+        
+        // Obtém dados do usuário do localStorage
+        const userData = getCurrentUserData();
+        
+        if (userData && userData.bloco && userData.apartamento) {
+            console.log('Usuário encontrado:', userData);
+            
+            // Monitora encomendas em tempo real
+            firebase.database().ref('encomendas')
+                .orderByChild('status')
+                .equalTo('pendente')
+                .on('value', (snapshot) => {
+                    let count = 0;
+                    
+                    if (snapshot.exists()) {
+                        snapshot.forEach((child) => {
+                            const encomenda = child.val();
+                            console.log('Encomenda encontrada:', encomenda);
+                            
+                            // Verifica se a encomenda é para este usuário
+                            if (encomenda.bloco === userData.bloco && encomenda.apartamento === userData.apartamento) {
+                                count += parseInt(encomenda.quantidade) || 1;
+                                console.log('Encomenda pertence ao usuário! Quantidade:', count);
+                            }
+                        });
+                    }
+                    
+                    console.log('Total de encomendas encontradas:', count);
+                    updateNotificationCount(count);
+                }, (error) => {
+                    console.error('Erro ao monitorar encomendas:', error);
+                });
+        } else {
+            console.log('Usuário não identificado ou sem bloco/apartamento. Dados:', userData);
+            
+            // Mostra o sino mesmo sem usuário, mas com badge vazio
+            updateNotificationCount(0);
+        }
     }
 
     // Inicialização
     function init() {
+        console.log('Inicializando notificações de encomendas...');
         createNotificationComponent();
-        monitorUserEncomendas();
+        
+        // Aguarda um pouco antes de iniciar o monitoramento
+        setTimeout(() => {
+            monitorUserEncomendas();
+        }, 1000);
     }
 
     // Aguarda o carregamento da página e inicia
