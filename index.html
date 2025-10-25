@@ -303,463 +303,401 @@
 </div>
 
 <script>
-// Sistema de Notificações em Tempo Real - Para outras páginas
+// Script de Notificação de Encomendas para Moradores - BUSCA AUTOMÁTICA DO FIREBASE
 (function() {
-    // Elementos da notificação
-    let notificationContainer = null;
-    let notificationBell = null;
-    let notificationBadge = null;
-    
-    // Função para criar o elemento de notificação
-    function criarElementoNotificacao() {
-        // Verifica se já existe
-        if (document.getElementById('notificationContainer')) {
-            return;
+    // Configuração do Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+        authDomain: "rifas-c414b.firebaseapp.com",
+        databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+        projectId: "rifas-c414b",
+        storageBucket: "rifas-c414b.firebasestorage.app",
+        messagingSenderId: "770195193538",
+        appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+    };
+
+    // Inicializa o Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    // Variáveis globais
+    let encomendasCount = 0;
+    let currentUserData = null;
+
+    // Estilos CSS para o componente
+    const styles = `
+        .notification-bell {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            cursor: pointer;
         }
         
-        // Cria o container da notificação
-        notificationContainer = document.createElement('div');
-        notificationContainer.id = 'notificationContainer';
-        notificationContainer.className = 'notification-container';
-        notificationContainer.innerHTML = `
-            <div class="notification-bell" id="notificationBell">
-                <i class="material-icons">notifications</i>
-                <span class="notification-badge" id="notificationBadge">0</span>
+        .bell-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        .bell-container:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+        }
+        
+        .bell-icon {
+            color: white;
+            font-size: 28px;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid white;
+            animation: bounce 1s infinite alternate;
+        }
+        
+        .notification-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .notification-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .notification-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        
+        .notification-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .encomendas-count {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        
+        .close-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .close-button:hover {
+            background: #764ba2;
+        }
+        
+        .no-encomendas {
+            font-size: 18px;
+            color: #999;
+            margin: 30px 0;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    `;
+
+    // Função para criar o componente
+    function createNotificationComponent() {
+        // Adiciona os estilos
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = styles;
+        document.head.appendChild(styleSheet);
+
+        // Cria o sino de notificação
+        const bellContainer = document.createElement('div');
+        bellContainer.className = 'notification-bell';
+        bellContainer.innerHTML = `
+            <div class="bell-container">
+                <i class="material-icons bell-icon">notifications</i>
+                <div class="notification-badge" id="notificationBadge" style="display: none;">0</div>
             </div>
-            <div class="notification-dropdown" id="notificationDropdown">
+        `;
+
+        // Cria o modal de notificação
+        const modalContainer = document.createElement('div');
+        modalContainer.className = 'notification-modal';
+        modalContainer.id = 'notificationModal';
+        modalContainer.innerHTML = `
+            <div class="notification-content">
                 <div class="notification-header">
-                    <h6>Minhas Encomendas</h6>
-                    <span class="notification-subtitle">Pendentes na portaria</span>
+                    <i class="material-icons" style="color: #667eea; font-size: 32px;">local_shipping</i>
+                    <h2 class="notification-title">Suas Encomendas</h2>
                 </div>
-                <div class="notification-content" id="notificationContent">
-                    <div class="notification-empty">
-                        <i class="material-icons">inventory_2</i>
-                        <p>Nenhuma encomenda pendente</p>
-                    </div>
+                <div id="notificationBody">
+                    <!-- Conteúdo dinâmico será inserido aqui -->
                 </div>
-                <div class="notification-footer">
-                    <a href="usuario.html" class="btn-small blue darken-3 waves-effect waves-light">
-                        <i class="material-icons left">list</i>
-                        Ver Todas
-                    </a>
-                </div>
+                <button class="close-button">Entendi</button>
             </div>
         `;
-        
+
         // Adiciona ao body
-        document.body.appendChild(notificationContainer);
-        
-        // Adiciona estilos
-        adicionarEstilosNotificacao();
-        
-        // Configura eventos
-        configurarEventosNotificacao();
-        
-        // Carrega notificações salvas
-        carregarNotificacoesSalvas();
+        document.body.appendChild(bellContainer);
+        document.body.appendChild(modalContainer);
+
+        // Configura os event listeners
+        setupEventListeners();
     }
-    
-    // Função para adicionar estilos CSS
-    function adicionarEstilosNotificacao() {
-        const styles = `
-            <style>
-            .notification-container {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 1000;
+
+    // Configura os event listeners
+    function setupEventListeners() {
+        const bell = document.querySelector('.notification-bell');
+        const modal = document.getElementById('notificationModal');
+        const closeBtn = modal.querySelector('.close-button');
+
+        bell.addEventListener('click', openNotificationModal);
+        closeBtn.addEventListener('click', closeNotificationModal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeNotificationModal();
             }
-            
-            .notification-bell {
-                position: relative;
-                background-color: white;
-                border-radius: 50%;
-                width: 60px;
-                height: 60px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-            
-            .notification-bell:hover {
-                transform: scale(1.05);
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-                background-color: #f8f9fa;
-            }
-            
-            .notification-bell i {
-                font-size: 28px;
-                color: #34495e;
-                transition: color 0.3s ease;
-            }
-            
-            .notification-bell:hover i {
-                color: #2980b9;
-            }
-            
-            .notification-badge {
-                position: absolute;
-                top: -5px;
-                right: -5px;
-                background-color: #e74c3c;
-                color: white;
-                border-radius: 50%;
-                width: 24px;
-                height: 24px;
-                font-size: 12px;
-                font-weight: bold;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                animation: pulse 2s infinite;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            }
-            
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.1); }
-                100% { transform: scale(1); }
-            }
-            
-            .notification-dropdown {
-                position: absolute;
-                top: 70px;
-                right: 0;
-                width: 320px;
-                background: white;
-                border-radius: 8px;
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-                opacity: 0;
-                visibility: hidden;
-                transform: translateY(-10px);
-                transition: all 0.3s ease;
-                z-index: 1001;
-            }
-            
-            .notification-dropdown.show {
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0);
-            }
-            
-            .notification-header {
-                padding: 16px;
-                border-bottom: 1px solid #eee;
-                background-color: #f8f9fa;
-                border-radius: 8px 8px 0 0;
-            }
-            
-            .notification-header h6 {
-                margin: 0;
-                color: #34495e;
-                font-weight: 500;
-            }
-            
-            .notification-subtitle {
-                font-size: 12px;
-                color: #7f8c8d;
-                margin-top: 4px;
-                display: block;
-            }
-            
-            .notification-content {
-                max-height: 300px;
-                overflow-y: auto;
-            }
-            
-            .notification-item {
-                padding: 12px 16px;
-                border-bottom: 1px solid #f0f0f0;
-                cursor: pointer;
-                transition: background-color 0.2s ease;
-            }
-            
-            .notification-item:hover {
-                background-color: #f8f9fa;
-            }
-            
-            .notification-item:last-child {
-                border-bottom: none;
-            }
-            
-            .notification-item .notification-title {
-                font-weight: 500;
-                color: #2c3e50;
-                margin-bottom: 4px;
-                font-size: 14px;
-            }
-            
-            .notification-item .notification-desc {
-                font-size: 12px;
-                color: #7f8c8d;
-                margin-bottom: 4px;
-            }
-            
-            .notification-item .notification-time {
-                font-size: 11px;
-                color: #95a5a6;
-            }
-            
-            .notification-empty {
-                padding: 40px 20px;
-                text-align: center;
-                color: #95a5a6;
-            }
-            
-            .notification-empty i {
-                font-size: 48px;
-                margin-bottom: 16px;
-                opacity: 0.5;
-            }
-            
-            .notification-empty p {
-                margin: 0;
-                font-size: 14px;
-            }
-            
-            .notification-footer {
-                padding: 12px 16px;
-                border-top: 1px solid #eee;
-                text-align: center;
-                background-color: #f8f9fa;
-                border-radius: 0 0 8px 8px;
-            }
-            
-            /* Animações */
-            @keyframes shake {
-                0%, 100% { transform: rotate(0deg); }
-                25% { transform: rotate(-5deg); }
-                75% { transform: rotate(5deg); }
-            }
-            
-            .shake {
-                animation: shake 0.5s ease-in-out;
-            }
-            
-            @keyframes bounce {
-                0%, 20%, 53%, 80%, 100% {
-                    transform: translate3d(0,0,0);
-                }
-                40%, 43% {
-                    transform: translate3d(0,-8px,0);
-                }
-                70% {
-                    transform: translate3d(0,-4px,0);
-                }
-                90% {
-                    transform: translate3d(0,-2px,0);
-                }
-            }
-            
-            .bounce {
-                animation: bounce 1s;
-            }
-            
-            .new-notification {
-                animation: newNotification 0.6s ease-out;
-            }
-            
-            @keyframes newNotification {
-                0% { 
-                    transform: scale(1);
-                    background-color: white;
-                }
-                50% { 
-                    transform: scale(1.1);
-                    background-color: #fff3cd;
-                }
-                100% { 
-                    transform: scale(1);
-                    background-color: white;
-                }
-            }
-            </style>
-        `;
-        
-        document.head.insertAdjacentHTML('beforeend', styles);
-    }
-    
-    // Função para configurar eventos
-    function configurarEventosNotificacao() {
-        notificationBell = document.getElementById('notificationBell');
-        notificationBadge = document.getElementById('notificationBadge');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-        
-        if (!notificationBell) return;
-        
-        // Toggle do dropdown
-        notificationBell.addEventListener('click', function(e) {
-            e.stopPropagation();
-            notificationDropdown.classList.toggle('show');
-        });
-        
-        // Fecha dropdown ao clicar fora
-        document.addEventListener('click', function() {
-            notificationDropdown.classList.remove('show');
-        });
-        
-        // Previne fechamento ao clicar dentro do dropdown
-        notificationDropdown.addEventListener('click', function(e) {
-            e.stopPropagation();
         });
     }
-    
-    // Função para carregar notificações salvas
-    function carregarNotificacoesSalvas() {
-        const quantidade = localStorage.getItem('encomendasPendentes') || 0;
-        const encomendasData = localStorage.getItem('encomendasData');
-        let encomendas = {};
+
+    // Abre o modal de notificação
+    function openNotificationModal() {
+        const modal = document.getElementById('notificationModal');
+        const notificationBody = document.getElementById('notificationBody');
         
-        try {
-            encomendas = encomendasData ? JSON.parse(encomendasData) : {};
-        } catch (e) {
-            encomendas = {};
-        }
-        
-        atualizarNotificacao(parseInt(quantidade), encomendas);
-    }
-    
-    // Função para atualizar notificações
-    function atualizarNotificacao(quantidade, encomendas) {
-        if (!notificationBadge) return;
-        
-        // Atualiza o badge
-        notificationBadge.textContent = quantidade;
-        
-        // Mostra/oculta o badge
-        if (quantidade > 0) {
-            notificationBadge.style.display = 'flex';
-            // Adiciona animação
-            notificationBell.classList.add('shake');
-            setTimeout(() => {
-                notificationBell.classList.remove('shake');
-            }, 500);
-            
-            // Mostra notificação toast se for nova
-            mostrarNotificacaoToast(quantidade);
-        } else {
-            notificationBadge.style.display = 'none';
-        }
-        
-        // Atualiza o conteúdo do dropdown
-        atualizarConteudoNotificacao(encomendas);
-    }
-    
-    // Função para mostrar notificação toast
-    function mostrarNotificacaoToast(quantidade) {
-        if (typeof M !== 'undefined' && M.toast) {
-            const ultimaNotificacao = localStorage.getItem('ultimaNotificacaoToast') || 0;
-            const agora = Date.now();
-            
-            // Mostra toast apenas se passaram mais de 30 segundos da última notificação
-            if (agora - ultimaNotificacao > 30000) {
-                M.toast({
-                    html: `<i class="material-icons left">local_shipping</i> Você tem ${quantidade} encomenda(s) pendente(s)`,
-                    classes: 'blue darken-3',
-                    displayLength: 4000
-                });
-                localStorage.setItem('ultimaNotificacaoToast', agora);
-            }
-        }
-    }
-    
-    // Função para atualizar o conteúdo das notificações
-    function atualizarConteudoNotificacao(encomendas) {
-        const notificationContent = document.getElementById('notificationContent');
-        if (!notificationContent) return;
-        
-        if (!encomendas || Object.keys(encomendas).length === 0) {
-            notificationContent.innerHTML = `
-                <div class="notification-empty">
-                    <i class="material-icons">inventory_2</i>
-                    <p>Nenhuma encomenda pendente</p>
+        if (encomendasCount > 0) {
+            notificationBody.innerHTML = `
+                <p class="notification-message">
+                    Você tem encomendas disponíveis para retirada na portaria!
+                </p>
+                <div class="encomendas-count">${encomendasCount}</div>
+                <p style="color: #666; font-size: 14px;">
+                    ${encomendasCount === 1 ? '1 encomenda aguardando' : encomendasCount + ' encomendas aguardando'}
+                </p>
+                <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px;">
+                    <i class="material-icons" style="color: #1976d2; vertical-align: middle;">info</i>
+                    <span style="color: #1976d2; font-size: 14px;">
+                        Dirija-se à portaria para retirar suas encomendas
+                    </span>
                 </div>
             `;
-            return;
+        } else {
+            notificationBody.innerHTML = `
+                <p class="no-encomendas">
+                    <i class="material-icons" style="font-size: 48px; color: #ccc; margin-bottom: 20px;">
+                        inventory_2
+                    </i><br>
+                    Nenhuma encomenda disponível no momento
+                </p>
+            `;
         }
         
-        let html = '';
-        let count = 0;
+        modal.style.display = 'flex';
+    }
+
+    // Fecha o modal de notificação
+    function closeNotificationModal() {
+        const modal = document.getElementById('notificationModal');
+        modal.style.display = 'none';
+    }
+
+    // Atualiza o contador de encomendas
+    function updateNotificationCount(count) {
+        encomendasCount = count;
+        const badge = document.getElementById('notificationBadge');
         
-        Object.entries(encomendas).forEach(([id, encomenda]) => {
-            if (count < 5) { // Limita a 5 notificações no dropdown
-                html += `
-                    <div class="notification-item new-notification" onclick="window.location.href='usuario.html'">
-                        <div class="notification-title">
-                            📦 Encomenda #${id.substring(0, 6)}
-                        </div>
-                        <div class="notification-desc">
-                            ${encomenda.descricao || 'Encomenda recebida'}
-                        </div>
-                        <div class="notification-time">
-                            📍 ${encomenda.quantidade} item(s) • ${formatarDataNotificacao(encomenda.data)}
-                        </div>
-                    </div>
-                `;
-                count++;
+        if (count > 0) {
+            badge.style.display = 'flex';
+            badge.textContent = count > 99 ? '99+' : count;
+            
+            // Adiciona animação para novas encomendas
+            badge.style.animation = 'bounce 0.5s ease 3';
+            setTimeout(() => {
+                badge.style.animation = 'bounce 1s infinite alternate';
+            }, 1500);
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    // Busca todos os usuários e encontra o que corresponde ao ID do localStorage
+    async function findUserData() {
+        try {
+            const userId = localStorage.getItem('uniqueUserId');
+            
+            if (!userId) {
+                console.log('Nenhum usuário encontrado no localStorage');
+                return null;
             }
-        });
-        
-        notificationContent.innerHTML = html || `
-            <div class="notification-empty">
-                <i class="material-icons">inventory_2</i>
-                <p>Nenhuma encomenda pendente</p>
-            </div>
-        `;
-        
-        // Remove animação após um tempo
-        setTimeout(() => {
-            document.querySelectorAll('.new-notification').forEach(item => {
-                item.classList.remove('new-notification');
+
+            console.log('Buscando dados do usuário no Firebase...', userId);
+            
+            // Busca em todos os usuários
+            const usersSnapshot = await firebase.database().ref('users').once('value');
+            let userFound = null;
+
+            usersSnapshot.forEach((child) => {
+                const user = child.val();
+                // Verifica se o ID do localStorage corresponde a algum usuário
+                if (user.id === userId || child.key === userId) {
+                    userFound = {
+                        uid: userId,
+                        bloco: user.bloco,
+                        apartamento: user.apartamento,
+                        nome: user.nome
+                    };
+                    console.log('Usuário encontrado:', userFound);
+                }
             });
-        }, 1000);
-    }
-    
-    // Função auxiliar para formatar data
-    function formatarDataNotificacao(timestamp) {
-        if (!timestamp) return 'Data não informada';
-        const date = new Date(timestamp);
-        return date.toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    }
-    
-    // Escuta eventos de atualização de outras páginas
-    window.addEventListener('encomendasAtualizadas', function(e) {
-        atualizarNotificacao(e.detail.quantidade, e.detail.encomendas);
-    });
-    
-    // Verifica atualizações no localStorage
-    function verificarAtualizacoesLocalStorage() {
-        setInterval(() => {
-            const ultimaAtualizacao = localStorage.getItem('ultimaAtualizacaoNotificacao');
-            if (ultimaAtualizacao && Date.now() - parseInt(ultimaAtualizacao) < 5000) {
-                carregarNotificacoesSalvas();
+
+            if (!userFound) {
+                console.log('Usuário não encontrado na base de dados');
+                
+                // Tenta buscar também na lista de admins
+                const adminsSnapshot = await firebase.database().ref('admins').once('value');
+                adminsSnapshot.forEach((child) => {
+                    const admin = child.val();
+                    if (child.key === userId) {
+                        userFound = {
+                            uid: userId,
+                            bloco: admin.bloco,
+                            apartamento: admin.apartamento,
+                            nome: admin.nome
+                        };
+                        console.log('Usuário encontrado como admin:', userFound);
+                    }
+                });
             }
-        }, 2000);
+
+            return userFound;
+        } catch (error) {
+            console.error('Erro ao buscar usuário no Firebase:', error);
+            return null;
+        }
     }
-    
-    // Inicialização quando o DOM estiver pronto
-    document.addEventListener('DOMContentLoaded', function() {
-        // Cria o elemento de notificação
-        criarElementoNotificacao();
+
+    // Monitora as encomendas do usuário
+    async function monitorUserEncomendas() {
+        console.log('Iniciando monitoramento de encomendas...');
         
-        // Inicia verificação de atualizações
-        verificarAtualizacoesLocalStorage();
-    });
-    
-    // Inicialização para páginas já carregadas
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(() => {
-            criarElementoNotificacao();
-            verificarAtualizacoesLocalStorage();
-        }, 1000);
+        // Busca dados do usuário
+        currentUserData = await findUserData();
+        
+        if (currentUserData && currentUserData.bloco && currentUserData.apartamento) {
+            console.log('Monitorando encomendas para:', currentUserData.bloco, currentUserData.apartamento);
+            
+            // Monitora encomendas em tempo real
+            firebase.database().ref('encomendas')
+                .orderByChild('status')
+                .equalTo('pendente')
+                .on('value', (snapshot) => {
+                    let count = 0;
+                    
+                    if (snapshot.exists()) {
+                        snapshot.forEach((child) => {
+                            const encomenda = child.val();
+                            
+                            // Verifica se a encomenda é para este usuário
+                            if (encomenda.bloco === currentUserData.bloco && 
+                                encomenda.apartamento === currentUserData.apartamento) {
+                                count += parseInt(encomenda.quantidade) || 1;
+                            }
+                        });
+                    }
+                    
+                    console.log('Total de encomendas encontradas:', count);
+                    updateNotificationCount(count);
+                }, (error) => {
+                    console.error('Erro ao monitorar encomendas:', error);
+                });
+        } else {
+            console.log('Usuário não identificado ou sem bloco/apartamento:', currentUserData);
+            
+            // Mostra o sino mesmo sem usuário, mas com badge vazio
+            updateNotificationCount(0);
+        }
+    }
+
+    // Inicialização
+    function init() {
+        console.log('Inicializando notificações de encomendas...');
+        createNotificationComponent();
+        
+        // Inicia o monitoramento
+        monitorUserEncomendas();
+    }
+
+    // Aguarda o carregamento da página e inicia
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
 })();
 </script>
