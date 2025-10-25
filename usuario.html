@@ -348,6 +348,64 @@ h4, h5 {
         <i class="material-icons left">wifi</i>
         <span id="connectionText">Conectado</span>
     </div>
+    <script>
+// Sistema de Notificações em Tempo Real - usuario.html
+(function() {
+    // Função para enviar notificações para outras páginas
+    function enviarNotificacaoParaOutrasPaginas(quantidade, encomendas) {
+        // Salva no localStorage para outras páginas acessarem
+        localStorage.setItem('encomendasPendentes', quantidade);
+        localStorage.setItem('ultimaAtualizacaoNotificacao', Date.now());
+        localStorage.setItem('encomendasData', JSON.stringify(encomendas));
+        
+        // Dispara um evento personalizado para páginas abertas
+        window.dispatchEvent(new CustomEvent('encomendasAtualizadas', {
+            detail: { 
+                quantidade: quantidade,
+                encomendas: encomendas
+            }
+        }));
+    }
+    
+    // Monitora mudanças nas encomendas para notificações
+    function monitorarEncomendasParaNotificacao() {
+        const user = firebase.auth().currentUser;
+        if (!user || !window.userData) return;
+        
+        const blocoApto = `Bloco ${window.userData.bloco}, Apt ${window.userData.apartamento}`;
+        
+        // Listener para contar encomendas pendentes
+        firebase.database().ref('encomendas')
+            .orderByChild('blocoApto')
+            .equalTo(blocoApto)
+            .on('value', snapshot => {
+                let contador = 0;
+                let encomendasPendentes = {};
+                
+                if (snapshot.exists()) {
+                    snapshot.forEach(item => {
+                        const encomenda = item.val();
+                        if (encomenda.status === 'pendente' || encomenda.status === 'aguardando_confirmacao') {
+                            contador++;
+                            encomendasPendentes[item.key] = encomenda;
+                        }
+                    });
+                }
+                
+                // Envia notificação para outras páginas
+                enviarNotificacaoParaOutrasPaginas(contador, encomendasPendentes);
+            });
+    }
+    
+    // Inicia o monitoramento quando o usuário estiver autenticado
+    const authCheck = setInterval(() => {
+        if (firebase.auth().currentUser && window.userData) {
+            clearInterval(authCheck);
+            monitorarEncomendasParaNotificacao();
+        }
+    }, 500);
+})();
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -880,6 +938,7 @@ function verificarSolicitacoesPendentes(snapshot) {
     </script>
 </body>
 </html>
+
 
 
 
