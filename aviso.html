@@ -332,1090 +332,201 @@
     </div>
     
 <script>
-// Script SIMPLES de Notificação de Encomendas
+// Script CORRIGIDO de Notificação de Encomendas
 (function() {
-    // Configuração do Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
-        authDomain: "rifas-c414b.firebaseapp.com",
-        databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
-        projectId: "rifas-c414b",
-        storageBucket: "rifas-c414b.firebasestorage.app",
-        messagingSenderId: "770195193538",
-        appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
-    };
-
-    // Inicializa o Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-
-    // Estilos do sino
-    const style = document.createElement('style');
-    style.textContent = `
-        .encomenda-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-            cursor: pointer;
-        }
-        .encomenda-bell {
-            width: 50px;
-            height: 50px;
-            background: #4A90E2;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            position: relative;
-        }
-        .encomenda-bell i {
-            color: white;
-            font-size: 24px;
-        }
-        .encomenda-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ff4444;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .encomenda-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-        }
-        .encomenda-modal-content {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            max-width: 300px;
-            width: 90%;
-            text-align: center;
-        }
-    `;
-    document.head.appendChild(style);
-
-    // Cria o sino
-    const bellHtml = `
-        <div class="encomenda-notification">
-            <div class="encomenda-bell">
-                <i class="material-icons">notifications</i>
-                <div class="encomenda-badge" id="encomendaBadge">0</div>
-            </div>
-        </div>
-        <div class="encomenda-modal" id="encomendaModal">
-            <div class="encomenda-modal-content">
-                <h3>Suas Encomendas</h3>
-                <div id="encomendaMessage"></div>
-                <button onclick="document.getElementById('encomendaModal').style.display='none'" 
-                        style="margin-top: 15px; padding: 8px 16px; background: #4A90E2; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Fechar
-                </button>
-            </div>
-        </div>
-    `;
+    console.log('Iniciando script de encomendas...');
     
-    document.body.insertAdjacentHTML('beforeend', bellHtml);
+    // Aguarda o Firebase ser carregado
+    const checkFirebase = setInterval(() => {
+        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+            clearInterval(checkFirebase);
+            initEncomendas();
+        }
+    }, 100);
 
-    // Função para buscar dados do usuário
-    function getUserData() {
-        return new Promise((resolve) => {
-            const userId = localStorage.getItem('uniqueUserId');
-            if (!userId) {
-                resolve(null);
-                return;
+    function initEncomendas() {
+        console.log('Firebase carregado, iniciando encomendas...');
+
+        // Estilos do sino
+        const style = document.createElement('style');
+        style.textContent = `
+            .encomenda-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                cursor: pointer;
             }
-
-            // Tenta encontrar o usuário no Firebase
-            firebase.database().ref('users').once('value')
-                .then(snapshot => {
-                    let userFound = null;
-                    snapshot.forEach(user => {
-                        const userData = user.val();
-                        // Verifica se é o usuário pelo ID ou outros campos
-                        if (user.key === userId || userData.id === userId) {
-                            userFound = userData;
-                        }
-                    });
-                    resolve(userFound);
-                })
-                .catch(() => resolve(null));
-        });
-    }
-
-    // Função para monitorar encomendas
-    function monitorEncomendas() {
-        getUserData().then(userData => {
-            if (!userData || !userData.bloco || !userData.apartamento) {
-                console.log('Usuário não encontrado ou sem bloco/apartamento');
-                return;
+            .encomenda-bell {
+                width: 50px;
+                height: 50px;
+                background: #4A90E2;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                position: relative;
+                transition: transform 0.3s ease;
             }
-
-            console.log('Monitorando encomendas para:', userData.bloco, userData.apartamento);
-            
-            const blocoApto = `Bloco ${userData.bloco}, Apt ${userData.apartamento}`;
-            
-            // Escuta por encomendas em tempo real
-            firebase.database().ref('encomendas')
-                .orderByChild('blocoApto')
-                .equalTo(blocoApto)
-                .on('value', snapshot => {
-                    let count = 0;
-                    if (snapshot.exists()) {
-                        snapshot.forEach(item => {
-                            const encomenda = item.val();
-                            if (encomenda.status === 'pendente' || encomenda.status === 'aguardando_confirmacao') {
-                                count++;
-                            }
-                        });
-                    }
-                    
-                    updateBadge(count);
-                });
-        });
-    }
-
-    // Função para atualizar o badge
-    function updateBadge(count) {
-        const badge = document.getElementById('encomendaBadge');
-        if (count > 0) {
-            badge.style.display = 'flex';
-            badge.textContent = count;
-        } else {
-            badge.style.display = 'none';
-        }
-    }
-
-    // Configura os cliques
-    document.querySelector('.encomenda-notification').addEventListener('click', function() {
-        const badge = document.getElementById('encomendaBadge');
-        const count = parseInt(badge.textContent) || 0;
-        const modal = document.getElementById('encomendaModal');
-        const message = document.getElementById('encomendaMessage');
-        
-        if (count > 0) {
-            message.innerHTML = `
-                <p>Você tem <strong>${count} encomenda(s)</strong> para retirar na portaria!</p>
-                <p style="font-size: 14px; color: #666; margin-top: 10px;">
-                    📦 Dirija-se à portaria para retirar suas encomendas
-                </p>
-            `;
-        } else {
-            message.innerHTML = `
-                <p>Nenhuma encomenda pendente no momento.</p>
-                <p style="font-size: 14px; color: #666; margin-top: 10px;">
-                    📭 Volte mais tarde
-                </p>
-            `;
-        }
-        
-        modal.style.display = 'flex';
-    });
-
-    // Fecha modal ao clicar fora
-    document.getElementById('encomendaModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.style.display = 'none';
-        }
-    });
-
-    // Inicia o monitoramento
-    setTimeout(monitorEncomendas, 1000);
-
-})();
-</script>
-
-<!-- Adicione também o Material Icons se não estiver incluído -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-<!-- E o Firebase se não estiver incluído -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const firebaseConfig = {
-                apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
-                authDomain: "rifas-c414b.firebaseapp.com",
-                databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
-                projectId: "rifas-c414b",
-                storageBucket: "rifas-c414b.firebasestorage.app",
-                messagingSenderId: "770195193538",
-                appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
-            };
-            
-            try {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-            } catch (error) {
-                console.error("Erro ao inicializar Firebase:", error);
-                showError("Erro de conexão. Por favor, recarregue a página.");
+            .encomenda-bell:hover {
+                transform: scale(1.1);
             }
-            
-            const db = firebase.database();
-            const avisosRef = db.ref('avisos');
-
-            const avisosGrid = document.getElementById('avisos-grid');
-            const modalOverlay = document.getElementById('avisoModalOverlay');
-            const modalConteudo = document.getElementById('modalConteudo');
-            const searchInput = document.getElementById('search-input');
-            const filterButtons = document.querySelectorAll('.filter-btn');
-
-            let allAvisos = [];
-
-            const showSkeletons = (count = 3) => {
-                avisosGrid.innerHTML = '';
-                for (let i = 0; i < count; i++) {
-                    const skeleton = document.createElement('div');
-                    skeleton.className = 'skeleton-card';
-                    skeleton.innerHTML = `
-                        <div class="skeleton-line title"></div>
-                        <div class="skeleton-line meta"></div>
-                        <div class="skeleton-line content"></div>
-                        <div class="skeleton-line content short"></div>
-                    `;
-                    avisosGrid.appendChild(skeleton);
-                }
-            };
-
-            const openModal = () => {
-                modalOverlay.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            };
-            
-            const closeModal = () => {
-                modalOverlay.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            };
-
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay || e.target.closest('.modal-close-btn')) {
-                    closeModal();
-                }
-            });
-
-            const applyFiltersAndRender = () => {
-                const currentSearch = searchInput.value.toLowerCase();
-                const currentFilter = document.querySelector('.filter-btn.active').dataset.filter;
-                
-                const filteredAvisos = allAvisos.filter(aviso => {
-                    const matchesFilter = currentFilter === 'todos' || (currentFilter === 'urgente' && aviso.urgente);
-                    const matchesSearch = !currentSearch || aviso.titulo.toLowerCase().includes(currentSearch) || aviso.mensagem.toLowerCase().includes(currentSearch);
-                    return matchesFilter && matchesSearch;
-                });
-                renderAvisos(filteredAvisos);
-            };
-
-            avisosRef.orderByChild('data').on('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    showNoAvisos();
-                    return;
-                }
-                allAvisos = [];
-                snapshot.forEach(child => {
-                    allAvisos.push({ id: child.key, ...child.val() });
-                });
-                allAvisos.sort((a, b) => b.data - a.data);
-                applyFiltersAndRender();
-            }, (error) => {
-                console.error("Erro ao carregar avisos:", error);
-                showError("Erro ao carregar avisos. Por favor, recarregue a página.");
-            });
-
-            searchInput.addEventListener('input', applyFiltersAndRender);
-            filterButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    filterButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    applyFiltersAndRender();
-                });
-            });
-
-            function renderAvisos(avisos) {
-                avisosGrid.innerHTML = '';
-                if (avisos.length === 0) {
-                    showNoResults();
-                    return;
-                }
-                
-                const fragment = document.createDocumentFragment();
-                avisos.forEach(aviso => {
-                    const card = createAvisoCard(aviso);
-                    card.addEventListener('click', () => openModalWithAviso(aviso));
-                    fragment.appendChild(card);
-                });
-                avisosGrid.appendChild(fragment);
+            .encomenda-bell i {
+                color: white;
+                font-size: 24px;
             }
-
-            function createAvisoCard(aviso) {
-                const card = document.createElement('div');
-                card.className = `aviso-card ${aviso.urgente ? 'urgente' : 'normal'}`;
-                const dataFormatada = new Date(aviso.data).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
-                
-                card.innerHTML = `
-                    <h2>${aviso.titulo}</h2>
-                    <div class="aviso-meta">
-                        <div class="aviso-meta-item">
-                            <i class="material-icons-outlined">event</i>
-                            <span>${dataFormatada}</span>
-                        </div>
-                        <div class="aviso-meta-item">
-                            <i class="material-icons-outlined">person_outline</i>
-                            <span>${aviso.autor || 'Administração'}</span>
-                        </div>
-                    </div>
-                    <div class="aviso-conteudo">${processMediaLinks(aviso.mensagem)}</div>
-                `;
-                return card;
+            .encomenda-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: #ff4444;
+                color: white;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                font-size: 12px;
+                font-weight: bold;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                animation: pulse 1.5s infinite;
             }
-
-            function openModalWithAviso(aviso) {
-                modalConteudo.innerHTML = processMediaLinks(aviso.mensagem);
-                openModal();
+            .encomenda-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 10001;
+                align-items: center;
+                justify-content: center;
             }
-
-            function processMediaLinks(text) {
-                if (!text) return '';
-                const urlRegex = /(https?:\/\/[^\s]+)/g;
-                
-                return text.split('\n').map(line => {
-                    if (!line.trim()) return ''; // Ignora linhas vazias
-                    
-                    let processedLine = line;
-                    const urls = line.match(urlRegex);
-
-                    if (urls) {
-                        urls.forEach(url => {
-                            let replacement = '';
-                            const youtubeMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-                            
-                            if (youtubeMatch) {
-                                replacement = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${youtubeMatch[1]}" frameborder="0" allowfullscreen></iframe></div>`;
-                            } else if (/\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(url)) {
-                                replacement = `<div class="image-container"><img src="${url}" alt="Imagem do aviso" loading="lazy"></div>`;
-                            } else {
-                                replacement = `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-                            }
-                            processedLine = processedLine.replace(url, replacement);
-                        });
-                    }
-                    
-                    return (processedLine.startsWith('<div')) ? processedLine : `<p>${processedLine}</p>`;
-                }).join('');
+            .encomenda-modal-content {
+                background: white;
+                border-radius: 10px;
+                padding: 20px;
+                max-width: 300px;
+                width: 90%;
+                text-align: center;
+                animation: modalAppear 0.3s ease;
             }
-
-            function showNoAvisos() { 
-                avisosGrid.innerHTML = `<div class="no-avisos"><i class="material-icons-outlined">notifications_off</i><h3>Nenhum aviso disponível</h3><p>Volte mais tarde para conferir as novidades.</p></div>`;
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
             }
-            function showNoResults() { 
-                avisosGrid.innerHTML = `<div class="no-results"><i class="material-icons-outlined">search_off</i><h3>Nenhum aviso encontrado</h3><p>Tente ajustar os filtros ou termos de busca.</p></div>`;
+            @keyframes modalAppear {
+                from { opacity: 0; transform: scale(0.8); }
+                to { opacity: 1; transform: scale(1); }
             }
-            function showError(message) { 
-                avisosGrid.innerHTML = `<div class="no-results"><i class="material-icons-outlined">error_outline</i><h3>Ocorreu um erro</h3><p>${message}</p></div>`;
-            }
+        `;
+        document.head.appendChild(style);
 
-            // Inicia com os skeletons
-            showSkeletons();
-        });
-    </script>
-</body>
-</html>            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: var(--fonte-principal);
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto-principal);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* --- LAYOUT PRINCIPAL --- */
-        .page-container {
-            max-width: 850px;
-            margin: 0 auto;
-            padding: 32px 20px;
-        }
-        .page-header {
-            margin-bottom: 32px;
-        }
-        .header-content h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .header-content p {
-            font-size: 1rem;
-            color: var(--cor-texto-secundario);
-            max-width: 600px;
-        }
-        
-        /* --- CONTROLES E FILTROS --- */
-        .controls-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 32px;
-            align-items: center;
-        }
-        .search-box {
-            position: relative;
-            flex: 1;
-            min-width: 250px;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 14px 18px 14px 48px;
-            border: 1px solid var(--cor-borda);
-            border-radius: var(--raio-borda);
-            font-family: var(--fonte-principal);
-            font-size: 1rem;
-            transition: var(--transition);
-            background-color: var(--cor-surface);
-        }
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--cor-primaria);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
-        }
-        .search-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--cor-texto-secundario);
-        }
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .filter-btn {
-            padding: 10px 20px;
-            background: var(--cor-surface);
-            border: 1px solid var(--cor-borda);
-            border-radius: var(--raio-borda);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .filter-btn:hover {
-            border-color: #ccc;
-            background: #f5f5f5;
-        }
-        .filter-btn.active {
-            background: var(--cor-primaria);
-            color: white;
-            border-color: var(--cor-primaria);
-        }
-        .filter-btn.active .material-icons-outlined {
-            color: white;
-        }
-        .filter-btn .material-icons-outlined {
-             font-size: 20px;
-             color: var(--cor-texto-secundario);
-        }
-
-        /* --- GRID DE AVISOS E CARDS --- */
-        .avisos-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        .aviso-card {
-            background-color: var(--cor-surface);
-            border-radius: var(--raio-borda);
-            box-shadow: var(--sombra-suave);
-            border: 1px solid var(--cor-borda);
-            padding: 24px;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            border-left: 5px solid;
-        }
-        .aviso-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--sombra-media);
-        }
-        .aviso-card.normal { border-color: var(--cor-aviso-normal); }
-        .aviso-card.urgente { border-color: var(--cor-aviso-urgente); }
-        .aviso-card h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-        .aviso-meta {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 0.9rem;
-            color: var(--cor-texto-secundario);
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .aviso-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .aviso-meta .material-icons-outlined { font-size: 18px; }
-        .aviso-conteudo {
-            font-size: 1rem;
-            color: #444;
-            max-height: 250px; /* Previne cards muito longos na lista */
-            overflow: hidden;
-            -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-        }
-
-        /* --- SKELETON LOADER --- */
-        .skeleton-card {
-            background-color: var(--cor-surface);
-            border-radius: var(--raio-borda);
-            border: 1px solid var(--cor-borda);
-            padding: 24px;
-        }
-        .skeleton-line {
-            height: 16px;
-            border-radius: 4px;
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: skeleton-shine 1.5s linear infinite;
-        }
-        .skeleton-line.title { height: 24px; width: 70%; margin-bottom: 16px; }
-        .skeleton-line.meta { height: 16px; width: 50%; margin-bottom: 20px; }
-        .skeleton-line.content { width: 100%; margin-bottom: 10px; }
-        .skeleton-line.content.short { width: 85%; }
-        
-        @keyframes skeleton-shine {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* --- MODAL DE AVISO --- */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 16px;
-            animation: fadeIn 0.3s ease-out;
-        }
-        .modal-container {
-            position: relative;
-            background: var(--cor-surface);
-            border-radius: var(--raio-borda);
-            max-width: 750px;
-            width: 100%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            animation: modal-appear 0.3s ease-out;
-            max-height: 90vh;
-            display: flex;
-        }
-        .modal-body {
-            padding: 32px;
-            width: 100%;
-            overflow-y: auto;
-            color: var(--cor-texto-principal);
-        }
-        .modal-close-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #e4e6eb;
-            color: var(--cor-texto-secundario);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            z-index: 10;
-        }
-        .modal-close-btn:hover { background: #d8dbdf; }
-
-        /* --- MÍDIA (IMAGENS E VÍDEOS) --- */
-        .image-container, .video-container {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            border-radius: var(--raio-borda);
-            overflow: hidden;
-            box-shadow: var(--sombra-suave);
-        }
-        .image-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .video-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* 16:9 */
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .aviso-conteudo p, .modal-body p {
-            margin-bottom: 1em;
-        }
-        
-        /* --- ESTADOS E ANIMAÇÕES --- */
-        .no-avisos, .no-results {
-            text-align: center;
-            padding: 64px 0;
-            color: var(--cor-texto-secundario);
-        }
-        .no-avisos .material-icons-outlined, .no-results .material-icons-outlined {
-            font-size: 56px;
-            margin-bottom: 16px;
-        }
-        @keyframes modal-appear { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
-</head>
-<body>
-
-    <main class="page-container">
-        <div class="page-header">
-            <div class="header-content">
-                <h1>Quadro de Avisos</h1>
-                <p>Fique por dentro das últimas informações e comunicados importantes do condomínio.</p>
+        // Cria o sino
+        const bellHtml = `
+            <div class="encomenda-notification">
+                <div class="encomenda-bell">
+                    <i class="material-icons">notifications</i>
+                    <div class="encomenda-badge" id="encomendaBadge">0</div>
+                </div>
             </div>
-        </div>
-        <div class="controls-container">
-            <div class="search-box">
-                <i class="material-icons-outlined search-icon">search</i>
-                <input type="text" id="search-input" placeholder="Buscar por título ou conteúdo...">
-            </div>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="todos"><i class="material-icons-outlined">all_inbox</i>Todos</button>
-                <button class="filter-btn" data-filter="urgente"><i class="material-icons-outlined">error_outline</i>Urgentes</button>
-            </div>
-        </div>
-        <div id="avisos-grid" class="avisos-grid">
-            </div>
-    </main>
-
-    <div id="avisoModalOverlay" class="modal-overlay">
-        <div class="modal-container">
-            <button class="modal-close-btn"><i class="material-icons-outlined">close</i></button>
-            <div class="modal-body" id="modalConteudo"></div>
-        </div>
-    </div>
-    
-<script>
-// Script de Notificação de Encomendas para Moradores - VERSÃO CORRIGIDA
-(function() {
-    // Configuração do Firebase (usa a mesma do seu sistema)
-    const firebaseConfig = {
-        apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
-        authDomain: "rifas-c414b.firebaseapp.com",
-        databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
-        projectId: "rifas-c414b",
-        storageBucket: "rifas-c414b.firebasestorage.app",
-        messagingSenderId: "770195193538",
-        appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
-    };
-
-    // Inicializa o Firebase apenas se não estiver inicializado
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-
-    // Variáveis globais
-    let encomendasCount = 0;
-    let userData = null;
-    let encomendasListener = null;
-
-    // Estilos CSS para o componente
-    const styles = `
-        .notification-bell {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-            cursor: pointer;
-        }
-        
-        .bell-container {
-            position: relative;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            animation: pulse 2s infinite;
-        }
-        
-        .bell-container:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(0,0,0,0.4);
-        }
-        
-        .bell-icon {
-            color: white;
-            font-size: 28px;
-        }
-        
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ff4444;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            border: 2px solid white;
-            animation: bounce 1s infinite alternate;
-        }
-        
-        .notification-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .notification-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            text-align: center;
-            position: relative;
-            animation: slideIn 0.3s ease;
-        }
-        
-        .notification-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-        
-        .notification-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin: 0;
-        }
-        
-        .notification-message {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-        
-        .encomendas-count {
-            font-size: 48px;
-            font-weight: bold;
-            color: #667eea;
-            margin: 20px 0;
-        }
-        
-        .close-button {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        
-        .close-button:hover {
-            background: #764ba2;
-        }
-        
-        .no-encomendas {
-            font-size: 18px;
-            color: #999;
-            margin: 30px 0;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes bounce {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-5px); }
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-    `;
-
-    // Função para criar o componente
-    function createNotificationComponent() {
-        // Adiciona os estilos
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = styles;
-        document.head.appendChild(styleSheet);
-
-        // Cria o sino de notificação
-        const bellContainer = document.createElement('div');
-        bellContainer.className = 'notification-bell';
-        bellContainer.innerHTML = `
-            <div class="bell-container">
-                <i class="material-icons bell-icon">notifications</i>
-                <div class="notification-badge" id="notificationBadge" style="display: none;">0</div>
+            <div class="encomenda-modal" id="encomendaModal">
+                <div class="encomenda-modal-content">
+                    <h3 style="margin-bottom: 15px; color: #333;">📦 Suas Encomendas</h3>
+                    <div id="encomendaMessage"></div>
+                    <button onclick="document.getElementById('encomendaModal').style.display='none'" 
+                            style="margin-top: 15px; padding: 8px 16px; background: #4A90E2; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: inherit;">
+                        Fechar
+                    </button>
+                </div>
             </div>
         `;
-
-        // Cria o modal de notificação
-        const modalContainer = document.createElement('div');
-        modalContainer.className = 'notification-modal';
-        modalContainer.id = 'notificationModal';
-        modalContainer.innerHTML = `
-            <div class="notification-content">
-                <div class="notification-header">
-                    <i class="material-icons" style="color: #667eea; font-size: 32px;">local_shipping</i>
-                    <h2 class="notification-title">Suas Encomendas</h2>
-                </div>
-                <div id="notificationBody">
-                    <!-- Conteúdo dinâmico será inserido aqui -->
-                </div>
-                <button class="close-button">Entendi</button>
-            </div>
-        `;
-
-        // Adiciona ao body
-        document.body.appendChild(bellContainer);
-        document.body.appendChild(modalContainer);
-
-        // Configura os event listeners
-        setupEventListeners();
-    }
-
-    // Configura os event listeners
-    function setupEventListeners() {
-        const bell = document.querySelector('.notification-bell');
-        const modal = document.getElementById('notificationModal');
-        const closeBtn = modal.querySelector('.close-button');
-
-        bell.addEventListener('click', openNotificationModal);
-        closeBtn.addEventListener('click', closeNotificationModal);
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeNotificationModal();
-            }
-        });
-    }
-
-    // Abre o modal de notificação
-    function openNotificationModal() {
-        const modal = document.getElementById('notificationModal');
-        const notificationBody = document.getElementById('notificationBody');
         
-        if (encomendasCount > 0) {
-            notificationBody.innerHTML = `
-                <p class="notification-message">
-                    Você tem encomendas disponíveis para retirada na portaria!
-                </p>
-                <div class="encomendas-count">${encomendasCount}</div>
-                <p style="color: #666; font-size: 14px;">
-                    ${encomendasCount === 1 ? '1 encomenda aguardando' : encomendasCount + ' encomendas aguardando'}
-                </p>
-                <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px;">
-                    <i class="material-icons" style="color: #1976d2; vertical-align: middle;">info</i>
-                    <span style="color: #1976d2; font-size: 14px;">
-                        Dirija-se à portaria para retirar suas encomendas
-                    </span>
-                </div>
-            `;
-        } else {
-            notificationBody.innerHTML = `
-                <p class="no-encomendas">
-                    <i class="material-icons" style="font-size: 48px; color: #ccc; margin-bottom: 20px;">
-                        inventory_2
-                    </i><br>
-                    Nenhuma encomenda disponível no momento
-                </p>
-            `;
-        }
-        
-        modal.style.display = 'flex';
-    }
+        document.body.insertAdjacentHTML('beforeend', bellHtml);
 
-    // Fecha o modal de notificação
-    function closeNotificationModal() {
-        const modal = document.getElementById('notificationModal');
-        modal.style.display = 'none';
-    }
-
-    // Atualiza o contador de encomendas
-    function updateNotificationCount(count) {
-        encomendasCount = count;
-        const badge = document.getElementById('notificationBadge');
+        // TESTE: Vamos monitorar TODAS as encomendas primeiro para ver se funciona
+        console.log('Iniciando monitoramento de encomendas...');
         
-        if (count > 0) {
-            badge.style.display = 'flex';
-            badge.textContent = count > 99 ? '99+' : count;
-            
-            // Adiciona animação para novas encomendas
-            badge.style.animation = 'bounce 0.5s ease 3';
-            setTimeout(() => {
-                badge.style.animation = 'bounce 1s infinite alternate';
-            }, 1500);
-        } else {
-            badge.style.display = 'none';
-        }
-    }
-
-    // Monitora as encomendas do usuário logado
-    function monitorUserEncomendas() {
-        console.log('Iniciando monitoramento de encomendas para:', userData);
-        
-        if (!userData || !userData.bloco || !userData.apartamento) {
-            console.log('Dados do usuário incompletos:', userData);
-            updateNotificationCount(0);
-            return;
-        }
-
-        const blocoApto = `Bloco ${userData.bloco}, Apt ${userData.apartamento}`;
-        console.log('Buscando encomendas para:', blocoApto);
-        
-        // Remove listener anterior se existir
-        if (encomendasListener) {
-            firebase.database().ref('encomendas').off('value', encomendasListener);
-        }
-        
-        // Monitora encomendas em tempo real
-        encomendasListener = firebase.database().ref('encomendas')
-            .orderByChild('blocoApto')
-            .equalTo(blocoApto)
-            .on('value', (snapshot) => {
-                let count = 0;
+        // Monitora TODAS as encomendas pendentes (para teste)
+        firebase.database().ref('encomendas')
+            .orderByChild('status')
+            .equalTo('pendente')
+            .on('value', snapshot => {
+                let totalEncomendas = 0;
                 
                 if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        const encomenda = child.val();
-                        
-                        // Conta apenas encomendas pendentes
-                        if (encomenda.status === 'pendente' || encomenda.status === 'aguardando_confirmacao') {
-                            count += parseInt(encomenda.quantidade) || 1;
-                        }
+                    snapshot.forEach(item => {
+                        const encomenda = item.val();
+                        console.log('Encomenda encontrada:', encomenda);
+                        totalEncomendas++;
                     });
                 }
                 
-                console.log('Total de encomendas encontradas:', count);
-                updateNotificationCount(count);
-            }, (error) => {
-                console.error('Erro ao monitorar encomendas:', error);
+                console.log('Total de encomendas pendentes:', totalEncomendas);
+                updateBadge(totalEncomendas);
             });
-    }
 
-    // Inicialização quando o usuário estiver autenticado
-    function init() {
-        console.log('Inicializando notificações de encomendas...');
-        createNotificationComponent();
-        
-        // Monitora autenticação do usuário
-        firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
-                console.log('Usuário autenticado:', user.uid);
-                
-                try {
-                    // Busca dados do usuário no Firebase
-                    const userSnapshot = await firebase.database().ref(`users/${user.uid}`).once('value');
-                    if (userSnapshot.exists()) {
-                        userData = userSnapshot.val();
-                        console.log('Dados do usuário carregados:', userData);
-                        
-                        // Verifica se é morador e tem bloco/apartamento
-                        if (userData.tipo === 'morador' && userData.bloco && userData.apartamento) {
-                            monitorUserEncomendas();
-                        } else {
-                            console.log('Usuário não é morador ou não tem bloco/apartamento definido');
-                            updateNotificationCount(0);
-                        }
-                    } else {
-                        console.log('Dados do usuário não encontrados no Firebase');
-                        updateNotificationCount(0);
-                    }
-                } catch (error) {
-                    console.error('Erro ao carregar dados do usuário:', error);
-                    updateNotificationCount(0);
-                }
+        // Função para atualizar o badge
+        function updateBadge(count) {
+            const badge = document.getElementById('encomendaBadge');
+            if (count > 0) {
+                badge.style.display = 'flex';
+                badge.textContent = count > 99 ? '99+' : count;
+                console.log('Badge atualizado para:', count);
             } else {
-                console.log('Usuário não autenticado - notificações desativadas');
-                updateNotificationCount(0);
+                badge.style.display = 'none';
+                console.log('Nenhuma encomenda, badge oculto');
             }
-        });
-    }
+        }
 
-    // Aguarda o carregamento da página e inicia
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
+        // Configura os cliques
+        setTimeout(() => {
+            const bellElement = document.querySelector('.encomenda-notification');
+            if (bellElement) {
+                bellElement.addEventListener('click', function() {
+                    const badge = document.getElementById('encomendaBadge');
+                    const count = parseInt(badge.textContent) || 0;
+                    const modal = document.getElementById('encomendaModal');
+                    const message = document.getElementById('encomendaMessage');
+                    
+                    if (count > 0) {
+                        message.innerHTML = `
+                            <p style="margin-bottom: 10px;">Você tem <strong style="color: #4A90E2;">${count} encomenda(s)</strong> pendentes!</p>
+                            <p style="font-size: 14px; color: #666;">
+                                📦 Dirija-se à portaria para retirar
+                            </p>
+                        `;
+                    } else {
+                        message.innerHTML = `
+                            <p style="margin-bottom: 10px;">Nenhuma encomenda pendente</p>
+                            <p style="font-size: 14px; color: #666;">
+                                📭 Volte mais tarde
+                            </p>
+                        `;
+                    }
+                    
+                    modal.style.display = 'flex';
+                });
+
+                // Fecha modal ao clicar fora
+                document.getElementById('encomendaModal').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+
+                console.log('Sino configurado com sucesso!');
+            }
+        }, 500);
     }
 })();
 </script>
+
+<!-- Adicione também o Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <!-- Adicione também o Material Icons se não estiver incluído -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
