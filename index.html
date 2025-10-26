@@ -303,9 +303,9 @@
 </div>
 
 <script>
-// Script de Notificação de Encomendas para Moradores - BUSCA AUTOMÁTICA DO FIREBASE
+// Script de Notificação de Encomendas para Moradores - VERSÃO CORRIGIDA
 (function() {
-    // Configuração do Firebase
+    // Configuração do Firebase (usa a mesma do seu sistema)
     const firebaseConfig = {
         apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
         authDomain: "rifas-c414b.firebaseapp.com",
@@ -316,14 +316,15 @@
         appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
     };
 
-    // Inicializa o Firebase
+    // Inicializa o Firebase apenas se não estiver inicializado
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
 
     // Variáveis globais
     let encomendasCount = 0;
-    let currentUserData = null;
+    let userData = null;
+    let encomendasListener = null;
 
     // Estilos CSS para o componente
     const styles = `
@@ -586,111 +587,86 @@
         }
     }
 
-    // Busca todos os usuários e encontra o que corresponde ao ID do localStorage
-    async function findUserData() {
-        try {
-            const userId = localStorage.getItem('uniqueUserId');
-            
-            if (!userId) {
-                console.log('Nenhum usuário encontrado no localStorage');
-                return null;
-            }
-
-            console.log('Buscando dados do usuário no Firebase...', userId);
-            
-            // Busca em todos os usuários
-            const usersSnapshot = await firebase.database().ref('users').once('value');
-            let userFound = null;
-
-            usersSnapshot.forEach((child) => {
-                const user = child.val();
-                // Verifica se o ID do localStorage corresponde a algum usuário
-                if (user.id === userId || child.key === userId) {
-                    userFound = {
-                        uid: userId,
-                        bloco: user.bloco,
-                        apartamento: user.apartamento,
-                        nome: user.nome
-                    };
-                    console.log('Usuário encontrado:', userFound);
-                }
-            });
-
-            if (!userFound) {
-                console.log('Usuário não encontrado na base de dados');
-                
-                // Tenta buscar também na lista de admins
-                const adminsSnapshot = await firebase.database().ref('admins').once('value');
-                adminsSnapshot.forEach((child) => {
-                    const admin = child.val();
-                    if (child.key === userId) {
-                        userFound = {
-                            uid: userId,
-                            bloco: admin.bloco,
-                            apartamento: admin.apartamento,
-                            nome: admin.nome
-                        };
-                        console.log('Usuário encontrado como admin:', userFound);
-                    }
-                });
-            }
-
-            return userFound;
-        } catch (error) {
-            console.error('Erro ao buscar usuário no Firebase:', error);
-            return null;
-        }
-    }
-
-    // Monitora as encomendas do usuário
-    async function monitorUserEncomendas() {
-        console.log('Iniciando monitoramento de encomendas...');
+    // Monitora as encomendas do usuário logado
+    function monitorUserEncomendas() {
+        console.log('Iniciando monitoramento de encomendas para:', userData);
         
-        // Busca dados do usuário
-        currentUserData = await findUserData();
-        
-        if (currentUserData && currentUserData.bloco && currentUserData.apartamento) {
-            console.log('Monitorando encomendas para:', currentUserData.bloco, currentUserData.apartamento);
-            
-            // Monitora encomendas em tempo real
-            firebase.database().ref('encomendas')
-                .orderByChild('status')
-                .equalTo('pendente')
-                .on('value', (snapshot) => {
-                    let count = 0;
-                    
-                    if (snapshot.exists()) {
-                        snapshot.forEach((child) => {
-                            const encomenda = child.val();
-                            
-                            // Verifica se a encomenda é para este usuário
-                            if (encomenda.bloco === currentUserData.bloco && 
-                                encomenda.apartamento === currentUserData.apartamento) {
-                                count += parseInt(encomenda.quantidade) || 1;
-                            }
-                        });
-                    }
-                    
-                    console.log('Total de encomendas encontradas:', count);
-                    updateNotificationCount(count);
-                }, (error) => {
-                    console.error('Erro ao monitorar encomendas:', error);
-                });
-        } else {
-            console.log('Usuário não identificado ou sem bloco/apartamento:', currentUserData);
-            
-            // Mostra o sino mesmo sem usuário, mas com badge vazio
+        if (!userData || !userData.bloco || !userData.apartamento) {
+            console.log('Dados do usuário incompletos:', userData);
             updateNotificationCount(0);
+            return;
         }
+
+        const blocoApto = `Bloco ${userData.bloco}, Apt ${userData.apartamento}`;
+        console.log('Buscando encomendas para:', blocoApto);
+        
+        // Remove listener anterior se existir
+        if (encomendasListener) {
+            firebase.database().ref('encomendas').off('value', encomendasListener);
+        }
+        
+        // Monitora encomendas em tempo real
+        encomendasListener = firebase.database().ref('encomendas')
+            .orderByChild('blocoApto')
+            .equalTo(blocoApto)
+            .on('value', (snapshot) => {
+                let count = 0;
+                
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const encomenda = child.val();
+                        
+                        // Conta apenas encomendas pendentes
+                        if (encomenda.status === 'pendente' || encomenda.status === 'aguardando_confirmacao') {
+                            count += parseInt(encomenda.quantidade) || 1;
+                        }
+                    });
+                }
+                
+                console.log('Total de encomendas encontradas:', count);
+                updateNotificationCount(count);
+            }, (error) => {
+                console.error('Erro ao monitorar encomendas:', error);
+            });
     }
 
-    // Inicialização
+    // Inicialização quando o usuário estiver autenticado
     function init() {
         console.log('Inicializando notificações de encomendas...');
         createNotificationComponent();
         
-        // Inicia o monitoramento
-        monitorUserEncomendas();
+        // Monitora autenticação do usuário
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                console.log('Usuário autenticado:', user.uid);
+                
+                try {
+                    // Busca dados do usuário no Firebase
+                    const userSnapshot = await firebase.database().ref(`users/${user.uid}`).once('value');
+                    if (userSnapshot.exists()) {
+                        userData = userSnapshot.val();
+                        console.log('Dados do usuário carregados:', userData);
+                        
+                        // Verifica se é morador e tem bloco/apartamento
+                        if (userData.tipo === 'morador' && userData.bloco && userData.apartamento) {
+                            monitorUserEncomendas();
+                        } else {
+                            console.log('Usuário não é morador ou não tem bloco/apartamento definido');
+                            updateNotificationCount(0);
+                        }
+                    } else {
+                        console.log('Dados do usuário não encontrados no Firebase');
+                        updateNotificationCount(0);
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar dados do usuário:', error);
+                    updateNotificationCount(0);
+                }
+            } else {
+                console.log('Usuário não autenticado - notificações desativadas');
+                updateNotificationCount(0);
+            }
+        });
     }
 
     // Aguarda o carregamento da página e inicia
