@@ -330,10 +330,11 @@
             <div class="modal-body" id="modalConteudo"></div>
         </div>
     </div>
+    
 <script>
-// Script de Notificação de Encomendas para Moradores
+// Script de Notificação de Encomendas para Moradores - VERSÃO CORRIGIDA
 (function() {
-    // Configuração do Firebase
+    // Configuração do Firebase (usa a mesma do seu sistema)
     const firebaseConfig = {
         apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
         authDomain: "rifas-c414b.firebaseapp.com",
@@ -344,14 +345,15 @@
         appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
     };
 
-    // Inicializa o Firebase
+    // Inicializa o Firebase apenas se não estiver inicializado
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
 
     // Variáveis globais
     let encomendasCount = 0;
-    let currentUser = null;
+    let userData = null;
+    let encomendasListener = null;
 
     // Estilos CSS para o componente
     const styles = `
@@ -495,27 +497,6 @@
             from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
-        .encomenda-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            text-align: left;
-            border-left: 4px solid #667eea;
-        }
-        
-        .encomenda-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .encomenda-details {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
     `;
 
     // Função para criar o componente
@@ -626,12 +607,10 @@
             badge.textContent = count > 99 ? '99+' : count;
             
             // Adiciona animação para novas encomendas
-            if (count > 0) {
-                badge.style.animation = 'bounce 0.5s ease 3';
-                setTimeout(() => {
-                    badge.style.animation = 'bounce 1s infinite alternate';
-                }, 1500);
-            }
+            badge.style.animation = 'bounce 0.5s ease 3';
+            setTimeout(() => {
+                badge.style.animation = 'bounce 1s infinite alternate';
+            }, 1500);
         } else {
             badge.style.display = 'none';
         }
@@ -639,48 +618,84 @@
 
     // Monitora as encomendas do usuário logado
     function monitorUserEncomendas() {
-        firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
+        console.log('Iniciando monitoramento de encomendas para:', userData);
+        
+        if (!userData || !userData.bloco || !userData.apartamento) {
+            console.log('Dados do usuário incompletos:', userData);
+            updateNotificationCount(0);
+            return;
+        }
+
+        const blocoApto = `Bloco ${userData.bloco}, Apt ${userData.apartamento}`;
+        console.log('Buscando encomendas para:', blocoApto);
+        
+        // Remove listener anterior se existir
+        if (encomendasListener) {
+            firebase.database().ref('encomendas').off('value', encomendasListener);
+        }
+        
+        // Monitora encomendas em tempo real
+        encomendasListener = firebase.database().ref('encomendas')
+            .orderByChild('blocoApto')
+            .equalTo(blocoApto)
+            .on('value', (snapshot) => {
+                let count = 0;
                 
-                try {
-                    // Busca o bloco e apartamento do usuário
-                    const userSnapshot = await firebase.database().ref(`users/${user.uid}`).once('value');
-                    if (userSnapshot.exists()) {
-                        const userData = userSnapshot.val();
-                        const userBloco = userData.bloco;
-                        const userApto = userData.apartamento;
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const encomenda = child.val();
                         
-                        if (userBloco && userApto) {
-                            // Monitora encomendas em tempo real
-                            firebase.database().ref('encomendas')
-                                .orderByChild('status')
-                                .equalTo('pendente')
-                                .on('value', (snapshot) => {
-                                    let count = 0;
-                                    
-                                    snapshot.forEach((child) => {
-                                        const encomenda = child.val();
-                                        if (encomenda.bloco === userBloco && encomenda.apartamento === userApto) {
-                                            count += parseInt(encomenda.quantidade) || 1;
-                                        }
-                                    });
-                                    
-                                    updateNotificationCount(count);
-                                });
+                        // Conta apenas encomendas pendentes
+                        if (encomenda.status === 'pendente' || encomenda.status === 'aguardando_confirmacao') {
+                            count += parseInt(encomenda.quantidade) || 1;
                         }
-                    }
-                } catch (error) {
-                    console.error('Erro ao buscar dados do usuário:', error);
+                    });
                 }
-            }
-        });
+                
+                console.log('Total de encomendas encontradas:', count);
+                updateNotificationCount(count);
+            }, (error) => {
+                console.error('Erro ao monitorar encomendas:', error);
+            });
     }
 
-    // Inicialização
+    // Inicialização quando o usuário estiver autenticado
     function init() {
+        console.log('Inicializando notificações de encomendas...');
         createNotificationComponent();
-        monitorUserEncomendas();
+        
+        // Monitora autenticação do usuário
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                console.log('Usuário autenticado:', user.uid);
+                
+                try {
+                    // Busca dados do usuário no Firebase
+                    const userSnapshot = await firebase.database().ref(`users/${user.uid}`).once('value');
+                    if (userSnapshot.exists()) {
+                        userData = userSnapshot.val();
+                        console.log('Dados do usuário carregados:', userData);
+                        
+                        // Verifica se é morador e tem bloco/apartamento
+                        if (userData.tipo === 'morador' && userData.bloco && userData.apartamento) {
+                            monitorUserEncomendas();
+                        } else {
+                            console.log('Usuário não é morador ou não tem bloco/apartamento definido');
+                            updateNotificationCount(0);
+                        }
+                    } else {
+                        console.log('Dados do usuário não encontrados no Firebase');
+                        updateNotificationCount(0);
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar dados do usuário:', error);
+                    updateNotificationCount(0);
+                }
+            } else {
+                console.log('Usuário não autenticado - notificações desativadas');
+                updateNotificationCount(0);
+            }
+        });
     }
 
     // Aguarda o carregamento da página e inicia
