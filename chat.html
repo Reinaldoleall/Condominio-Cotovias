@@ -1,3915 +1,649 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interfone Virtual</title>
-    
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <title>Painel de Administração - Lojas Fixas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- CSS -->
+    <style>
+        :root {
+            --md-sys-color-primary: #6750A4;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-on-primary-container: #21005D;
+            --md-sys-color-secondary: #625B71;
+            --md-sys-color-background: #F8F9FA;
+            --md-sys-color-surface: #FFFFFF;
+            --md-sys-color-on-surface: #1C1B1F;
+            --md-sys-color-on-surface-variant: #49454F;
+            --md-sys-color-outline: #CAC4D0;
+            --md-sys-color-error: #B3261E;
+            --md-sys-color-on-error: #FFFFFF;
+            --md-sys-color-success: #0D652D;
+            --md-sys-font-family: 'Inter', sans-serif;
+            --md-sys-border-radius: 16px;
+            --md-sys-elevation-1: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --md-sys-elevation-2: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--md-sys-font-family);
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-surface);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- HEADER --- */
+        .page-header {
+            background-color: var(--md-sys-color-surface);
+            padding: 16px;
+            border-bottom: 1px solid #E0E0E0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border: none;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav-button:hover {
+            background-color: #5a4a93;
+            box-shadow: 0 2px 8px rgba(103, 80, 164, 0.3);
+        }
+
+        .nav-button.secondary {
+            background-color: transparent;
+            color: var(--md-sys-color-primary);
+            border: 1px solid var(--md-sys-color-primary);
+        }
+
+        .nav-button.secondary:hover {
+            background-color: rgba(103, 80, 164, 0.05);
+        }
+
+        /* --- CONTEÚDO PRINCIPAL --- */
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 16px;
+        }
+
+        /* --- FORMULÁRIO DE CADASTRO --- */
+        .form-section {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--md-sys-border-radius);
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: var(--md-sys-elevation-1);
+        }
+
+        .form-section h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .form-input,
+        .form-textarea {
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 8px;
+            background-color: var(--md-sys-color-background);
+            transition: all 0.2s ease;
+            font-family: var(--md-sys-font-family);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 3px var(--md-sys-color-primary-container);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .form-button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .form-button.primary {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+        }
+
+        .form-button.primary:hover {
+            background-color: #5a4a93;
+        }
+
+        .form-button.secondary {
+            background-color: transparent;
+            color: var(--md-sys-color-primary);
+            border: 1px solid var(--md-sys-color-primary);
+        }
+
+        .form-button.secondary:hover {
+            background-color: rgba(103, 80, 164, 0.05);
+        }
+
+        /* --- LISTA DE LOJAS --- */
+        .stores-section {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--md-sys-border-radius);
+            padding: 24px;
+            box-shadow: var(--md-sys-elevation-1);
+        }
+
+        .stores-section h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .stores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .store-card {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--md-sys-border-radius);
+            box-shadow: var(--md-sys-elevation-1);
+            overflow: hidden;
+            border: 1px solid #E0E0E0;
+            transition: all 0.2s ease;
+        }
+
+        .store-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--md-sys-elevation-2);
+        }
+
+        .card-banner {
+            height: 0;
+            padding-top: 56.25%;
+            /* Proporção 16:9 */
+            background-size: cover;
+            background-position: center;
+            background-color: #f0f0f0;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .store-card__title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .store-card__description {
+            font-size: 0.95rem;
+            color: var(--md-sys-color-on-surface-variant);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .store-card__url {
+            font-size: 0.85rem;
+            color: var(--md-sys-color-secondary);
+            margin-bottom: 16px;
+            word-break: break-all;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .card-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: none;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .card-button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .card-button.edit:hover {
+            border-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-primary);
+        }
+
+        .card-button.delete:hover {
+            border-color: var(--md-sys-color-error);
+            color: var(--md-sys-color-error);
+        }
+
+        /* --- MENSAGENS --- */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message.success {
+            background-color: rgba(13, 101, 45, 0.1);
+            color: var(--md-sys-color-success);
+            border: 1px solid rgba(13, 101, 45, 0.2);
+        }
+
+        .message.error {
+            background-color: rgba(179, 38, 30, 0.1);
+            color: var(--md-sys-color-error);
+            border: 1px solid rgba(179, 38, 30, 0.2);
+        }
+
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 24px 16px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .nav-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stores-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
-<style>
-  /* Variáveis CSS e estilos principais */
-  :root {
-    --md-sys-color-primary: #6750A4;
-    --md-sys-color-on-primary: #FFFFFF;
-    --md-sys-color-primary-container: #EADDFF;
-    --md-sys-color-on-primary-container: #21005D;
-    --md-sys-color-secondary: #625B71;
-    --md-sys-color-on-secondary: #FFFFFF;
-    --md-sys-color-secondary-container: #E8DEF8;
-    --md-sys-color-on-secondary-container: #1D192B;
-    --md-sys-color-surface: #FFFBFE;
-    --md-sys-color-on-surface: #1C1B1F;
-    --md-sys-color-surface-variant: #E7E0EC;
-    --md-sys-color-on-surface-variant: #49454F;
-    --md-sys-color-error: #BA1A1A;
-    --md-sys-color-on-error: #FFFFFF;
-    --md-sys-color-error-container: #FFDAD6;
-    --md-sys-color-on-error-container: #410002;
-    --md-sys-color-outline: #79747E;
-    --md-sys-color-shadow: #000000;
-
-    --md-ref-typeface-plain: Roboto, sans-serif;
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: var(--md-ref-typeface-plain);
-  }
-
-  body {
-    background-color: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-surface);
-    /* Garante que o chat ocupe toda a altura */
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Botão Flutuante do Chat (ESCONDIDO) */
-  .chat-toggle {
-    display: none; /* Alteração 1: Esconde o botão */
-  }
-
-  .unread-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: #f44336;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-
-  .unread-badge.pulse {
-    animation: pulse 0.5s ease-in-out;
-  }
-
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-  }
-
-  /* Container do Chat (VISÍVEL E EM TELA CHEIA) */
-  .chat-container {
-    width: 100%; /* Alteração 2: Ocupa toda a largura */
-    height: 100vh; /* Alteração 3: Ocupa toda a altura */
-    background-color: var(--md-sys-color-surface);
-    display: flex; /* Alteração 4: Deixa o chat visível por padrão */
-    flex-direction: column;
-    overflow: hidden;
-    /* As propriedades de posicionamento, sombra e borda foram removidas */
-  }
-  
-  /* A classe .active não é mais necessária para exibir o chat, então pode ser removida */
-  .chat-container.active {
-    /* display: flex; */ /* (Esta linha agora está na classe principal .chat-container) */
-  }
-
-
-  /* Cabeçalho do Chat */
-  .chat-header {
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .chat-title {
-    font-size: 18px;
-    font-weight: 500;
-  }
-  
-  /* Esconde os botões de minimizar e fechar */
-  .chat-actions {
-    display: none; /* Alteração 5: Esconde os botões de controle da janela */
-    gap: 8px;
-  }
-
-  .chat-action-btn {
-    background: none;
-    border: none;
-    color: var(--md-sys-color-on-primary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    transition: background-color 0.2s;
-  }
-
-  .chat-action-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  /* Abas do Chat */
-  .chat-tabs {
-    display: flex;
-    background-color: var(--md-sys-color-surface-variant);
-    border-bottom: 1px solid var(--md-sys-color-outline);
-  }
-
-  .chat-tab {
-    flex: 1;
-    padding: 12px 16px;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-weight: 500;
-  }
-
-  .chat-tab.active {
-    background-color: var(--md-sys-color-surface);
-    border-bottom: 2px solid var(--md-sys-color-primary);
-  }
-
-  /* Conteúdo das Abas */
-  .chat-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .chat-tab-content {
-    flex: 1;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .chat-tab-content.active {
-    display: flex;
-  }
-
-  /* Lista de Usuários */
-  .users-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-  }
-
-  .user-item {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-
-  .user-item:hover {
-    background-color: var(--md-sys-color-surface-variant);
-  }
-
-  .user-item.active {
-    background-color: var(--md-sys-color-primary-container);
-  }
-
-  .user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--md-sys-color-secondary-container);
-    color: var(--md-sys-color-on-secondary-container);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 12px;
-    font-weight: 500;
-  }
-
-  .user-info {
-    flex: 1;
-  }
-
-  .user-name {
-    font-weight: 500;
-    margin-bottom: 2px;
-  }
-
-  .user-details {
-    font-size: 12px;
-    color: var(--md-sys-color-on-surface-variant);
-  }
-
-  .user-status {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #4CAF50;
-  }
-
-  .user-status.offline {
-    background-color: #9E9E9E;
-  }
-
-  .user-actions {
-    display: flex;
-    gap: 4px;
-    margin-left: 8px;
-  }
-
-  /* Área de Conversa */
-  .conversation-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--md-sys-color-outline);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .conversation-user {
-    display: flex;
-    align-items: center;
-  }
-
-  .conversation-back {
-    background: none;
-    border: none;
-    color: var(--md-sys-color-primary);
-    cursor: pointer;
-    margin-right: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .conversation-actions {
-    display: flex;
-    gap: 4px;
-    margin-left: 8px;
-  }
-
-  .messages-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .message {
-    max-width: 80%;
-    padding: 12px;
-    border-radius: 12px;
-    position: relative;
-  }
-
-  .message.sent {
-    align-self: flex-end;
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-    border-bottom-right-radius: 4px;
-  }
-
-  .message.received {
-    align-self: flex-start;
-    background-color: var(--md-sys-color-surface-variant);
-    color: var(--md-sys-color-on-surface-variant);
-    border-bottom-left-radius: 4px;
-  }
-
-  .message-time {
-    font-size: 10px;
-    margin-top: 4px;
-    text-align: right;
-    opacity: 0.7;
-  }
-
-  .message-input-container {
-    display: flex;
-    padding: 16px;
-    border-top: 1px solid var(--md-sys-color-outline);
-    gap: 8px;
-  }
-
-  .message-input {
-    flex: 1;
-    padding: 12px 16px;
-    border: 1px solid var(--md-sys-color-outline);
-    border-radius: 24px;
-    outline: none;
-    font-size: 14px;
-  }
-
-  .message-input:focus {
-    border-color: var(--md-sys-color-primary);
-  }
-
-  .send-button {
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-
-  .send-button:hover {
-    background-color: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
-  }
-
-  /* Lista de conversas */
-  .conversations-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-  }
-
-  .conversation-item {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    border-bottom: 1px solid var(--md-sys-color-surface-variant);
-  }
-
-  .conversation-item:hover {
-    background-color: var(--md-sys-color-surface-variant);
-  }
-
-  .conversation-item.active {
-    background-color: var(--md-sys-color-primary-container);
-  }
-
-  .conversation-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--md-sys-color-secondary-container);
-    color: var(--md-sys-color-on-secondary-container);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 12px;
-    font-weight: 500;
-  }
-
-  .conversation-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .conversation-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-  }
-
-  .conversation-name {
-    font-weight: 500;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .conversation-time {
-    font-size: 11px;
-    color: var(--md-sys-color-on-surface-variant);
-    white-space: nowrap;
-  }
-
-  .conversation-preview {
-    font-size: 12px;
-    color: var(--md-sys-color-on-surface-variant);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .conversation-unread {
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 8px;
-  }
-
-  /* Botão de Bloquear */
-  .block-btn {
-    background: none;
-    border: none;
-    color: var(--md-sys-color-error);
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
-  }
-
-  .block-btn:hover {
-    background-color: var(--md-sys-color-error-container);
-  }
-
-  /* Estados de loading e vazio */
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    text-align: center;
-    color: var(--md-sys-color-on-surface-variant);
-  }
-
-  .empty-state .material-icons {
-    font-size: 48px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-  }
-
-  .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-
-  .spinner {
-    width: 24px;
-    height: 24px;
-    border: 3px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top-color: var(--md-sys-color-primary);
-    animation: spin 1s ease-in-out infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  /* Responsividade */
-  @media (max-width: 480px) {
-    /* Esta seção não é mais necessária, pois o chat já é tela cheia por padrão */
-  }
-
-  /* Tema Escuro */
-  body.dark-theme {
-    --md-sys-color-primary: #D0BCFF;
-    --md-sys-color-on-primary: #371E73;
-    --md-sys-color-primary-container: #4F378B;
-    --md-sys-color-on-primary-container: #EADDFF;
-    --md-sys-color-secondary: #CCC2DC;
-    --md-sys-color-on-secondary: #332D41;
-    --md-sys-color-secondary-container: #4A4458;
-    --md-sys-color-on-secondary-container: #E8DEF8;
-    --md-sys-color-surface: #1C1B1F;
-    --md-sys-color-on-surface: #E6E1E5;
-    --md-sys-color-surface-variant: #49454F;
-    --md-sys-color-on-surface-variant: #CAC4D0;
-    --md-sys-color-error: #F2B8B5;
-    --md-sys-color-on-error: #601410;
-    --md-sys-color-error-container: #8C1D18;
-    --md-sys-color-on-error-container: #F9DEDC;
-    --md-sys-color-outline: #938F99;
-    --md-sys-color-shadow: #000000;
-  }
-
-  body.dark-theme .chat-container {
-    background-color: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-surface);
-  }
-
-  body.dark-theme .message-input {
-    background-color: var(--md-sys-color-surface-variant);
-    color: var(--md-sys-color-on-surface-variant);
-    border-color: var(--md-sys-color-outline);
-  }
-
-  /* Estilos para Configurações */
-  .settings-content {
-    flex: 1;
-    overflow-y: scroll;
-    padding: 16px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--md-sys-color-outline) var(--md-sys-color-surface-variant);
-  }
-
-  /* Para Firefox */
-  .settings-content {
-    scrollbar-width: thin;
-    scrollbar-color: var(--md-sys-color-outline) var(--md-sys-color-surface-variant);
-  }
-
-  /* Para Webkit (Chrome, Safari, Edge) */
-  .settings-content::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .settings-content::-webkit-scrollbar-track {
-    background: var(--md-sys-color-surface-variant);
-    border-radius: 3px;
-  }
-
-  .settings-content::-webkit-scrollbar-thumb {
-    background: var(--md-sys-color-outline);
-    border-radius: 3px;
-  }
-
-  .settings-content::-webkit-scrollbar-thumb:hover {
-    background: var(--md-sys-color-primary);
-  }
-
-  /* Garantir que outras abas não tenham scroll */
-  .chat-tab-content:not(#settingsTab) {
-    overflow: hidden;
-  }
-
-  /* Ajuste específico para cada aba */
-  #usersTab .users-list,
-  #conversationsTab .conversations-list,
-  #conversationTab .messages-container {
-    overflow-y: auto;
-  }
-
-  .settings-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-  }
-
-  .settings-action-btn {
-    background: var(--md-sys-color-surface-variant);
-    color: var(--md-sys-color-on-surface-variant);
-    border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    transition: background-color 0.2s;
-  }
-
-  .settings-action-btn:hover {
-    background: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
-  }
-
-  .settings-section {
-    margin-bottom: 24px;
-  }
-
-  .settings-title {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 12px;
-  }
-
-  .setting-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--md-sys-color-surface-variant);
-  }
-
-  .setting-item:last-child {
-    border-bottom: none;
-  }
-
-  .setting-info {
-    flex: 1;
-  }
-
-  .setting-label {
-    font-weight: 500;
-    font-size: 14px;
-    margin-bottom: 2px;
-  }
-
-  .setting-description {
-    font-size: 12px;
-    color: var(--md-sys-color-on-surface-variant);
-  }
-
-  /* Switch Toggle */
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 24px;
-  }
-
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--md-sys-color-surface-variant);
-    transition: .3s;
-    border-radius: 24px;
-  }
-
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .3s;
-    border-radius: 50%;
-  }
-
-  input:checked + .slider {
-    background-color: var(--md-sys-color-primary);
-  }
-
-  input:checked + .slider:before {
-    transform: translateX(20px);
-  }
-
-  /* Select */
-  .setting-select {
-    padding: 6px 12px;
-    border: 1px solid var(--md-sys-color-outline);
-    border-radius: 8px;
-    background: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-surface);
-    font-size: 14px;
-    min-width: 100px;
-  }
-
-  .setting-select:focus {
-    border-color: var(--md-sys-color-primary);
-    outline: none;
-  }
-
-  /* Botões de Ação */
-  .settings-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
-    width: 100%;
-  }
-
-  .action-btn.secondary {
-    background: var(--md-sys-color-surface-variant);
-    color: var(--md-sys-color-on-surface-variant);
-  }
-
-  .action-btn.secondary:hover {
-    background: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
-  }
-
-  .action-btn.danger {
-    background: var(--md-sys-color-error-container);
-    color: var(--md-sys-color-on-error-container);
-  }
-
-  .action-btn.danger:hover {
-    background: var(--md-sys-color-error);
-    color: var(--md-sys-color-on-error);
-  }
-
-  /* Lista de usuários bloqueados */
-  .blocked-users-list {
-    max-height: 200px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-  }
-
-  .blocked-users-list::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .blocked-user {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    background-color: var(--md-sys-color-surface-variant);
-  }
-
-  .unblock-btn {
-    background: none;
-    border: none;
-    color: var(--md-sys-color-error);
-    cursor: pointer;
-    font-size: 14px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-  }
-
-  .unblock-btn:hover {
-    background-color: var(--md-sys-color-error-container);
-  }
-
-  /* Modal de Confirmação */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-  }
-
-  .modal-overlay.active {
-    display: flex;
-  }
-
-  .modal {
-    background: var(--md-sys-color-surface);
-    border-radius: 12px;
-    padding: 24px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  }
-
-  .modal-title {
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-
-  .modal-message {
-    color: var(--md-sys-color-on-surface-variant);
-    margin-bottom: 20px;
-  }
-
-  .modal-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-  }
-
-  .modal-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-  }
-
-  .modal-btn.cancel {
-    background: var(--md-sys-color-surface-variant);
-    color: var(--md-sys-color-on-surface-variant);
-  }
-
-  .modal-btn.confirm {
-    background: var(--md-sys-color-error);
-    color: var(--md-sys-color-on-error);
-  }
-
-  /* CORREÇÃO COR BOTÃO LIGAR */
-  #startCallBtn,
-  .call-list-btn {
-    color: #4CAF50; /* Um tom de verde padrão e agradável */
-  }
-
-  #startCallBtn:hover,
-  .call-list-btn:hover {
-    background-color: rgba(76, 175, 80, 0.1); /* Verde com 10% de opacidade */
-  }
-
-  /* Indicador de volume para teste de microfone */
-  .volume-indicator {
-    width: 100%;
-    height: 8px;
-    background: var(--md-sys-color-surface-variant);
-    border-radius: 4px;
-    overflow: hidden;
-    margin: 10px 0;
-  }
-
-  .volume-level {
-    height: 100%;
-    background: var(--md-sys-color-primary);
-    width: 0%;
-    transition: width 0.1s ease;
-  }
-
-  /* Status do microfone */
-  .microphone-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
-    border-radius: 6px;
-    margin: 8px 0;
-  }
-
-  .microphone-status.connected {
-    background: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
-  }
-
-  .microphone-status.disconnected {
-    background: var(--md-sys-color-error-container);
-    color: var(--md-sys-color-on-error-container);
-  }
-
-  /* CONTROLES DE VIVA-VOZ */
-  .call-controls {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 15px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 15px;
-    border-radius: 25px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 10001;
-  }
-
-  .call-control-btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 20px;
-  }
-
-  .call-control-btn.speaker {
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-  }
-
-  .call-control-btn.mute {
-    background-color: var(--md-sys-color-secondary);
-    color: var(--md-sys-color-on-secondary);
-  }
-
-  .call-control-btn.hangup {
-    background-color: var(--md-sys-color-error);
-    color: var(--md-sys-color-on-error);
-  }
-
-  .call-control-btn:hover {
-    transform: scale(1.1);
-  }
-
-  .call-control-btn.active {
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
-  }
-
-  /* Indicadores de status da chamada */
-  .call-status-bar {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-    z-index: 10001;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .quality-indicator {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .quality-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #4CAF50;
-  }
-
-  .quality-dot.poor {
-    background-color: #f44336;
-  }
-
-  /* Notificações */
-  .notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 10000;
-    animation: slideIn 0.3s ease-out;
-  }
-
-  .notification-success {
-    background: #4CAF50;
-    color: white;
-  }
-
-  .notification-error {
-    background: #f44336;
-    color: white;
-  }
-
-  .notification-info {
-    background: #2196F3;
-    color: white;
-  }
-
-  @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  @keyframes slideOut {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
-  }
-  /* Notificação DENTRO da página do chat */
-.on-page-notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 10001;
-  display: none;
-  cursor: pointer;
-  max-width: 300px;
-  animation: slideIn 0.3s ease-out;
-}
-.on-page-notification.show {
-  display: block;
-}
-
-</style>
 
 <body>
-    <!-- Botão flutuante do chat -->
-    <div class="chat-toggle" id="chatToggle">
-        <span class="material-icons">chat</span>
-        <div class="unread-badge" id="unreadBadge" style="display: none;"></div>
-    </div>
-
-    <!-- Container do chat -->
-    <div class="chat-container" id="chatContainer">
-        <!-- Cabeçalho -->
-        <div class="chat-header">
-            <div class="chat-title">Interfone Virtual</div>
-            <div class="chat-actions">
-                <button class="chat-action-btn" id="minimizeChat">
-                    <span class="material-icons">minimize</span>
-                </button>
-                <button class="chat-action-btn" id="closeChat">
-                    <span class="material-icons">close</span>
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Painel de Administração - Lojas Fixas</h1>
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-button secondary">
+                    <i class="material-icons-outlined" style="margin-right: 8px;">arrow_back</i>
+                    Voltar ao Portal
+                </a>
+                <button class="nav-button" id="addStoreButton">
+                    <i class="material-icons-outlined" style="margin-right: 8px;">add</i>
+                    Nova Loja
                 </button>
             </div>
         </div>
+    </header>
 
-        <!-- Abas -->
-        <div class="chat-tabs">
-            <div class="chat-tab active" data-tab="conversations">Conversas</div>
-            <div class="chat-tab" data-tab="users">Usuários</div>
-            <div class="chat-tab" data-tab="conversation">Conversa</div>
-            <div class="chat-tab" data-tab="settings">Configurações</div>
-        </div>
+    <main class="page-container">
+        <div id="messageContainer"></div>
 
-        <!-- Conteúdo -->
-        <div class="chat-content">
-            <!-- Aba de Conversas -->
-            <div class="chat-tab-content active" id="conversationsTab">
-                <div class="conversations-list" id="conversationsList">
-                    <div class="loading">
-                        <div class="spinner"></div>
+        <section class="form-section" id="storeForm" style="display: none;">
+            <h2 id="formTitle">Cadastrar Nova Loja</h2>
+            <form id="storeFormElement">
+                <input type="hidden" id="storeId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="storeName" class="form-label">Nome da Loja</label>
+                        <input type="text" id="storeName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="storeLogo" class="form-label">URL do Logo</label>
+                        <input type="url" id="storeLogo" class="form-input" placeholder="https://exemplo.com/logo.jpg">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="storeDescription" class="form-label">Descrição</label>
+                        <textarea id="storeDescription" class="form-textarea" required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="storeUrl" class="form-label">URL da Loja</label>
+                        <input type="url" id="storeUrl" class="form-input" required placeholder="https://exemplo.com">
                     </div>
                 </div>
+                <div class="form-actions">
+                    <button type="button" class="form-button secondary" id="cancelButton">Cancelar</button>
+                    <button type="submit" class="form-button primary" id="saveButton">Salvar Loja</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="stores-section">
+            <h2>Lojas Fixas Cadastradas</h2>
+            <div class="stores-grid" id="storesGrid">
+                <!-- As lojas fixas serão carregadas aqui -->
             </div>
+        </section>
+    </main>
 
-            <!-- Aba de Usuários -->
-            <div class="chat-tab-content" id="usersTab">
-                <div class="users-list" id="usersList">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
-            </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
-            <!-- Aba de Conversa -->
-            <div class="chat-tab-content" id="conversationTab">
-                <div class="conversation-header">
-                    <div class="conversation-user">
-                        <button class="conversation-back" id="backToUsers">
-                            <span class="material-icons">arrow_back</span>
-                        </button>
-                        <div id="currentUserName">Selecione um usuário</div>
-                    </div>
-                    <div class="conversation-actions">
-                        <button class="chat-action-btn" id="startCallBtn" title="Ligar para usuário" style="display: none;">
-                            <span class="material-icons">call</span>
-                        </button>
-                        <div class="user-status" id="currentUserStatus"></div>
-                        <button class="block-btn" id="blockCurrentUser" title="Bloquear usuário" style="display: none;">
-                            <span class="material-icons">block</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="messages-container" id="messagesContainer">
-                    <div class="empty-state">
-                        <span class="material-icons">forum</span>
-                        <p>Selecione um usuário para iniciar uma conversa</p>
-                    </div>
-                </div>
-                <div class="message-input-container">
-                    <input type="text" class="message-input" id="messageInput" placeholder="Digite sua mensagem..." disabled>
-                    <button class="send-button" id="sendMessage" disabled>
-                        <span class="material-icons">send</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Aba de Configurações -->
-            <div class="chat-tab-content" id="settingsTab">
-                <div class="settings-content">
-                    <!-- Conteúdo das configurações será carregado via JavaScript -->
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal de Chamada -->
-    <div class="modal-overlay" id="callModal">
-        <div class="modal" id="callContainer" style="width: 320px; text-align: center;">
-            <div id="incomingCallUI" style="display: none;">
-                <div class="user-avatar" id="incomingCallAvatar" style="margin: 0 auto 16px; width: 80px; height: 80px; font-size: 32px;"></div>
-                <div class="modal-title" id="incomingCallName"></div>
-                <p class="modal-message" id="incomingCallStatus">está te ligando...</p>
-                <div class="modal-actions" style="margin-top: 24px;">
-                    <button class="modal-btn" id="rejectCallBtn" style="background-color: var(--md-sys-color-error); color: var(--md-sys-color-on-error);">
-                        <span class="material-icons">call_end</span> Rejeitar
-                    </button>
-                    <button class="modal-btn" id="answerCallBtn" style="background-color: #4CAF50; color: white;">
-                        <span class="material-icons">call</span> Atender
-                    </button>
-                </div>
-            </div>
-            <div id="outgoingCallUI" style="display: none;">
-                <div class="user-avatar" id="outgoingCallAvatar" style="margin: 0 auto 16px; width: 80px; height: 80px; font-size: 32px;"></div>
-                <div class="modal-title" id="outgoingCallName"></div>
-                <p class="modal-message" id="outgoingCallStatus">Chamando...</p>
-                <div class="modal-actions" style="margin-top: 24px;">
-                    <button class="modal-btn" id="hangUpBtn" style="background-color: var(--md-sys-color-error); color: var(--md-sys-color-on-error);">
-                        <span class="material-icons">call_end</span> Desligar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
-    <!-- JavaScript -->
-    <script>
-      // Configuração do Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
-    authDomain: "rifas-c414b.firebaseapp.com",
-    databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
-    projectId: "rifas-c414b",
-    storageBucket: "rifas-c414b.appspot.com",
-    messagingSenderId: "770195193538",
-    appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
-};
-
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const database = firebase.database();
-    </script>
-    <script>
-      // Variáveis globais
-let currentUser = null;
-let userSettings = {
-    soundNotification: true,
-    tabNotification: true,
-    onlineStatus: true,
-    receiveMessages: true,
-    darkTheme: false,
-    fontSize: 'medium'
-};
-
-// Elementos DOM
-const chatToggle = document.getElementById('chatToggle');
-const chatContainer = document.getElementById('chatContainer');
-const minimizeChat = document.getElementById('minimizeChat');
-const closeChat = document.getElementById('closeChat');
-const chatTabs = document.querySelectorAll('.chat-tab');
-const tabContents = document.querySelectorAll('.chat-tab-content');
-
-// Inicialização
-document.addEventListener('DOMContentLoaded', function() {
-    // Verificar se o usuário está autenticado
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            currentUser = user;
-            initializeChat();
-        } else {
-            // Se não estiver autenticado, mostrar mensagem
-            document.getElementById('usersList').innerHTML = `
-                <div class="empty-state">
-                    <span class="material-icons">login</span>
-                    <p>Faça login para usar o interfone virtual</p>
-                </div>
-            `;
-        }
-    });
-    
-    // Solicitar permissão do microfone
-    // Verificar e solicitar permissão do microfone
-setTimeout(async () => {
-    const hasPermission = await checkMicrophonePermission();
-    if (!hasPermission) {
-        // Mostrar instruções educativas primeiro
-        showMicrophoneSetupInstructions();
-        
-        // Solicitar permissão após um tempo
-        setTimeout(() => {
-            requestMicrophonePermission();
-        }, 3000);
-    } else {
-        console.log('Microfone já está configurado');
-        showNotification('Microfone pronto para chamadas!', 'success');
-    }
-}, 2000);
-
-    // Event Listeners
-    chatToggle.addEventListener('click', toggleChat);
-    minimizeChat.addEventListener('click', minimizeChatWindow);
-    closeChat.addEventListener('click', closeChatWindow);
-    
-    chatTabs.forEach(tab => {
-        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-    });
-    
-    // Carregar configurações
-    loadSettings();
-});
-
-// Solicitar permissão do microfone
-async function requestMicrophonePermission() {
-    try {
-        console.log('Solicitando permissão do microfone...');
-        
-        // Tentar acessar o microfone para solicitar permissão
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            } 
-        });
-        
-        // Parar imediatamente após obter a permissão
-        stream.getTracks().forEach(track => track.stop());
-        console.log('Permissão do microfone concedida');
-        
-        // Mostrar notificação de sucesso
-        showNotification('Microfone configurado com sucesso!', 'success');
-        return true;
-        
-    } catch (error) {
-        console.error('Erro ao acessar microfone:', error);
-        
-        // Mostrar instruções para o usuário baseado no tipo de erro
-        if (error.name === 'NotAllowedError') {
-            showMicrophonePermissionInstructions();
-        } else if (error.name === 'NotFoundError') {
-            showNotification('Nenhum microfone encontrado no dispositivo.', 'error');
-        } else if (error.name === 'NotSupportedError') {
-            showNotification('Seu navegador não suporta acesso ao microfone.', 'error');
-        } else {
-            showNotification('Erro ao acessar o microfone: ' + error.message, 'error');
-        }
-        return false;
-    }
-}
-
-// Verificar se já temos permissão do microfone
-async function checkMicrophonePermission() {
-    try {
-        // Verificar permissão sem solicitar acesso
-        const permission = await navigator.permissions.query({ name: 'microphone' });
-        
-        if (permission.state === 'granted') {
-            console.log('Permissão do microfone já concedida');
-            return true;
-        } else if (permission.state === 'prompt') {
-            console.log('Permissão do microfone precisa ser solicitada');
-            return false;
-        } else {
-            console.log('Permissão do microfone negada');
-            return false;
-        }
-    } catch (error) {
-        console.log('API de Permissions não suportada:', error);
-        return false;
-    }
-}
-
-// Controles da interface
-function toggleChat() {
-    chatContainer.classList.toggle('active');
-    chatToggle.classList.toggle('active');
-}
-
-function minimizeChatWindow() {
-    chatContainer.classList.remove('active');
-}
-
-function closeChatWindow() {
-    chatContainer.classList.remove('active');
-    chatToggle.classList.remove('active');
-}
-
-function switchTab(tabName) {
-    // Atualizar abas
-    chatTabs.forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.tab === tabName);
-    });
-    
-    // Atualizar conteúdo
-    tabContents.forEach(content => {
-        content.classList.toggle('active', content.id === `${tabName}Tab`);
-    });
-    
-    // Se a aba de configurações foi selecionada, garantir que esteja carregada
-    if (tabName === 'settings') {
-        // Pequeno delay para garantir que a aba esteja visível
-        setTimeout(() => {
-            const settingsContent = document.querySelector('#settingsTab .settings-content');
-            if (settingsContent && (!settingsContent.innerHTML.trim() || settingsContent.innerHTML.includes('loading'))) {
-                initializeSettings();
-            }
-        }, 50);
-    }
-}
-
-// Atualizar último acesso do usuário
-function updateUserLastSeen() {
-    if (currentUser) {
-        database.ref(`users/${currentUser.uid}/lastSeen`).set(Date.now());
-    }
-}
-
-// Atualizar último acesso quando a página for carregada e periodicamente
-window.addEventListener('load', updateUserLastSeen);
-setInterval(updateUserLastSeen, 60000); // Atualizar a cada minuto
-
-// Funções auxiliares
-function getConversationId(user1, user2) {
-    return [user1, user2].sort().join('_');
-}
-
-function formatTime(timestamp) {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-}
-
-// Função para mostrar notificações
-function showNotification(message, type = 'info') {
-    // Remover notificação anterior se existir
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-    
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <span class="material-icons">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}</span>
-        <span>${message}</span>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Remover automaticamente após 3 segundos
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.animation = 'slideOut 0.3s ease-in';
-            setTimeout(() => notification.remove(), 300);
-        }
-    }, 3000);
-}
-
-// Função para mostrar notificação DENTRO da página
-function showOnPageNotification(title, body, onClickCallback) {
-  // Remove notificação anterior, se houver
-  const oldNotif = document.getElementById('onPageNotification');
-  if (oldNotif) oldNotif.remove();
-
-  const notification = document.createElement('div');
-  notification.id = 'onPageNotification';
-  notification.className = 'on-page-notification';
-  notification.innerHTML = `
-    <div style="font-weight: 500; margin-bottom: 4px;">${title}</div>
-    <div>${body}</div>
-  `;
-
-  // Adiciona evento de clique
-  notification.onclick = () => {
-    if (onClickCallback) onClickCallback();
-    notification.remove();
-  };
-
-  document.body.appendChild(notification);
-  notification.classList.add('show');
-
-  // Remove automaticamente após 5 segundos
-  setTimeout(() => {
-    if (notification.parentNode) {
-      notification.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => notification.remove(), 300);
-    }
-  }, 5000);
-}
-
-    </script>
-    <script>
-      // Variáveis do chat
-let selectedUser = null;
-let usersRef = null;
-let messagesRef = null;
-let blockedUsers = [];
-let conversationsList = [];
-
-// Elementos DOM do chat
-const usersList = document.getElementById('usersList');
-const messagesContainer = document.getElementById('messagesContainer');
-const messageInput = document.getElementById('messageInput');
-const sendMessage = document.getElementById('sendMessage');
-const backToUsers = document.getElementById('backToUsers');
-const currentUserName = document.getElementById('currentUserName');
-const currentUserStatus = document.getElementById('currentUserStatus');
-const blockedUsersList = document.getElementById('blockedUsersList');
-const startCallBtn = document.getElementById('startCallBtn');
-const blockCurrentUser = document.getElementById('blockCurrentUser');
-
-// Inicializar o chat
-// Inicializar o chat
-function initializeChat() {
-    // Referências do Firebase
-    usersRef = database.ref('users');
-    messagesRef = database.ref('messages');
-    
-    listenForIncomingCalls(currentUser.uid);
-    
-    // Carregar usuários bloqueados
-    loadBlockedUsers();
-    
-    // Carregar lista de usuários
-    loadUsersList();
-    
-    // Carregar lista de conversas
-    loadConversationsList();
-    
-    // Carregar configurações
-    loadSettings();
-    
-    // INICIALIZAR CONFIGURAÇÕES - ADICIONE ESTA LINHA
-    initializeSettings();
-    
-    // Escutar por novas mensagens
-    const cleanupListeners = listenForMessagesOptimized();
-    
-    // Atualizar último acesso
-    updateUserLastSeen();
-    
-    // Inicializar indicador de mensagens não lidas
-    setTimeout(updateUnreadMessagesIndicator, 2000);
-    
-    // Event Listeners específicos do chat
-    backToUsers.addEventListener('click', () => switchTab('users'));
-    sendMessage.addEventListener('click', sendNewMessage);
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendNewMessage();
-        }
-    });
-    
-    blockCurrentUser.addEventListener('click', () => {
-        if (selectedUser) {
-            blockUser(selectedUser.id);
-        }
-    });
-    
-    // Retornar função de cleanup para usar se necessário
-    return cleanupListeners;
-}
-
-// Carregar lista de usuários
-function loadUsersList() {
-    usersRef.on('value', snapshot => {
-        const users = snapshot.val();
-        usersList.innerHTML = '';
-        
-        if (!users) {
-            usersList.innerHTML = `
-                <div class="empty-state">
-                    <span class="material-icons">people</span>
-                    <p>Nenhum usuário cadastrado</p>
-                </div>
-            `;
-            return;
-        }
-        
-        Object.keys(users).forEach(userId => {
-            // Não mostrar o usuário atual na lista
-            if (userId === currentUser.uid) return;
-            
-            const user = users[userId];
-            const isBlocked = blockedUsers.includes(userId);
-            
-            // Verificar se o usuário está online
-            const isOnline = user.lastSeen && (Date.now() - user.lastSeen) < 300000; // 5 minutos
-            
-            const userItem = document.createElement('div');
-            userItem.className = 'user-item';
-            userItem.dataset.userId = userId;
-            
-            if (isBlocked) {
-                // Mostrar usuários bloqueados de forma diferente
-                userItem.innerHTML = `
-                    <div class="user-avatar" style="opacity: 0.5;">${user.nome ? user.nome.charAt(0).toUpperCase() : 'U'}</div>
-                    <div class="user-info" style="opacity: 0.5;">
-                        <div class="user-name">${user.nome || 'Usuário'} (Bloqueado)</div>
-                        <div class="user-details">${user.bloco ? `Bloco ${user.bloco}, AP ${user.apartamento}` : 'Portaria'}</div>
-                    </div>
-                    <div class="user-actions">
-                        <button class="unblock-btn" title="Desbloquear usuário">
-                            <span class="material-icons">lock_open</span>
-                        </button>
-                    </div>
-                `;
-                
-                const unblockBtn = userItem.querySelector('.unblock-btn');
-                unblockBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    unblockUser(userId);
-                });
-                
-                userItem.style.cursor = 'not-allowed';
-                userItem.addEventListener('click', () => {
-                    alert('Este usuário está bloqueado. Desbloqueie-o nas configurações para enviar mensagens.');
-                });
-            } else {
-                // Código normal para usuários não bloqueados
-                userItem.innerHTML = `
-                    <div class="user-avatar">${user.nome ? user.nome.charAt(0).toUpperCase() : 'U'}</div>
-                    <div class="user-info">
-                        <div class="user-name">${user.nome || 'Usuário'}</div>
-                        <div class="user-details">${user.bloco ? `Bloco ${user.bloco}, AP ${user.apartamento}` : 'Portaria'}</div>
-                    </div>
-                    <div class="user-actions">
-                        <div class="user-status ${isOnline ? '' : 'offline'}"></div>
-                        <button class="block-btn" title="Bloquear usuário">
-                            <span class="material-icons">block</span>
-                        </button>
-                    </div>
-                `;
-                
-                const blockBtn = userItem.querySelector('.block-btn');
-                blockBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    blockUser(userId);
-                });
-                
-                userItem.addEventListener('click', () => selectUser(userId, user));
-            }
-            
-            usersList.appendChild(userItem);
-        });
-    });
-}
-
-// Mostrar instruções de configuração do microfone
-function showMicrophoneSetupInstructions() {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-    `;
-    
-    modal.innerHTML = `
-        <div style="background: white; padding: 24px; border-radius: 12px; max-width: 400px; text-align: center;">
-            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 16px;">Configuração do Microfone</h3>
-            <p style="margin-bottom: 20px; color: var(--md-sys-color-on-surface);">
-                Para usar as chamadas de voz, precisamos da sua permissão para acessar o microfone.
-            </p>
-            <div style="text-align: left; background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
-                <p style="margin: 8px 0;"><strong>Próximos passos:</strong></p>
-                <p style="margin: 4px 0;">1. Em instantes, aparecerá um pop-up do navegador</p>
-                <p style="margin: 4px 0;">2. Clique em <strong>"Permitir"</strong> ou <strong>"Allow"</strong></p>
-                <p style="margin: 4px 0;">3. O microfone ficará pronto para chamadas</p>
-            </div>
-            <button onclick="this.parentElement.parentElement.remove()" 
-                    style="background: var(--md-sys-color-primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                Entendi, continuar
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Remover automaticamente após 8 segundos
-    setTimeout(() => {
-        if (modal.parentNode) {
-            modal.remove();
-        }
-    }, 8000);
-}
-
-// Mostrar instruções para habilitar o microfone
-function showMicrophonePermissionInstructions() {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-    `;
-    
-    modal.innerHTML = `
-        <div style="background: white; padding: 24px; border-radius: 12px; max-width: 450px; text-align: center;">
-            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 16px;">Permissão do Microfone Necessária</h3>
-            <p style="margin-bottom: 20px; color: var(--md-sys-color-on-surface);">
-                Você negou a permissão do microfone. Para fazer chamadas de voz, é necessário permitir o acesso.
-            </p>
-            
-            <div style="text-align: left; background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
-                <p style="margin: 8px 0;"><strong>Como permitir manualmente:</strong></p>
-                
-                <div style="margin: 12px 0;">
-                    <p style="margin: 6px 0; font-weight: 500;">Chrome/Edge:</p>
-                    <p style="margin: 4px 0; font-size: 14px;">1. Clique no ícone de cadeado/câmera na barra de endereço</p>
-                    <p style="margin: 4px 0; font-size: 14px;">2. Em "Microfone", selecione "Permitir"</p>
-                    <p style="margin: 4px 0; font-size: 14px;">3. Atualize a página (F5)</p>
-                </div>
-                
-                <div style="margin: 12px 0;">
-                    <p style="margin: 6px 0; font-weight: 500;">Firefox:</p>
-                    <p style="margin: 4px 0; font-size: 14px;">1. Clique no ícone de cadeado na barra de endereço</p>
-                    <p style="margin: 4px 0; font-size: 14px;">2. Mude "Microfone" para "Permitir"</p>
-                    <p style="margin: 4px 0; font-size: 14px;">3. Atualize a página (F5)</p>
-                </div>
-                
-                <div style="margin: 12px 0;">
-                    <p style="margin: 6px 0; font-weight: 500;">Safari:</p>
-                    <p style="margin: 4px 0; font-size: 14px;">1. Vá em Preferências > Websites</p>
-                    <p style="margin: 4px 0; font-size: 14px;">2. Encontre este site em Microfone</p>
-                    <p style="margin: 4px 0; font-size: 14px;">3. Selecione "Permitir"</p>
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="this.parentElement.parentElement.parentElement.remove()" 
-                        style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                    Fechar
-                </button>
-                <button onclick="location.reload()" 
-                        style="background: var(--md-sys-color-primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                    Atualizar Página
-                </button>
-                <button onclick="requestMicrophonePermission(); this.parentElement.parentElement.parentElement.remove()" 
-                        style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                    Tentar Novamente
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-}
-
-// Selecionar usuário para conversar
-function selectUser(userId, userData) {
-    // Verificar se o usuário está bloqueado
-    if (blockedUsers.includes(userId)) {
-        alert('Este usuário está bloqueado. Desbloqueie-o nas configurações para enviar mensagens.');
-        return;
-    }
-    
-    selectedUser = {
-        id: userId,
-        ...userData
-    };
-    
-    startCallBtn.style.display = 'flex';
-    startCallBtn.onclick = () => {
-        initiateCall(userId, userData.nome || 'Usuário');
-    };
-    
-    currentUserName.textContent = userData.nome || 'Usuário';
-    blockCurrentUser.style.display = 'flex';
-    
-    // Verificar se o usuário está online
-    const isOnline = userData.lastSeen && (Date.now() - userData.lastSeen) < 300000;
-    currentUserStatus.className = `user-status ${isOnline ? '' : 'offline'}`;
-    
-    // Ativar a aba de conversa
-    switchTab('conversation');
-    
-    // Carregar mensagens da conversa
-    loadConversationMessages();
-    
-    // Habilitar campo de mensagem
-    messageInput.disabled = false;
-    sendMessage.disabled = false;
-    
-    // Marcar conversa como lida
-    const conversationId = getConversationId(currentUser.uid, selectedUser.id);
-    onConversationOpened(conversationId);
-}
-
-// Carregar mensagens da conversa
-function loadConversationMessages() {
-    if (!selectedUser) return;
-    
-    const conversationId = getConversationId(currentUser.uid, selectedUser.id);
-    const conversationRef = database.ref(`conversations/${conversationId}`);
-    
-    conversationRef.on('value', snapshot => {
-        const messages = snapshot.val();
-        messagesContainer.innerHTML = '';
-        
-        if (!messages) {
-            messagesContainer.innerHTML = `
-                <div class="empty-state">
-                    <span class="material-icons">chat_bubble_outline</span>
-                    <p>Nenhuma mensagem ainda. Inicie a conversa!</p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Ordenar mensagens por timestamp
-        const sortedMessages = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
-        
-        sortedMessages.forEach(message => {
-            const messageElement = document.createElement('div');
-            const isSent = message.senderId === currentUser.uid;
-            
-            messageElement.className = `message ${isSent ? 'sent' : 'received'}`;
-            messageElement.innerHTML = `
-                <div class="message-text">${message.text}</div>
-                <div class="message-time">${formatTime(message.timestamp)}</div>
-            `;
-            
-            messagesContainer.appendChild(messageElement);
-        });
-        
-        // Rolagem automática para a última mensagem
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    });
-}
-
-// Enviar mensagem
-function sendNewMessage() {
-    if (!selectedUser || !messageInput.value.trim()) return;
-    
-    const messageText = messageInput.value.trim();
-    const conversationId = getConversationId(currentUser.uid, selectedUser.id);
-    const messageRef = database.ref(`conversations/${conversationId}`).push();
-    
-    const messageData = {
-        text: messageText,
-        senderId: currentUser.uid,
-        receiverId: selectedUser.id,
-        timestamp: Date.now()
-    };
-    
-    messageRef.set(messageData)
-        .then(() => {
-            messageInput.value = '';
-            // Atualizar a lista de conversas após enviar mensagem
-            loadConversationsList();
-        })
-        .catch(error => {
-            console.error('Erro ao enviar mensagem:', error);
-            alert('Erro ao enviar mensagem. Tente novamente.');
-        });
-}
-
-// Carregar lista de conversas
-function loadConversationsList() {
-    if (!currentUser) return;
-    
-    const conversationsRef = database.ref('conversations');
-    const usersRef = database.ref('users');
-    
-    conversationsRef.on('value', snapshot => {
-        const conversations = snapshot.val();
-        conversationsList = [];
-        
-        if (!conversations) {
-            document.getElementById('conversationsList').innerHTML = `
-                <div class="empty-state">
-                    <span class="material-icons">forum</span>
-                    <p>Nenhuma conversa ainda</p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Buscar informações dos usuários
-        usersRef.once('value').then(usersSnapshot => {
-            const allUsers = usersSnapshot.val();
-            const userConversations = [];
-            
-            // Filtrar conversas do usuário atual
-            Object.keys(conversations).forEach(conversationId => {
-                if (conversationId.includes(currentUser.uid)) {
-                    const messages = conversations[conversationId];
-                    if (!messages) return;
-                    
-                    // Encontrar a última mensagem
-                    const messageKeys = Object.keys(messages);
-                    const lastMessageKey = messageKeys[messageKeys.length - 1];
-                    const lastMessage = messages[lastMessageKey];
-                    
-                    if (!lastMessage) return;
-                    
-                    // Encontrar o outro usuário da conversa
-                    const userIds = conversationId.split('_');
-                    const otherUserId = userIds[0] === currentUser.uid ? userIds[1] : userIds[0];
-                    const otherUser = allUsers[otherUserId];
-                    
-                    if (otherUser && !blockedUsers.includes(otherUserId)) {
-                        userConversations.push({
-                            userId: otherUserId,
-                            userData: otherUser,
-                            lastMessage: lastMessage,
-                            conversationId: conversationId,
-                            unread: checkIfUnread(conversationId, lastMessage)
-                        });
-                    }
-                }
-            });
-            
-            // Ordenar por última mensagem (mais recente primeiro)
-            userConversations.sort((a, b) => b.lastMessage.timestamp - a.lastMessage.timestamp);
-            conversationsList = userConversations;
-            
-            updateConversationsListDisplay();
-        });
-    });
-}
-
-function checkIfUnread(conversationId, lastMessage) {
-    // Mensagens enviadas pelo usuário atual nunca são não lidas
-    if (lastMessage.senderId === currentUser.uid) return false;
-    
-    // Buscar quando o usuário visualizou esta conversa pela última vez
-    const lastSeenRef = database.ref(`users/${currentUser.uid}/lastSeenConversations/${conversationId}`);
-    
-    // Valor padrão é true (não lida) até provar o contrário
-    let unreadStatus = true;
-    
-    lastSeenRef.once('value').then(snapshot => {
-        const lastSeenTime = snapshot.val();
-        
-        // Se o usuário já viu esta conversa após a última mensagem, então está lida
-        if (lastSeenTime && lastSeenTime >= lastMessage.timestamp) {
-            unreadStatus = false;
-        }
-    }).catch(error => {
-        console.error('Erro ao verificar status de leitura:', error);
-        unreadStatus = false;
-    });
-    
-    return unreadStatus;
-}
-
-function updateConversationsListDisplay() {
-    const conversationsListElement = document.getElementById('conversationsList');
-    conversationsListElement.innerHTML = '';
-    
-    if (conversationsList.length === 0) {
-        conversationsListElement.innerHTML = `
-            <div class="empty-state">
-                <span class="material-icons">forum</span>
-                <p>Nenhuma conversa ainda</p>
-            </div>
-        `;
-        return;
-    }
-    
-    conversationsList.forEach(conversation => {
-        const conversationItem = document.createElement('div');
-        conversationItem.className = 'conversation-item';
-        conversationItem.dataset.userId = conversation.userId;
-        
-        const lastMessage = conversation.lastMessage;
-        const isSent = lastMessage.senderId === currentUser.uid;
-        const messagePreview = isSent ? `Você: ${lastMessage.text}` : lastMessage.text;
-        const time = formatTime(lastMessage.timestamp);
-        
-        conversationItem.innerHTML = `
-            <div class="conversation-avatar">
-                ${conversation.userData.nome ? conversation.userData.nome.charAt(0).toUpperCase() : 'U'}
-            </div>
-            <div class="conversation-info">
-                <div class="conversation-header">
-                    <div class="conversation-name">${conversation.userData.nome || 'Usuário'}</div>
-                    <div class="conversation-time">${time}</div>
-                </div>
-                <div class="conversation-preview">${messagePreview}</div>
-            </div>
-            <div class="conversation-actions">
-                ${conversation.unread ? '<div class="conversation-unread"></div>' : ''}
-                <button class="chat-action-btn call-list-btn" data-user-id="${conversation.userId}" data-user-name="${conversation.userData.nome || 'Usuário'}" title="Ligar">
-                    <span class="material-icons">call</span>
-                </button>
-                <button class="block-btn" title="Bloquear usuário">
-                    <span class="material-icons">block</span>
-                </button>
-            </div>
-        `;
-
-        const blockBtn = conversationItem.querySelector('.block-btn');
-        blockBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            blockUser(conversation.userId);
-        });
-        
-        conversationItem.addEventListener('click', () => {
-            selectUser(conversation.userId, conversation.userData);
-        });
-        
-        conversationsListElement.appendChild(conversationItem);
-    });
-    
-    document.querySelectorAll('.call-list-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const userId = e.currentTarget.dataset.userId;
-            const userName = e.currentTarget.dataset.userName;
-            initiateCall(userId, userName);
-        });
-    });
-}
-
-// Escutar por novas mensagens
-function listenForMessagesOptimized() {
-    const userConversationsRef = database.ref('conversations');
-    let updateTimeout;
-    
-    const handleConversationUpdate = (snapshot, eventType) => {
-        const conversationId = snapshot.key;
-        if (conversationId.includes(currentUser.uid)) {
-            const messages = snapshot.val();
-            
-            // Encontrar a última mensagem
-            const messageKeys = Object.keys(messages || {});
-            if (messageKeys.length === 0) return;
-            
-            const lastMessageKey = messageKeys[messageKeys.length - 1];
-            const lastMessage = messages[lastMessageKey];
-            
-            // Verificar se é uma mensagem recebida (não enviada pelo usuário atual)
-            const isReceivedMessage = lastMessage && lastMessage.senderId !== currentUser.uid;
-            const isCurrentConversation = selectedUser && conversationId === getConversationId(currentUser.uid, selectedUser.id);
-            
-            // Debounce para atualizações frequentes
-            clearTimeout(updateTimeout);
-            updateTimeout = setTimeout(() => {
-                // Atualizar lista de conversas
-                loadConversationsList();
-                
-                // Se estivermos na conversa certa, atualizar as mensagens
-                if (isCurrentConversation) {
-                    loadConversationMessages();
-                    
-                    // Marcar como lida automaticamente quando estamos na conversa
-                    if (isReceivedMessage) {
-                        markConversationAsRead(conversationId);
-                    }
-                } else if (isReceivedMessage && eventType === 'child_changed') {
-                    // Só notificar para mensagens novas, não para conversas existentes
-                    handleNewMessageNotification(lastMessage, conversationId);
-                }
-                
-                updateUnreadMessagesIndicator();
-            }, 100); // Debounce de 100ms
-        }
-    };
-    
-    userConversationsRef.on('child_changed', snapshot => {
-        handleConversationUpdate(snapshot, 'child_changed');
-    });
-    
-    userConversationsRef.on('child_added', snapshot => {
-        handleConversationUpdate(snapshot, 'child_added');
-    });
-    
-    userConversationsRef.on('child_removed', snapshot => {
-        const conversationId = snapshot.key;
-        if (conversationId.includes(currentUser.uid)) {
-            clearTimeout(updateTimeout);
-            updateTimeout = setTimeout(() => {
-                loadConversationsList();
-                updateUnreadMessagesIndicator();
-            }, 100);
-        }
-    });
-    
-    // Retornar função para limpar event listeners se necessário
-    return () => {
-        userConversationsRef.off();
-        clearTimeout(updateTimeout);
-    };
-}
-
-function handleNewMessageNotification(lastMessage, conversationId) {
-    // Tocar som de notificação se configurado
-    if (userSettings.soundNotification) {
-        playNotificationSound();
-    }
-    
-    // Mostrar notificação visual se configurado
-    if (userSettings.tabNotification) {
-        showDesktopNotification(lastMessage, conversationId); // Esta é a notificação do navegador
-    }
-
-    // --- ADIÇÃO: MOSTRAR NOTIFICAÇÃO NA PÁGINA ---
-    // (Vamos buscar o nome do remetente para a notificação)
-    usersRef.child(lastMessage.senderId).once('value').then(snapshot => {
-        const sender = snapshot.val();
-        const senderName = sender ? sender.nome || 'Usuário' : 'Usuário';
-        
-        showOnPageNotification(
-            `Nova Mensagem de ${senderName}`,
-            lastMessage.text,
-            () => {
-                // Ao clicar, abre o chat e a conversa
-                if (chatContainer) {
-                    chatContainer.classList.add('active');
-                    chatToggle.classList.add('active');
-                    if (sender) {
-                        selectUser(lastMessage.senderId, sender);
-                    }
-                }
-            }
-        );
-    });
-    // --- FIM DA ADIÇÃO ---
-    
-    // Adicionar efeito visual no badge
-    const badge = document.getElementById('unreadBadge');
-    if (badge) {
-        badge.classList.add('pulse');
-        setTimeout(() => badge.classList.remove('pulse'), 1000);
-    }
-}
-
-// Chamar quando o usuário abre uma conversa
-function onConversationOpened(conversationId) {
-    markConversationAsRead(conversationId);
-}
-
-// Carregar usuários bloqueados
-function loadBlockedUsers() {
-    const blockedRef = database.ref(`users/${currentUser.uid}/blockedUsers`);
-    
-    blockedRef.on('value', snapshot => {
-        blockedUsers = snapshot.val() || [];
-        updateBlockedUsersList();
-    });
-}
-
-// Atualizar lista de usuários bloqueados
-function updateBlockedUsersList() {
-    blockedUsersList.innerHTML = '';
-    
-    if (blockedUsers.length === 0) {
-        blockedUsersList.innerHTML = `
-            <div class="empty-state">
-                <span class="material-icons">block</span>
-                <p>Nenhum usuário bloqueado</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Buscar informações dos usuários bloqueados
-    usersRef.once('value').then(snapshot => {
-        const allUsers = snapshot.val();
-        
-        blockedUsers.forEach(userId => {
-            if (allUsers[userId]) {
-                const user = allUsers[userId];
-                const blockedUserElement = document.createElement('div');
-                blockedUserElement.className = 'blocked-user';
-                
-                blockedUserElement.innerHTML = `
-                    <div>
-                        <div class="user-name">${user.nome || 'Usuário'}</div>
-                        <div class="user-details">${user.bloco ? `Bloco ${user.bloco}, AP ${user.apartamento}` : 'Portaria'}</div>
-                    </div>
-                    <button class="unblock-btn" data-user-id="${userId}">Desbloquear</button>
-                `;
-                
-                blockedUsersList.appendChild(blockedUserElement);
-            }
-        });
-        
-        // Adicionar event listeners aos botões de desbloquear
-        document.querySelectorAll('.unblock-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const userIdToUnblock = this.dataset.userId;
-                unblockUser(userIdToUnblock);
-            });
-        });
-    });
-}
-
-// Bloquear usuário
-function blockUser(userId) {
-    if (!currentUser) return;
-    
-    // Confirmar com o usuário
-    if (!confirm('Tem certeza que deseja bloquear este usuário?\n\nUsuários bloqueados não poderão:\n• Enviar mensagens para você\n• Ver seu status online\n• Iniciar novas conversas')) {
-        return;
-    }
-    
-    if (!blockedUsers.includes(userId)) {
-        blockedUsers.push(userId);
-        database.ref(`users/${currentUser.uid}/blockedUsers`).set(blockedUsers)
-            .then(() => {
-                // Atualizar a interface
-                updateBlockedUsersList();
-                loadUsersList();
-                loadConversationsList();
-                
-                // Se estiver conversando com este usuário, fechar a conversa
-                if (selectedUser && selectedUser.id === userId) {
-                    switchTab('users');
-                    selectedUser = null;
-                    messageInput.disabled = true;
-                    sendMessage.disabled = true;
-                }
-                
-                // Mostrar confirmação
-                showNotification('Usuário bloqueado com sucesso!', 'success');
-            })
-            .catch(error => {
-                console.error('Erro ao bloquear usuário:', error);
-                showNotification('Erro ao bloquear usuário. Tente novamente.', 'error');
-            });
-    } else {
-        showNotification('Este usuário já está bloqueado.', 'info');
-    }
-}
-
-// Desbloquear usuário
-function unblockUser(userId) {
-    blockedUsers = blockedUsers.filter(id => id !== userId);
-    database.ref(`users/${currentUser.uid}/blockedUsers`).set(blockedUsers)
-        .then(() => {
-            alert('Usuário desbloqueado com sucesso.');
-            updateBlockedUsersList();
-        })
-        .catch(error => {
-            console.error('Erro ao desbloquear usuário:', error);
-            alert('Erro ao desbloquear usuário. Tente novamente.');
-        });
-}
-
-// Atualizar indicador de mensagens não lidas
-function updateUnreadMessagesIndicator() {
-    if (!currentUser) return;
-    
-    const userConversationsRef = database.ref('conversations');
-    let unreadCount = 0;
-    
-    userConversationsRef.once('value').then(snapshot => {
-        const conversations = snapshot.val();
-        
-        if (!conversations) {
-            removeUnreadIndicator();
-            return;
-        }
-        
-        // Buscar a última vez que o usuário visualizou as conversas
-        const lastSeenRef = database.ref(`users/${currentUser.uid}/lastSeenConversations`);
-        
-        lastSeenRef.once('value').then(lastSeenSnapshot => {
-            const lastSeenTimes = lastSeenSnapshot.val() || {};
-            
-            Object.keys(conversations).forEach(conversationId => {
-                // Verificar se esta conversa é do usuário atual
-                if (conversationId.includes(currentUser.uid)) {
-                    const messages = conversations[conversationId];
-                    
-                    if (!messages) return;
-                    
-                    // Encontrar a mensagem mais recente
-                    const messageKeys = Object.keys(messages);
-                    const lastMessageKey = messageKeys[messageKeys.length - 1];
-                    const lastMessage = messages[lastMessageKey];
-                    
-                    // Verificar se é uma mensagem recebida (não enviada pelo usuário atual)
-                    if (lastMessage && lastMessage.senderId !== currentUser.uid) {
-                        const conversationLastSeen = lastSeenTimes[conversationId] || 0;
-                        
-                        // Se a mensagem é mais recente que a última visualização, contar como não lida
-                        if (lastMessage.timestamp > conversationLastSeen) {
-                            unreadCount++;
-                        }
-                    }
-                }
-            });
-            
-            // Atualizar o indicador
-            updateBadge(unreadCount);
-        });
-    }).catch(error => {
-        console.error('Erro ao verificar mensagens não lidas:', error);
-    });
-}
-
-function updateBadge(count) {
-    const badge = document.getElementById('unreadBadge');
-    
-    if (count > 0) {
-        badge.textContent = count > 9 ? '9+' : count;
-        badge.style.display = 'flex';
-        
-        // Adicionar animação de pulsação para novas mensagens
-        if (count > (parseInt(badge.textContent) || 0)) {
-            badge.classList.add('pulse');
-            setTimeout(() => badge.classList.remove('pulse'), 1000);
-        }
-    } else {
-        badge.style.display = 'none';
-    }
-}
-
-function removeUnreadIndicator() {
-    const badge = document.getElementById('unreadBadge');
-    if (badge) {
-        badge.style.display = 'none';
-    }
-}
-
-// Marcar conversa como lida quando o usuário visualiza
-function markConversationAsRead(conversationId) {
-    if (!currentUser) return;
-    
-    const lastSeenRef = database.ref(`users/${currentUser.uid}/lastSeenConversations/${conversationId}`);
-    lastSeenRef.set(Date.now())
-        .then(() => {
-            updateUnreadMessagesIndicator();
-        })
-        .catch(error => {
-            console.error('Erro ao marcar conversa como lida:', error);
-        });
-}
-
-// Adicione esta função para tocar som de notificação
-function playNotificationSound() {
-    try {
-        // Criar um som de notificação simples usando Web Audio API
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.3);
-    } catch (error) {
-        console.log('Web Audio API não suportada ou bloqueada pelo navegador');
-    }
-}
-
-function showDesktopNotification(lastMessage, conversationId) {
-    // Verificar se as notificações são suportadas
-    if (!("Notification" in window)) {
-        console.log("Este navegador não suporta notificações desktop");
-        return;
-    }
-    
-    // Verificar se já temos permissão
-    if (Notification.permission === "granted") {
-        createNotification(lastMessage);
-    } else if (Notification.permission !== "denied") {
-        // Pedir permissão ao usuário
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                createNotification(lastMessage);
-            }
-        });
-    }
-    
-    function createNotification(message) {
-        // Buscar informações do remetente
-        const senderId = message.senderId;
-        usersRef.child(senderId).once('value').then(snapshot => {
-            const sender = snapshot.val();
-            const senderName = sender ? sender.nome || 'Usuário' : 'Usuário';
-            
-            const notification = new Notification("Interfone Virtual - Nova Mensagem", {
-                body: `${senderName}: ${message.text}`,
-                icon: '/favicon.ico',
-                tag: conversationId,
-                requireInteraction: false
-            });
-            
-            notification.onclick = function() {
-                window.focus();
-                // Focar no chat e abrir a conversa
-                if (chatContainer) {
-                    chatContainer.classList.add('active');
-                    chatToggle.classList.add('active');
-                    
-                    // Buscar informações do usuário para selecionar a conversa
-                    usersRef.child(senderId).once('value').then(userSnapshot => {
-                        const userData = userSnapshot.val();
-                        if (userData) {
-                            selectUser(senderId, userData);
-                        }
-                    });
-                }
-                notification.close();
+        document.addEventListener('DOMContentLoaded', () => {
+            const firebaseConfig = {
+                apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
+                authDomain: "rifalidiane-fde3b.firebaseapp.com",
+                databaseURL: "https://rifalidiane-fde3b-default-rtdb.firebaseio.com",
+                projectId: "rifalidiane-fde3b",
+                storageBucket: "rifalidiane-fde3b.appspot.com",
+                messagingSenderId: "649359518677",
+                appId: "1:649359518677:web:879b4ed9fa5150d24d2b5c"
             };
-            
-            // Fechar automaticamente após 5 segundos
-            setTimeout(() => {
-                notification.close();
-            }, 5000);
-        });
-    }
-}
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
 
-// Atualizar o indicador periodicamente
-setInterval(updateUnreadMessagesIndicator, 30000); // A cada 30 segundos
+            // Elementos do DOM
+            const storeForm = document.getElementById('storeForm');
+            const formTitle = document.getElementById('formTitle');
+            const storeFormElement = document.getElementById('storeFormElement');
+            const storeIdInput = document.getElementById('storeId');
+            const storeNameInput = document.getElementById('storeName');
+            const storeLogoInput = document.getElementById('storeLogo');
+            const storeDescriptionInput = document.getElementById('storeDescription');
+            const storeUrlInput = document.getElementById('storeUrl');
+            const addStoreButton = document.getElementById('addStoreButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const saveButton = document.getElementById('saveButton');
+            const storesGrid = document.getElementById('storesGrid');
+            const messageContainer = document.getElementById('messageContainer');
 
-// Atualizar quando o chat é aberto/fechado
-chatToggle.addEventListener('click', function() {
-    if (chatContainer.classList.contains('active')) {
-        // Quando o chat é aberto, atualizar o indicador após um pequeno delay
-        setTimeout(updateUnreadMessagesIndicator, 1000);
-    }
-});
-    </script>
-    <script>
-      // Variáveis Globais da Chamada
-let localStream = null;
-let remoteStream = null;
-let peerConnection = null;
-let currentCallerId = null;
-let currentCalleeId = null;
-let isSpeakerOn = false;
-let isMuted = false;
-let proximitySensorEnabled = false;
-let isNearEar = false;
-let audioContext = null;
-let gainNode = null;
-let callStartTime = null;
-let callTimerInterval = null;
-let reconnectAttempts = 0;
-let reconnectTimeout = null;
-const MAX_RECONNECT_ATTEMPTS = 3;
-let iceCandidateBuffer = [];
-const db = firebase.database();
+            // Estado da aplicação
+            let fixedStores = [];
+            let isEditing = false;
 
-// Configuração dos servidores STUN
-const configuration = {
-    iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' }
-    ],
-    iceCandidatePoolSize: 10
-};
+            // Event Listeners
+            addStoreButton.addEventListener('click', showForm);
+            cancelButton.addEventListener('click', hideForm);
+            storeFormElement.addEventListener('submit', saveStore);
 
-// Iniciar uma chamada
-// Iniciar uma chamada
-async function initiateCall(calleeId, calleeName) {
-    console.log('Iniciando chamada para:', calleeId, calleeName);
-    
-    if (!currentUser) {
-        showNotification('Você precisa estar logado para ligar.', 'error');
-        return;
-    }
-
-    try {
-        // Verificar permissão do microfone
-        const hasPermission = await checkMicrophonePermission();
-        if (!hasPermission) {
-            const granted = await requestMicrophonePermission();
-            if (!granted) {
-                showNotification('Permissão do microfone é necessária para fazer chamadas.', 'error');
-                return;
+            // Funções
+            function showForm() {
+                isEditing = false;
+                formTitle.textContent = 'Cadastrar Nova Loja';
+                storeFormElement.reset();
+                storeIdInput.value = '';
+                storeForm.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
-        }
 
-        currentCalleeId = calleeId;
-        showCallUI('outgoing', calleeName);
-        
-        // Mostrar controles de chamada
-        showCallControls();
-
-        // Criar PeerConnection
-        peerConnection = new RTCPeerConnection(configuration);
-        
-        // Configurar listeners
-        registerPeerConnectionListeners(calleeId);
-
-        // Configurar áudio
-        const audioConstraints = {
-            audio: {
-                channelCount: 1,
-                sampleRate: 48000,
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            },
-            video: false
-        };
-
-        console.log('Obtendo stream de mídia...');
-        localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
-        console.log('Stream de mídia obtido com sucesso');
-
-        // Adicionar tracks ao PeerConnection
-        localStream.getTracks().forEach(track => {
-            console.log('Adicionando track:', track.kind);
-            peerConnection.addTrack(track, localStream);
-        });
-
-        // Criar oferta
-        console.log('Criando oferta...');
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        console.log('Oferta criada:', offer.type);
-
-        // Enviar dados da chamada
-        const callData = {
-            offer: {
-                type: offer.type,
-                sdp: offer.sdp,
-            },
-            callerId: currentUser.uid,
-            callerName: currentUser.displayName || 'Usuário',
-            timestamp: Date.now()
-        };
-
-        console.log('Enviando dados da chamada para:', calleeId);
-        await db.ref(`calls/${calleeId}`).set(callData);
-        
-        // Iniciar timer
-        startCallTimer();
-
-        // Escutar por resposta
-        setupAnswerListener();
-        setupCallStateListener();
-
-        showNotification(`Chamando ${calleeName}...`, 'info');
-
-    } catch (error) {
-        console.error('Erro ao iniciar chamada:', error);
-        showNotification('Erro ao iniciar chamada: ' + error.message, 'error');
-        cleanupCall();
-    }
-}
-
-function setupAnswerListener() {
-    console.log('Configurando listener para a resposta da chamada...');
-    
-    // Fica ouvindo a "resposta" do usuário que atendeu
-    db.ref(`calls/${currentUser.uid}/answer`).on('value', async (snapshot) => {
-        if (snapshot.exists()) {
-            const answer = snapshot.val();
-            console.log('Resposta recebida:', answer);
-            
-            // Ignorar se a conexão já estiver totalmente estabelecida e a resposta for a mesma
-            if (peerConnection.currentRemoteDescription) {
-                console.log('Já existe uma remote description. Ignorando resposta duplicada.');
-                return;
+            function hideForm() {
+                storeForm.style.display = 'none';
             }
-            
-            try {
-                // Define a resposta recebida como a descrição remota da conexão
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
 
-                // --- INÍCIO DA CORREÇÃO ---
-                // Processa qualquer ICE candidate que tenha chegado antes da resposta
-                console.log('Processando candidates do buffer após definir a resposta...');
-                iceCandidateBuffer.forEach(candidate => {
-                    peerConnection.addIceCandidate(candidate).catch(e => console.error("Erro ao adicionar candidate do buffer:", e));
-                });
-                iceCandidateBuffer = []; // Limpa o buffer
-                // --- FIM DA CORREÇÃO ---
-                
-                console.log('Remote description (resposta) definida com sucesso.');
-                updateCallStatus('Conectado');
-                showNotification('Chamada conectada!', 'success');
-                
-            } catch (error) {
-                console.error('Erro ao definir a resposta:', error);
-                showNotification('Erro ao conectar a chamada.', 'error');
+            function editStore(store) {
+                isEditing = true;
+                formTitle.textContent = 'Editar Loja';
+                storeIdInput.value = store.id;
+                storeNameInput.value = store.name;
+                storeLogoInput.value = store.logo || '';
+                storeDescriptionInput.value = store.description;
+                storeUrlInput.value = store.url;
+                storeForm.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
-        }
-    });
-}
 
+            async function saveStore(e) {
+                e.preventDefault();
 
-function setupCallStateListener() {
-    console.log('Configurando listener de estado da chamada...');
-    db.ref(`calls/${currentCalleeId}`).on('value', (snapshot) => {
-        if (!snapshot.exists()) {
-            console.log("Chamada finalizada pelo outro usuário.");
-            showNotification('Chamada finalizada pelo outro usuário.', 'info');
-            cleanupCall();
-        }
-    });
-}
+                const storeData = {
+                    name: storeNameInput.value.trim(),
+                    logo: storeLogoInput.value.trim(),
+                    description: storeDescriptionInput.value.trim(),
+                    url: storeUrlInput.value.trim(),
+                    isFixed: true
+                };
 
-// ESCUTA POR CHAMADAS RECEBIDAS
-// ESCUTA POR CHAMADAS RECEBIDAS
-function listenForIncomingCalls(userId) {
-    console.log('Ouvindo chamadas recebidas para:', userId);
-    const userCallRef = db.ref(`calls/${userId}`);
-    userCallRef.on('value', async (snapshot) => {
-        const callData = snapshot.val();
-        console.log('Dados de chamada recebidos:', callData);
-        
-        if (callData && callData.offer && !currentCallerId) {
-            console.log('Chamada recebida de:', callData.callerName);
-            currentCallerId = callData.callerId;
-            currentCalleeId = userId;
+                // Validação básica
+                if (!storeData.name || !storeData.description || !storeData.url) {
+                    showMessage('Por favor, preencha todos os campos obrigatórios.', 'error');
+                    return;
+                }
 
-            showCallUI('incoming', callData.callerName);
+                try {
+                    saveButton.disabled = true;
+                    saveButton.textContent = 'Salvando...';
 
-            // Configurar botões
-            setupCallButtons(callData);
-            
-            // Tocar som de chamada
-            playIncomingCallSound();
-        }
-    });
-}
+                    let storeId = storeIdInput.value;
 
-// Tocar som de chamada recebida
-function playIncomingCallSound() {
-    try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        
-        // Som intermitente para chamada
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.3);
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + 0.6);
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.9);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 1.2);
-        
-        // Repetir a cada 2 segundos
-        incomingCallInterval = setInterval(() => {
-            if (currentCallerId) { // Só tocar se ainda houver chamada
-                playIncomingCallSound();
-            }
-        }, 2000);
-        
-    } catch (error) {
-        console.log('Web Audio API não suportada para som de chamada');
-    }
-}
-
-// Variável para controlar o intervalo do som de chamada
-let incomingCallInterval = null;
-
-// Parar som de chamada
-function stopIncomingCallSound() {
-    if (incomingCallInterval) {
-        clearInterval(incomingCallInterval);
-        incomingCallInterval = null;
-    }
-}
-
-function setupCallButtons(callData) {
-    // Botão Atender
-    document.getElementById('answerCallBtn').onclick = async () => {
-        try {
-            // Parar som de chamada recebida
-            stopIncomingCallSound();
-            
-            peerConnection = new RTCPeerConnection(configuration);
-            registerPeerConnectionListeners(callData.callerId);
-
-            // Obter stream local de áudio
-            const audioConstraints = {
-                audio: {
-                    channelCount: 1,
-                    sampleRate: 48000,
-                    echoCancellation: true,
-                    noiseSuppression: true
-                },
-                video: false
-            };
-
-            localStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
-            
-            // Adicionar tracks de áudio à conexão
-            localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, localStream);
-            });
-
-            // Configurar a oferta recebida do outro usuário
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
-
-            // --- INÍCIO DA CORREÇÃO ---
-            // Processa qualquer ICE candidate que tenha chegado antes da hora
-            console.log('Processando candidates do buffer após definir a oferta...');
-            iceCandidateBuffer.forEach(candidate => {
-                peerConnection.addIceCandidate(candidate).catch(e => console.error("Erro ao adicionar candidate do buffer:", e));
-            });
-            iceCandidateBuffer = []; // Limpa o buffer para a próxima chamada
-            // --- FIM DA CORREÇÃO ---
-
-            // Criar a resposta para a oferta
-            const answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
-
-            // Enviar a resposta para quem originou a chamada
-            await db.ref(`calls/${callData.callerId}/answer`).set({
-                type: answer.type,
-                sdp: answer.sdp,
-            });
-
-            // Atualizar a interface do usuário
-            showCallControls();
-            startCallTimer();
-            updateCallStatus('Conectado');
-            showNotification('Chamada atendida!', 'success');
-
-        } catch (error) {
-            console.error("Erro ao atender chamada: ", error);
-            showNotification("Erro ao atender chamada.", 'error');
-            rejectCall();
-        }
-    };
-
-    // Botão Rejeitar
-    document.getElementById('rejectCallBtn').onclick = () => {
-        stopIncomingCallSound();
-        rejectCall();
-    };
-}
-
-
-// CONTROLES DE ÁUDIO E VIVA-VOZ
-async function setupAudioProcessing() {
-    try {
-        if (!window.AudioContext && !window.webkitAudioContext) {
-            console.log('AudioContext não suportado');
-            return;
-        }
-
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        await audioContext.resume();
-        
-        const source = audioContext.createMediaStreamSource(localStream);
-        gainNode = audioContext.createGain();
-        
-        // Filtro para melhorar qualidade
-        const filter = audioContext.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 800;
-        filter.Q.value = 1;
-        
-        source.connect(filter);
-        filter.connect(gainNode);
-        
-        const destination = audioContext.createMediaStreamDestination();
-        gainNode.connect(destination);
-        
-        // Parar tracks originais e usar as processadas
-        localStream.getTracks().forEach(track => track.stop());
-        localStream = destination.stream;
-        
-    } catch (error) {
-        console.log('Processamento de áudio não disponível:', error);
-    }
-}
-
-function setupAudioControls() {
-    createCallControlsUI();
-}
-
-function createCallControlsUI() {
-    // Verificar se já existe para não duplicar
-    if (document.getElementById('callControls')) return;
-
-    const controlsHTML = `
-        <div class="call-controls" id="callControls" style="display: none;">
-            <button class="call-control-btn speaker" id="speakerBtn" title="Viva-voz">
-                <span class="material-icons">volume_up</span>
-            </button>
-            <button class="call-control-btn mute" id="muteBtn" title="Silenciar">
-                <span class="material-icons">mic</span>
-            </button>
-            <button class="call-control-btn hangup" id="hangupControlBtn" title="Desligar">
-                <span class="material-icons">call_end</span>
-            </button>
-        </div>
-        
-        <div class="call-status-bar" id="callStatusBar" style="display: none;">
-            <div class="quality-indicator">
-                <span id="callQuality">Qualidade: Boa</span>
-                <div class="quality-dot" id="qualityDot"></div>
-            </div>
-            <span id="callTimer">00:00</span>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', controlsHTML);
-    
-    // Event listeners
-    document.getElementById('speakerBtn').addEventListener('click', toggleSpeaker);
-    document.getElementById('muteBtn').addEventListener('click', toggleMute);
-    document.getElementById('hangupControlBtn').addEventListener('click', hangUp);
-}
-
-function showCallControls() {
-    const callControls = document.getElementById('callControls');
-    const callStatusBar = document.getElementById('callStatusBar');
-    if (callControls) callControls.style.display = 'flex';
-    if (callStatusBar) callStatusBar.style.display = 'flex';
-}
-
-function toggleSpeaker() {
-    isSpeakerOn = !isSpeakerOn;
-    const speakerBtn = document.getElementById('speakerBtn');
-    
-    if (isSpeakerOn) {
-        enableSpeaker();
-        speakerBtn.classList.add('active');
-        speakerBtn.innerHTML = '<span class="material-icons">volume_up</span>';
-    } else {
-        disableSpeaker();
-        speakerBtn.classList.remove('active');
-        speakerBtn.innerHTML = '<span class="material-icons">volume_off</span>';
-    }
-}
-
-function enableSpeaker() {
-    if (gainNode) {
-        gainNode.gain.value = 1.5;
-    }
-    
-    // Configurar saída de áudio para alto-falante
-    setAudioOutput('speaker');
-}
-
-function disableSpeaker() {
-    if (gainNode) {
-        gainNode.gain.value = 1.0;
-    }
-    setAudioOutput('earpiece');
-}
-
-function toggleMute() {
-    isMuted = !isMuted;
-    const muteBtn = document.getElementById('muteBtn');
-    
-    if (localStream) {
-        localStream.getAudioTracks().forEach(track => {
-            track.enabled = !isMuted;
-        });
-    }
-    
-    if (isMuted) {
-        muteBtn.classList.add('active');
-        muteBtn.innerHTML = '<span class="material-icons">mic_off</span>';
-    } else {
-        muteBtn.classList.remove('active');
-        muteBtn.innerHTML = '<span class="material-icons">mic</span>';
-    }
-}
-
-function setAudioOutput(outputType) {
-    if (!remoteStream) return;
-    
-    const audioElements = document.querySelectorAll('audio[srcObject]');
-    audioElements.forEach(audio => {
-        if (audio.setSinkId) {
-            const sinkId = outputType === 'speaker' ? '' : 'earpiece';
-            audio.setSinkId(sinkId).catch(err => {
-                console.log('Erro ao configurar saída de áudio:', err);
-            });
-        }
-        
-        audio.volume = outputType === 'speaker' ? 1.0 : 0.7;
-    });
-}
-
-// SENSOR DE PROXIMIDADE (OUVIDO)
-function setupProximitySensor() {
-    if ('ondeviceproximity' in window || 'onuserproximity' in window) {
-        enableProximitySensor();
-    } else {
-        console.log('Sensor de proximidade não disponível');
-        setupAudioBasedProximity();
-    }
-}
-
-function enableProximitySensor() {
-    if ('ondeviceproximity' in window) {
-        window.addEventListener('deviceproximity', handleProximityEvent);
-    }
-    
-    if ('onuserproximity' in window) {
-        window.addEventListener('userproximity', handleProximityEvent);
-    }
-    
-    proximitySensorEnabled = true;
-}
-
-function handleProximityEvent(event) {
-    const wasNearEar = isNearEar;
-    isNearEar = event.near;
-    
-    if (wasNearEar !== isNearEar) {
-        toggleAudioOutput(isNearEar);
-    }
-}
-
-function setupAudioBasedProximity() {
-    let lastTouchTime = 0;
-    
-    document.addEventListener('touchstart', (e) => {
-        lastTouchTime = Date.now();
-        if (e.touches[0].clientY < window.innerHeight * 0.3) {
-            toggleAudioOutput(true);
-        }
-    });
-    
-    document.addEventListener('touchend', () => {
-        setTimeout(() => {
-            if (Date.now() - lastTouchTime > 1000) {
-                toggleAudioOutput(false);
-            }
-        }, 1500);
-    });
-    
-    if (window.DeviceOrientationEvent) {
-        window.addEventListener('deviceorientation', handleOrientation);
-    }
-}
-
-function handleOrientation(event) {
-    const gamma = Math.abs(event.gamma);
-    const beta = Math.abs(event.beta);
-    
-    if (gamma > 45 && beta > 45) {
-        toggleAudioOutput(true);
-    } else {
-        toggleAudioOutput(false);
-    }
-}
-
-function toggleAudioOutput(nearEar) {
-    if (nearEar) {
-        disableSpeaker();
-        setAudioOutput('earpiece');
-    } else {
-        enableSpeaker();
-        setAudioOutput('speaker');
-    }
-}
-
-// RECONEXÃO E MONITORAMENTO
-function setupReconnectionLogic() {
-    if (peerConnection) {
-        peerConnection.onconnectionstatechange = () => {
-            console.log('Estado da conexão:', peerConnection.connectionState);
-            
-            switch(peerConnection.connectionState) {
-                case 'disconnected':
-                case 'failed':
-                    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                        reconnectTimeout = setTimeout(() => {
-                            reconnectCall();
-                            reconnectAttempts++;
-                        }, 2000);
+                    if (isEditing && storeId) {
+                        // Atualizar loja existente
+                        await set(ref(db, `fixedStores/${storeId}`), storeData);
+                        showMessage('Loja atualizada com sucesso!', 'success');
                     } else {
-                        alert('Falha na conexão. Chamada será encerrada.');
-                        hangUp();
+                        // Criar nova loja
+                        storeId = 'store-' + Date.now();
+                        await set(ref(db, `fixedStores/${storeId}`), storeData);
+                        showMessage('Loja cadastrada com sucesso!', 'success');
                     }
-                    break;
-                case 'connected':
-                    reconnectAttempts = 0;
-                    updateCallStatus('Conectado');
-                    break;
-            }
-        };
-    }
-}
 
-async function reconnectCall() {
-    if (!currentCalleeId || !peerConnection) return;
-    
-    try {
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        
-        await db.ref(`calls/${currentCalleeId}`).update({
-            offer: {
-                type: offer.type,
-                sdp: offer.sdp,
-            },
-            reconnect: true,
-            timestamp: Date.now()
-        });
-        
-        updateCallStatus('Reconectando...');
-    } catch (error) {
-        console.error('Erro na reconexão:', error);
-    }
-}
-
-function setupCallQualityMonitoring() {
-    if (!peerConnection) return;
-    
-    setInterval(async () => {
-        if (peerConnection.iceConnectionState === 'connected') {
-            try {
-                const stats = await peerConnection.getStats();
-                let audioLevel = 0;
-                let packetsLost = 0;
-                let packetsTotal = 0;
-                
-                stats.forEach(report => {
-                    if (report.type === 'inbound-rtp' && report.mediaType === 'audio') {
-                        audioLevel = report.audioLevel || 0;
-                        packetsLost += report.packetsLost || 0;
-                        packetsTotal += report.packetsReceived || 1;
-                    }
-                });
-                
-                updateCallQualityIndicator(audioLevel, packetsLost, packetsTotal);
-            } catch (error) {
-                console.log('Erro ao obter estatísticas:', error);
-            }
-        }
-    }, 3000);
-}
-
-function updateCallQualityIndicator(level, packetsLost, packetsTotal) {
-    const qualityElement = document.getElementById('callQuality');
-    const qualityDot = document.getElementById('qualityDot');
-    
-    if (!qualityElement || !qualityDot) return;
-    
-    const packetLoss = packetsTotal > 0 ? (packetsLost / packetsTotal) * 100 : 0;
-    let quality = 'Boa';
-    let qualityClass = '';
-    
-    if (packetLoss > 10 || level < 0.05) {
-        quality = 'Fraca';
-        qualityClass = 'poor';
-    } else if (packetLoss > 5 || level < 0.1) {
-        quality = 'Média';
-    }
-    
-    qualityElement.textContent = `Qualidade: ${quality}`;
-    qualityDot.className = `quality-dot ${qualityClass}`;
-}
-
-// TIMER DA CHAMADA
-function startCallTimer() {
-    callStartTime = Date.now();
-    callTimerInterval = setInterval(updateCallTimer, 1000);
-}
-
-function updateCallTimer() {
-    const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-    const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
-    const seconds = (elapsed % 60).toString().padStart(2, '0');
-    
-    const callTimer = document.getElementById('callTimer');
-    if (callTimer) {
-        callTimer.textContent = `${minutes}:${seconds}`;
-    }
-}
-
-function stopCallTimer() {
-    if (callTimerInterval) {
-        clearInterval(callTimerInterval);
-        callTimerInterval = null;
-    }
-    
-    const callTimer = document.getElementById('callTimer');
-    if (callTimer) {
-        callTimer.textContent = '00:00';
-    }
-}
-
-// WEBRTC EVENT HANDLERS
-function registerPeerConnectionListeners(otherUserId) {
-    if (!peerConnection) return;
-
-    // Envia os ICE candidates gerados localmente para o outro usuário
-    peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-            db.ref(`calls/${otherUserId}/iceCandidates`).push(event.candidate.toJSON());
-        }
-    };
-
-    // Recebe e processa os ICE candidates do outro usuário (JÁ CORRIGIDO)
-    db.ref(`calls/${currentUser.uid}/iceCandidates`).on('child_added', (snapshot) => {
-        if (snapshot.exists()) {
-            const candidate = new RTCIceCandidate(snapshot.val());
-
-            // Se a conexão já estiver pronta (com remote description), adiciona o candidate
-            if (peerConnection && peerConnection.currentRemoteDescription) {
-                peerConnection.addIceCandidate(candidate).catch(error => {
-                    console.error('Erro ao adicionar ICE candidate recebido:', error);
-                });
-            } else {
-                // Se não, armazena temporariamente no buffer
-                iceCandidateBuffer.push(candidate);
-                console.log('Candidate guardado no buffer para uso posterior.');
-            }
-            // Remove o candidate do Firebase para não processá-lo novamente
-            snapshot.ref.remove();
-        }
-    });
-
-    // Quando o stream de áudio remoto chegar, toca o áudio
-    peerConnection.ontrack = (event) => {
-        remoteStream = event.streams[0];
-        const remoteAudio = new Audio();
-        remoteAudio.srcObject = remoteStream;
-        remoteAudio.autoplay = true;
-        remoteAudio.controls = false;
-        
-        // Adiciona o elemento de áudio ao corpo do documento para garantir a reprodução
-        document.body.appendChild(remoteAudio);
-    };
-
-    // Monitora o estado da conexão para depuração
-    peerConnection.oniceconnectionstatechange = () => {
-        console.log('ICE Connection State:', peerConnection.iceConnectionState);
-    };
-}
-
-
-// CONTROLES DA CHAMADA
-function rejectCall() {
-    if (currentCallerId) {
-        db.ref(`calls/${currentCalleeId}`).remove();
-    }
-    cleanupCall();
-}
-
-function hangUp() {
-    const userToRemove = currentCallerId || currentCalleeId;
-    if (userToRemove) {
-        db.ref(`calls/${userToRemove}`).remove();
-    }
-    cleanupCall();
-}
-
-// LIMPEZA DE RECURSOS
-// LIMPEZA DE RECURSOS
-function cleanupCall() {
-    console.log('Limpando recursos da chamada...');
-    
-    // Parar som de chamada
-    stopIncomingCallSound();
-    
-    // 1. Parar timer
-    stopCallTimer();
-    
-    // 2. Esconder controles
-    hideCallControls();
-    
-    // 3. Limpar áudio
-    cleanupAudio();
-    
-    // 4. Resetar variáveis
-    resetCallVariables();
-    
-    // 5. Fechar PeerConnection
-    closePeerConnection();
-    
-    // 6. Parar streams
-    stopMediaStreams();
-    
-    // 7. Remover listeners
-    removeFirebaseListeners();
-    
-    // 8. Limpar dados do Firebase
-    cleanupFirebaseData();
-    
-    // 9. Remover sensores
-    removeSensorListeners();
-    
-    // 10. Esconder UI
-    hideCallUI();
-    
-    console.log('Chamada finalizada - recursos liberados');
-    showNotification('Chamada finalizada.', 'info');
-}
-
-function hideCallControls() {
-    const callControls = document.getElementById('callControls');
-    const callStatusBar = document.getElementById('callStatusBar');
-    if (callControls) callControls.style.display = 'none';
-    if (callStatusBar) callStatusBar.style.display = 'none';
-}
-
-function cleanupAudio() {
-    if (audioContext) {
-        audioContext.close().catch(error => {
-            console.log('Erro ao fechar audio context:', error);
-        });
-        audioContext = null;
-        gainNode = null;
-    }
-}
-
-function resetCallVariables() {
-    isSpeakerOn = false;
-    isMuted = false;
-    reconnectAttempts = 0;
-    isNearEar = false;
-    currentCallerId = null;
-    currentCalleeId = null;
-    iceCandidateBuffer = [];
-}
-
-function closePeerConnection() {
-    if (peerConnection) {
-        peerConnection.onconnectionstatechange = null;
-        peerConnection.onicecandidate = null;
-        peerConnection.ontrack = null;
-        peerConnection.onnegotiationneeded = null;
-        peerConnection.oniceconnectionstatechange = null;
-        
-        peerConnection.close();
-        peerConnection = null;
-    }
-}
-
-function stopMediaStreams() {
-    if (localStream) {
-        localStream.getTracks().forEach(track => {
-            track.stop();
-            track.enabled = true;
-        });
-        localStream = null;
-    }
-    
-    if (remoteStream) {
-        remoteStream.getTracks().forEach(track => track.stop());
-        remoteStream = null;
-    }
-    
-    // Remover elementos de áudio
-    const remoteAudioElements = document.querySelectorAll('audio[srcObject]');
-    remoteAudioElements.forEach(audio => {
-        audio.srcObject = null;
-        audio.remove();
-    });
-}
-
-function removeFirebaseListeners() {
-    if (currentCallerId) {
-        db.ref(`calls/${currentCallerId}/answer`).off();
-        db.ref(`calls/${currentCallerId}/iceCandidates`).off();
-    }
-    if (currentCalleeId) {
-        db.ref(`calls/${currentCalleeId}`).off();
-        db.ref(`calls/${currentCalleeId}/iceCandidates`).off();
-    }
-}
-
-function cleanupFirebaseData() {
-    const cleanupPromises = [];
-    if (currentCallerId) {
-        cleanupPromises.push(db.ref(`calls/${currentCallerId}`).remove());
-    }
-    if (currentCalleeId) {
-        cleanupPromises.push(db.ref(`calls/${currentCalleeId}`).remove());
-    }
-    
-    Promise.allSettled(cleanupPromises).then(results => {
-        results.forEach((result, index) => {
-            if (result.status === 'rejected') {
-                console.warn(`Falha ao limpar dados ${index}:`, result.reason);
-            }
-        });
-    });
-}
-
-function removeSensorListeners() {
-    if (proximitySensorEnabled) {
-        window.removeEventListener('deviceproximity', handleProximityEvent);
-        window.removeEventListener('userproximity', handleProximityEvent);
-        window.removeEventListener('deviceorientation', handleOrientation);
-        proximitySensorEnabled = false;
-    }
-}
-
-// INTERFACE DO USUÁRIO
-function showCallUI(type, userName) {
-    const callModal = document.getElementById('callModal');
-    if (!callModal) return;
-    
-    callModal.classList.add('active');
-
-    const initial = userName ? userName.charAt(0).toUpperCase() : 'U';
-
-    if (type === 'incoming') {
-        document.getElementById('incomingCallUI').style.display = 'block';
-        document.getElementById('outgoingCallUI').style.display = 'none';
-        document.getElementById('incomingCallName').textContent = userName;
-        document.getElementById('incomingCallAvatar').textContent = initial;
-    } else {
-        document.getElementById('outgoingCallUI').style.display = 'block';
-        document.getElementById('incomingCallUI').style.display = 'none';
-        document.getElementById('outgoingCallName').textContent = userName;
-        document.getElementById('outgoingCallAvatar').textContent = initial;
-        updateCallStatus(`Chamando ${userName}...`);
-    }
-}
-
-function hideCallUI() {
-    const callModal = document.getElementById('callModal');
-    if (callModal) {
-        callModal.classList.remove('active');
-    }
-}
-
-function updateCallStatus(status) {
-    const outgoingCallStatus = document.getElementById('outgoingCallStatus');
-    if (outgoingCallStatus) {
-        outgoingCallStatus.textContent = status;
-    }
-}
-
-// Limpar timeout global ao sair
-window.addEventListener('beforeunload', function() {
-    if (reconnectTimeout) {
-        clearTimeout(reconnectTimeout);
-    }
-    cleanupCall();
-});
-    </script>
-    <script>
-      // Elementos DOM das configurações
-let settingsInitialized = false;
-
-// Inicializar configurações
-function initializeSettings() {
-    if (settingsInitialized) return;
-    
-    // Garantir que o conteúdo das configurações seja carregado
-    const settingsTab = document.getElementById('settingsTab');
-    if (settingsTab) {
-        loadSettingsContent();
-        
-        // Carregar configurações salvas
-        loadSettings();
-        
-        // Atualizar lista de usuários bloqueados
-        updateBlockedUsersList();
-        
-        settingsInitialized = true;
-    }
-}
-
-// Carregar conteúdo das configurações
-function loadSettingsContent() {
-    const settingsContent = document.querySelector('#settingsTab .settings-content');
-    
-    if (!settingsContent) {
-        console.error('Elemento settingsContent não encontrado');
-        return;
-    }
-    
-    settingsContent.innerHTML = `
-        <!-- Notificações -->
-        <div class="settings-section">
-            <div class="settings-title">Notificações</div>
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-label">Som de notificação</div>
-                    <div class="setting-description">Tocar som quando receber mensagens</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="soundNotification">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-label">Notificações na aba</div>
-                    <div class="setting-description">Mostrar notificações quando o chat estiver minimizado</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="tabNotification">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <!-- Privacidade -->
-        <div class="settings-section">
-            <div class="settings-title">Privacidade</div>
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-label">Status online</div>
-                    <div class="setting-description">Mostrar quando estou online para outros usuários</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="onlineStatus">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-label">Receber mensagens</div>
-                    <div class="setting-description">Permitir que outros usuários me enviem mensagens</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="receiveMessages">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <!-- Usuários Bloqueados -->
-        <div class="settings-section">
-            <div class="settings-header">
-                <div class="settings-title">Usuários Bloqueados</div>
-                <button class="settings-action-btn" id="clearBlocked">
-                    <span class="material-icons">delete_sweep</span>
-                    Limpar Todos
-                </button>
-            </div>
-            <div class="blocked-users-list" id="blockedUsersList">
-                <div class="loading">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Aparência -->
-        <div class="settings-section">
-            <div class="settings-title">Aparência</div>
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-label">Tema escuro</div>
-                    <div class="setting-description">Alternar entre tema claro e escuro</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="darkTheme">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <div class="setting-info">
-                    <div class="setting-label">Tamanho do texto</div>
-                    <div class="setting-description">Ajustar o tamanho das mensagens</div>
-                </div>
-                <select class="setting-select" id="fontSize">
-                    <option value="small">Pequeno</option>
-                    <option value="medium" selected>Médio</option>
-                    <option value="large">Grande</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Ações -->
-        <div class="settings-section">
-            <div class="settings-title">Ações</div>
-            <div class="settings-actions">
-                <button class="action-btn secondary" id="testMicrophone">
-                    <span class="material-icons">mic</span>
-                    Testar Microfone
-                </button>
-                <button class="action-btn secondary" id="clearHistory">
-                    <span class="material-icons">delete</span>
-                    Limpar Histórico
-                </button>
-                <button class="action-btn secondary" id="exportChat">
-                    <span class="material-icons">download</span>
-                    Exportar Conversas
-                </button>
-                <button class="action-btn danger" id="resetSettings">
-                    <span class="material-icons">restore</span>
-                    Redefinir Configurações
-                </button>
-            </div>
-        </div>
-    `;
-
-    // Adicionar event listeners após o conteúdo ser carregado
-    setTimeout(() => {
-        setupSettingsEventListeners();
-        applySettingsToUI(); // Aplicar configurações à UI
-    }, 100);
-}
-
-// Configurar event listeners para as configurações
-function setupSettingsEventListeners() {
-    // Event listeners para configurações
-    const soundNotification = document.getElementById('soundNotification');
-    const tabNotification = document.getElementById('tabNotification');
-    const onlineStatus = document.getElementById('onlineStatus');
-    const receiveMessages = document.getElementById('receiveMessages');
-    const darkTheme = document.getElementById('darkTheme');
-    const fontSize = document.getElementById('fontSize');
-    
-    if (soundNotification) {
-        soundNotification.addEventListener('change', saveSettings);
-        tabNotification.addEventListener('change', saveSettings);
-        onlineStatus.addEventListener('change', saveSettings);
-        receiveMessages.addEventListener('change', saveSettings);
-        darkTheme.addEventListener('change', toggleDarkTheme);
-        fontSize.addEventListener('change', saveSettings);
-    }
-    
-    // Event listeners para botões de ação
-    const clearBlocked = document.getElementById('clearBlocked');
-    const testMicrophone = document.getElementById('testMicrophone');
-    const clearHistory = document.getElementById('clearHistory');
-    const exportChat = document.getElementById('exportChat');
-    const resetSettings = document.getElementById('resetSettings');
-    
-    if (clearBlocked) {
-        clearBlocked.addEventListener('click', clearAllBlockedUsers);
-        testMicrophone.addEventListener('click', testMicrophoneFunction);
-        clearHistory.addEventListener('click', clearChatHistory);
-        exportChat.addEventListener('click', exportChatHistory);
-        resetSettings.addEventListener('click', resetAllSettings);
-    }
-}
-
-// Funções de Configurações
-function loadSettings() {
-    if (!currentUser) return;
-    
-    const settingsRef = database.ref(`users/${currentUser.uid}/settings`);
-    settingsRef.once('value').then(snapshot => {
-        const savedSettings = snapshot.val();
-        if (savedSettings) {
-            userSettings = { ...userSettings, ...savedSettings };
-            applySettings();
-            
-            // Se estivermos na aba de configurações, atualizar a interface
-            if (document.querySelector('#settingsTab.active')) {
-                applySettingsToUI();
-            }
-        }
-    }).catch(error => {
-        console.error('Erro ao carregar configurações:', error);
-    });
-}
-
-function saveSettings() {
-    if (!currentUser) return;
-    
-    // Atualizar objeto de configurações a partir da UI
-    updateSettingsFromUI();
-    
-    // Salvar no Firebase
-    const settingsRef = database.ref(`users/${currentUser.uid}/settings`);
-    settingsRef.set(userSettings)
-        .then(() => {
-            console.log('Configurações salvas com sucesso');
-            showNotification('Configurações salvas com sucesso!', 'success');
-        })
-        .catch(error => {
-            console.error('Erro ao salvar configurações:', error);
-            showNotification('Erro ao salvar configurações.', 'error');
-        });
-    
-    // Aplicar configurações imediatamente
-    applySettings();
-}
-
-function updateSettingsFromUI() {
-    const soundNotification = document.getElementById('soundNotification');
-    const tabNotification = document.getElementById('tabNotification');
-    const onlineStatus = document.getElementById('onlineStatus');
-    const receiveMessages = document.getElementById('receiveMessages');
-    const darkTheme = document.getElementById('darkTheme');
-    const fontSize = document.getElementById('fontSize');
-    
-    if (soundNotification) {
-        userSettings.soundNotification = soundNotification.checked;
-        userSettings.tabNotification = tabNotification.checked;
-        userSettings.onlineStatus = onlineStatus.checked;
-        userSettings.receiveMessages = receiveMessages.checked;
-        userSettings.darkTheme = darkTheme.checked;
-        userSettings.fontSize = fontSize.value;
-    }
-}
-
-function applySettingsToUI() {
-    const soundNotification = document.getElementById('soundNotification');
-    const tabNotification = document.getElementById('tabNotification');
-    const onlineStatus = document.getElementById('onlineStatus');
-    const receiveMessages = document.getElementById('receiveMessages');
-    const darkTheme = document.getElementById('darkTheme');
-    const fontSize = document.getElementById('fontSize');
-    
-    if (soundNotification) {
-        soundNotification.checked = userSettings.soundNotification;
-        tabNotification.checked = userSettings.tabNotification;
-        onlineStatus.checked = userSettings.onlineStatus;
-        receiveMessages.checked = userSettings.receiveMessages;
-        darkTheme.checked = userSettings.darkTheme;
-        fontSize.value = userSettings.fontSize;
-    }
-}
-
-function applySettings() {
-    // Aplicar tema
-    if (userSettings.darkTheme) {
-        document.body.classList.add('dark-theme');
-    } else {
-        document.body.classList.remove('dark-theme');
-    }
-    
-    // Aplicar tamanho da fonte
-    document.body.style.fontSize = getFontSizeValue(userSettings.fontSize);
-    
-    // Atualizar controles da interface apenas se existirem
-    applySettingsToUI();
-}
-
-function getFontSizeValue(size) {
-    switch(size) {
-        case 'small': return '12px';
-        case 'large': return '16px';
-        default: return '14px';
-    }
-}
-
-function toggleDarkTheme() {
-    userSettings.darkTheme = document.getElementById('darkTheme').checked;
-    saveSettings();
-}
-
-// Funções de Ação
-function clearAllBlockedUsers() {
-    if (confirm('Tem certeza que deseja desbloquear todos os usuários?')) {
-        blockedUsers = [];
-        database.ref(`users/${currentUser.uid}/blockedUsers`).set([])
-            .then(() => {
-                updateBlockedUsersList();
-                showNotification('Todos os usuários foram desbloqueados.', 'success');
-            })
-            .catch(error => {
-                console.error('Erro ao desbloquear usuários:', error);
-                showNotification('Erro ao desbloquear usuários.', 'error');
-            });
-    }
-}
-
-function clearChatHistory() {
-    if (confirm('Tem certeza que deseja limpar todo o histórico de conversas? Esta ação não pode ser desfeita.')) {
-        const conversationsRef = database.ref('conversations');
-        conversationsRef.once('value').then(snapshot => {
-            const conversations = snapshot.val();
-            const updates = {};
-            
-            Object.keys(conversations).forEach(conversationId => {
-                if (conversationId.includes(currentUser.uid)) {
-                    updates[`conversations/${conversationId}`] = null;
+                    hideForm();
+                    loadFixedStores();
+                } catch (error) {
+                    console.error("Erro ao salvar loja:", error);
+                    showMessage('Erro ao salvar loja. Tente novamente.', 'error');
+                } finally {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Salvar Loja';
                 }
-            });
-            
-            database.ref().update(updates)
-                .then(() => {
-                    loadConversationsList();
-                    showNotification('Histórico de conversas limpo com sucesso.', 'success');
-                })
-                .catch(error => {
-                    console.error('Erro ao limpar histórico:', error);
-                    showNotification('Erro ao limpar histórico.', 'error');
-                });
-        });
-    }
-}
+            }
 
-function exportChatHistory() {
-    const conversationsRef = database.ref('conversations');
-    conversationsRef.once('value').then(snapshot => {
-        const conversations = snapshot.val();
-        const userConversations = [];
-        
-        Object.keys(conversations).forEach(conversationId => {
-            if (conversationId.includes(currentUser.uid)) {
-                const messages = conversations[conversationId];
-                userConversations.push({
-                    conversationId: conversationId,
-                    messages: messages
+            async function deleteStore(storeId) {
+                if (!confirm('Tem certeza que deseja excluir esta loja?')) {
+                    return;
+                }
+
+                try {
+                    await remove(ref(db, `fixedStores/${storeId}`));
+                    showMessage('Loja excluída com sucesso!', 'success');
+                    loadFixedStores();
+                } catch (error) {
+                    console.error("Erro ao excluir loja:", error);
+                    showMessage('Erro ao excluir loja. Tente novamente.', 'error');
+                }
+            }
+
+            async function loadFixedStores() {
+                try {
+                    const storesRef = ref(db, 'fixedStores/');
+                    const snapshot = await get(storesRef);
+
+                    if (snapshot.exists()) {
+                        const storesData = snapshot.val();
+                        fixedStores = Object.entries(storesData).map(([id, store]) => ({
+                            id,
+                            ...store
+                        }));
+                        renderStores();
+                    } else {
+                        fixedStores = [];
+                        renderStores();
+                    }
+                } catch (error) {
+                    console.error("Erro ao carregar lojas fixas:", error);
+                    showMessage('Erro ao carregar lojas. Tente novamente.', 'error');
+                }
+            }
+
+            function renderStores() {
+                storesGrid.innerHTML = '';
+
+                if (fixedStores.length === 0) {
+                    storesGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--md-sys-color-on-surface-variant);">
+                            <i class="material-icons-outlined" style="font-size: 4rem; margin-bottom: 16px;">storefront</i>
+                            <h3>Nenhuma loja cadastrada</h3>
+                            <p>Clique em "Nova Loja" para adicionar sua primeira loja fixa.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const fragment = document.createDocumentFragment();
+
+                fixedStores.forEach(store => {
+                    const card = document.createElement('div');
+                    card.className = 'store-card';
+                    card.innerHTML = `
+                        <div class="card-banner" style="background-image: url('${store.logo || 'https://placehold.co/600x340/EADDFF/21005D?text=Loja'}')"></div>
+                        <div class="card-content">
+                            <h3 class="store-card__title">${store.name}</h3>
+                            <p class="store-card__description">${store.description}</p>
+                            <p class="store-card__url">${store.url}</p>
+                            <div class="card-actions">
+                                <button class="card-button edit" data-id="${store.id}">
+                                    <i class="material-icons-outlined">edit</i>
+                                </button>
+                                <button class="card-button delete" data-id="${store.id}">
+                                    <i class="material-icons-outlined">delete</i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    fragment.appendChild(card);
+                });
+
+                storesGrid.appendChild(fragment);
+
+                // Adicionar event listeners aos botões
+                document.querySelectorAll('.card-button.edit').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const storeId = button.getAttribute('data-id');
+                        const store = fixedStores.find(s => s.id === storeId);
+                        if (store) editStore(store);
+                    });
+                });
+
+                document.querySelectorAll('.card-button.delete').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const storeId = button.getAttribute('data-id');
+                        deleteStore(storeId);
+                    });
                 });
             }
-        });
-        
-        // Criar arquivo de exportação
-        const dataStr = JSON.stringify(userConversations, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(dataBlob);
-        link.download = `chat-export-${new Date().toISOString().split('T')[0]}.json`;
-        link.click();
-        
-        showNotification('Conversas exportadas com sucesso!', 'success');
-    }).catch(error => {
-        console.error('Erro ao exportar conversas:', error);
-        showNotification('Erro ao exportar conversas.', 'error');
-    });
-}
 
-function resetAllSettings() {
-    if (confirm('Tem certeza que deseja redefinir todas as configurações para os valores padrão?')) {
-        userSettings = {
-            soundNotification: true,
-            tabNotification: true,
-            onlineStatus: true,
-            receiveMessages: true,
-            darkTheme: false,
-            fontSize: 'medium'
-        };
-        
-        const settingsRef = database.ref(`users/${currentUser.uid}/settings`);
-        settingsRef.set(userSettings)
-            .then(() => {
-                applySettings();
-                showNotification('Configurações redefinidas com sucesso.', 'success');
-            })
-            .catch(error => {
-                console.error('Erro ao redefinir configurações:', error);
-                showNotification('Erro ao redefinir configurações.', 'error');
-            });
-    }
-}
-
-// Teste de microfone
-// Teste de microfone
-async function testMicrophoneFunction() {
-    try {
-        console.log('Iniciando teste do microfone...');
-        
-        // Verificar permissão primeiro
-        const hasPermission = await checkMicrophonePermission();
-        if (!hasPermission) {
-            showNotification('Permita o acesso ao microfone primeiro.', 'error');
-            showMicrophonePermissionInstructions();
-            return;
-        }
-        
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true,
-                sampleRate: 48000,
-                channelCount: 1
-            } 
-        });
-        
-        // Criar elemento de áudio para feedback
-        const audioContext = new AudioContext();
-        const source = audioContext.createMediaStreamSource(stream);
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        source.connect(analyser);
-        
-        // Mostrar indicador visual
-        showMicrophoneTestUI(stream, analyser);
-        
-    } catch (error) {
-        console.error('Erro ao testar microfone:', error);
-        showNotification('Erro ao acessar microfone: ' + error.message, 'error');
-        
-        if (error.name === 'NotAllowedError') {
-            showMicrophonePermissionInstructions();
-        }
-    }
-}
-
-function showMicrophoneTestUI(stream, analyser) {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-    `;
-    
-    modal.innerHTML = `
-        <div style="background: white; padding: 24px; border-radius: 12px; max-width: 300px; text-align: center;">
-            <h3 style="color: var(--md-sys-color-primary); margin-bottom: 16px;">Teste do Microfone</h3>
-            <div id="volumeIndicator" style="width: 100%; height: 20px; background: #f0f0f0; border-radius: 10px; margin: 20px 0; overflow: hidden;">
-                <div id="volumeLevel" style="height: 100%; background: #4CAF50; width: 0%; transition: width 0.1s;"></div>
-            </div>
-            <p id="volumeText" style="margin-bottom: 20px;">Fale para testar o microfone...</p>
-            <button id="stopMicrophoneTest" 
-                    style="background: var(--md-sys-color-primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                Parar Teste
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Animar o indicador de volume
-    const volumeLevel = document.getElementById('volumeLevel');
-    const volumeText = document.getElementById('volumeText');
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    
-    function updateVolume() {
-        analyser.getByteFrequencyData(dataArray);
-        const volume = Math.max(...dataArray) / 255 * 100;
-        volumeLevel.style.width = volume + '%';
-        
-        if (volume < 10) {
-            volumeLevel.style.background = '#f44336';
-            volumeText.textContent = 'Microfone não detectando áudio';
-        } else if (volume < 30) {
-            volumeLevel.style.background = '#FF9800';
-            volumeText.textContent = 'Volume baixo';
-        } else {
-            volumeLevel.style.background = '#4CAF50';
-            volumeText.textContent = 'Microfone funcionando!';
-        }
-        
-        if (modal.isConnected) {
-            requestAnimationFrame(updateVolume);
-        }
-    }
-    
-    updateVolume();
-    
-    // Event listener para o botão de parar
-    document.getElementById('stopMicrophoneTest').addEventListener('click', function() {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-        if (audioContext) {
-            audioContext.close();
-        }
-        modal.remove();
-    });
-    
-    // Armazenar a stream para parar depois
-    modal._stream = stream;
-    modal._audioContext = audioContext;
-}
-
-// Atualizar lista de usuários bloqueados na aba de configurações
-function updateBlockedUsersList() {
-    const blockedUsersList = document.getElementById('blockedUsersList');
-    if (!blockedUsersList) return;
-    
-    blockedUsersList.innerHTML = '';
-    
-    if (blockedUsers.length === 0) {
-        blockedUsersList.innerHTML = `
-            <div class="empty-state">
-                <span class="material-icons">block</span>
-                <p>Nenhum usuário bloqueado</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Buscar informações dos usuários bloqueados
-    usersRef.once('value').then(snapshot => {
-        const allUsers = snapshot.val();
-        
-        blockedUsers.forEach(userId => {
-            if (allUsers[userId]) {
-                const user = allUsers[userId];
-                const blockedUserElement = document.createElement('div');
-                blockedUserElement.className = 'blocked-user';
-                
-                blockedUserElement.innerHTML = `
-                    <div>
-                        <div class="user-name">${user.nome || 'Usuário'}</div>
-                        <div class="user-details">${user.bloco ? `Bloco ${user.bloco}, AP ${user.apartamento}` : 'Portaria'}</div>
+            function showMessage(message, type) {
+                messageContainer.innerHTML = `
+                    <div class="message ${type}">
+                        <i class="material-icons-outlined">${type === 'success' ? 'check_circle' : 'error'}</i>
+                        <span>${message}</span>
                     </div>
-                    <button class="unblock-btn" data-user-id="${userId}">Desbloquear</button>
                 `;
-                
-                blockedUsersList.appendChild(blockedUserElement);
-            }
-        });
-        
-        // Adicionar event listeners aos botões de desbloquear
-        document.querySelectorAll('.unblock-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const userIdToUnblock = this.dataset.userId;
-                unblockUser(userIdToUnblock);
-            });
-        });
-    }).catch(error => {
-        console.error('Erro ao carregar usuários bloqueados:', error);
-        blockedUsersList.innerHTML = `
-            <div class="empty-state">
-                <span class="material-icons">error</span>
-                <p>Erro ao carregar usuários bloqueados</p>
-            </div>
-        `;
-    });
-}
 
-// Desbloquear usuário
-function unblockUser(userId) {
-    if (confirm(`Tem certeza que deseja desbloquear este usuário?`)) {
-        blockedUsers = blockedUsers.filter(id => id !== userId);
-        database.ref(`users/${currentUser.uid}/blockedUsers`).set(blockedUsers)
-            .then(() => {
-                updateBlockedUsersList();
-                // Recarregar listas
-                loadUsersList();
-                loadConversationsList();
-                showNotification('Usuário desbloqueado com sucesso.', 'success');
-            })
-            .catch(error => {
-                console.error('Erro ao desbloquear usuário:', error);
-                showNotification('Erro ao desbloquear usuário.', 'error');
-            });
-    }
-}
-// Fallback: carregar configurações quando a aba se tornar visível
-const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-            const settingsTab = document.getElementById('settingsTab');
-            if (settingsTab && settingsTab.classList.contains('active') && !settingsInitialized) {
-                console.log('Aba de configurações ativada - inicializando...');
-                initializeSettings();
+                // Remover a mensagem após 5 segundos
+                setTimeout(() => {
+                    messageContainer.innerHTML = '';
+                }, 5000);
             }
-        }
-    });
-});
 
-// Iniciar observação quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', function() {
-    const settingsTab = document.getElementById('settingsTab');
-    if (settingsTab) {
-        observer.observe(settingsTab, { attributes: true });
-    }
-});
+            // Inicializar
+            loadFixedStores();
+        });
     </script>
 </body>
-    </html>
+
+</html>
