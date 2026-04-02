@@ -2,280 +2,230 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Condomínio Cotovias - Avisos</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Animate.css para animações extras -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EBF3FE',
+                            100: '#D7E8FD',
+                            200: '#B0D1FB',
+                            300: '#88B9F8',
+                            400: '#61A2F6',
+                            500: '#4A90E2',
+                            600: '#3A73B5',
+                            700: '#2B5688',
+                            800: '#1D3A5A',
+                            900: '#0E1D2D',
+                        },
+                        dark: {
+                            100: '#1E1E2F',
+                            200: '#16162A',
+                            300: '#0F0F1A',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'pulse-slow': 'pulse 2s infinite',
+                        'shimmer': 'shimmer 2s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    },
+                },
+            },
+        }
+    </script>
+    
     <style>
-        /* --- VARIÁVEIS DE DESIGN --- */
-        :root {
-            --cor-primaria: #4A90E2;
-            --cor-fundo: #F7F8FC;
-            --cor-surface: #FFFFFF;
-            --cor-texto-principal: #1C1E21;
-            --cor-texto-secundario: #606770;
-            --cor-borda: #E4E6EB;
-            --cor-aviso-urgente: #FF5252;
-            --cor-aviso-normal: #4CAF50;
-            --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.06);
-            --sombra-media: 0 6px 16px rgba(0, 0, 0, 0.1);
-            --fonte-principal: 'Inter', sans-serif;
-            --raio-borda: 12px;
-            --transition: all 0.3s ease;
-        }
-
-        /* --- RESET E ESTILOS GERAIS --- */
+        /* Estilos customizados complementares */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: var(--fonte-principal);
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto-principal);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* --- LAYOUT PRINCIPAL --- */
-        .page-container {
-            max-width: 850px;
-            margin: 0 auto;
-            padding: 32px 20px;
-        }
-        .page-header {
-            margin-bottom: 32px;
-        }
-        .header-content h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .header-content p {
-            font-size: 1rem;
-            color: var(--cor-texto-secundario);
-            max-width: 600px;
+            -webkit-tap-highlight-color: transparent;
         }
         
-        /* --- CONTROLES E FILTROS --- */
-        .controls-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 32px;
-            align-items: center;
+        body {
+            background: linear-gradient(135deg, #F7F8FC 0%, #EEF2F7 100%);
         }
-        .search-box {
-            position: relative;
-            flex: 1;
-            min-width: 250px;
+        
+        /* Glassmorphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .search-box input {
-            width: 100%;
-            padding: 14px 18px 14px 48px;
-            border: 1px solid var(--cor-borda);
-            border-radius: var(--raio-borda);
-            font-family: var(--fonte-principal);
-            font-size: 1rem;
-            transition: var(--transition);
-            background-color: var(--cor-surface);
+        
+        /* Card hover premium effect */
+        .premium-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--cor-primaria);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+        
+        .premium-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15), 0 4px 18px rgba(0, 0, 0, 0.05);
         }
-        .search-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--cor-texto-secundario);
+        
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+        
+        ::-webkit-scrollbar-track {
+            background: #E4E6EB;
+            border-radius: 10px;
         }
-        .filter-btn {
-            padding: 10px 20px;
-            background: var(--cor-surface);
-            border: 1px solid var(--cor-borda);
-            border-radius: var(--raio-borda);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            border-radius: 10px;
         }
-        .filter-btn:hover {
-            border-color: #ccc;
-            background: #f5f5f5;
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #3A73B5, #2B5688);
         }
-        .filter-btn.active {
-            background: var(--cor-primaria);
-            color: white;
-            border-color: var(--cor-primaria);
-        }
-        .filter-btn.active .material-icons-outlined {
-            color: white;
-        }
-        .filter-btn .material-icons-outlined {
-             font-size: 20px;
-             color: var(--cor-texto-secundario);
-        }
-
-        /* --- GRID DE AVISOS E CARDS --- */
-        .avisos-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        .aviso-card {
-            background-color: var(--cor-surface);
-            border-radius: var(--raio-borda);
-            box-shadow: var(--sombra-suave);
-            border: 1px solid var(--cor-borda);
-            padding: 24px;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            border-left: 5px solid;
-        }
-        .aviso-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--sombra-media);
-        }
-        .aviso-card.normal { border-color: var(--cor-aviso-normal); }
-        .aviso-card.urgente { border-color: var(--cor-aviso-urgente); }
-        .aviso-card h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-        .aviso-meta {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 0.9rem;
-            color: var(--cor-texto-secundario);
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .aviso-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .aviso-meta .material-icons-outlined { font-size: 18px; }
-        .aviso-conteudo {
-            font-size: 1rem;
-            color: #444;
-            max-height: 250px; /* Previne cards muito longos na lista */
-            overflow: hidden;
-            -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-        }
-
-        /* --- SKELETON LOADER --- */
-        .skeleton-card {
-            background-color: var(--cor-surface);
-            border-radius: var(--raio-borda);
-            border: 1px solid var(--cor-borda);
-            padding: 24px;
-        }
-        .skeleton-line {
-            height: 16px;
-            border-radius: 4px;
+        
+        /* Loading shimmer */
+        .shimmer-bg {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
-            animation: skeleton-shine 1.5s linear infinite;
         }
-        .skeleton-line.title { height: 24px; width: 70%; margin-bottom: 16px; }
-        .skeleton-line.meta { height: 16px; width: 50%; margin-bottom: 20px; }
-        .skeleton-line.content { width: 100%; margin-bottom: 10px; }
-        .skeleton-line.content.short { width: 85%; }
         
-        @keyframes skeleton-shine {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        /* Animações de entrada para cards */
+        .card-enter {
+            animation: slideUp 0.5s ease-out forwards;
+            opacity: 0;
         }
-
-        /* --- MODAL DE AVISO --- */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 16px;
-            animation: fadeIn 0.3s ease-out;
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .modal-container {
+        
+        /* Efeito de brilho nos botões */
+        .btn-glow {
             position: relative;
-            background: var(--cor-surface);
-            border-radius: var(--raio-borda);
-            max-width: 750px;
-            width: 100%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            animation: modal-appear 0.3s ease-out;
-            max-height: 90vh;
-            display: flex;
-        }
-        .modal-body {
-            padding: 32px;
-            width: 100%;
-            overflow-y: auto;
-            color: var(--cor-texto-principal);
-        }
-        .modal-close-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #e4e6eb;
-            color: var(--cor-texto-secundario);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            z-index: 10;
-        }
-        .modal-close-btn:hover { background: #d8dbdf; }
-
-        /* --- MÍDIA (IMAGENS E VÍDEOS) --- */
-        .image-container, .video-container {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            border-radius: var(--raio-borda);
             overflow: hidden;
-            box-shadow: var(--sombra-suave);
         }
-        .image-container img {
-            width: 100%;
-            height: auto;
-            display: block;
+        
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
-        .video-container {
+        
+        .btn-glow:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Modal animations */
+        .modal-content {
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Badge pulse */
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .badge-pulse {
+            animation: badgePulse 1s infinite;
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Video e image containers */
+        .media-container {
             position: relative;
             width: 100%;
-            padding-bottom: 56.25%; /* 16:9 */
+            border-radius: 16px;
+            overflow: hidden;
         }
-        .video-container iframe {
+        
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+        }
+        
+        .video-wrapper iframe {
             position: absolute;
             top: 0;
             left: 0;
@@ -283,261 +233,299 @@
             height: 100%;
             border: none;
         }
-        .aviso-conteudo p, .modal-body p {
-            margin-bottom: 1em;
+        
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
         }
         
-        /* --- ESTADOS E ANIMAÇÕES --- */
-        .no-avisos, .no-results {
-            text-align: center;
-            padding: 64px 0;
-            color: var(--cor-texto-secundario);
+        .image-wrapper:hover img {
+            transform: scale(1.05);
         }
-        .no-avisos .material-icons-outlined, .no-results .material-icons-outlined {
-            font-size: 56px;
-            margin-bottom: 16px;
+        
+        /* Search input custom */
+        .search-input {
+            transition: all 0.3s ease;
         }
-        @keyframes modal-appear { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+        }
+        
+        /* Aviso conteúdo truncado */
+        .aviso-content-preview {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     </style>
 </head>
-<body>
+<body class="font-inter antialiased">
 
-    <main class="page-container">
-        <div class="page-header">
-            <div class="header-content">
-                <h1>Quadro de Avisos</h1>
-                <p>Fique por dentro das últimas informações e comunicados importantes do condomínio.</p>
+    <!-- Header com efeito glass -->
+    <header class="glass sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg animate-float">
+                        <i class="material-icons text-white text-2xl">campaign</i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold gradient-text">Cotovias</h1>
+                        <p class="text-xs text-gray-500 hidden sm:block">Comunidade Inteligente</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-full">
+                        <i class="material-icons-outlined text-primary-500 text-sm">verified</i>
+                        <span class="text-xs text-gray-600">Comunicados Oficiais</span>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="controls-container">
-            <div class="search-box">
-                <i class="material-icons-outlined search-icon">search</i>
-                <input type="text" id="search-input" placeholder="Buscar por título ou conteúdo...">
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <!-- Hero Section -->
+        <div class="mb-8 sm:mb-10 text-center sm:text-left animate-slide-down">
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-800 mb-2">
+                Quadro de <span class="gradient-text">Avisos</span>
+            </h2>
+            <p class="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto sm:mx-0">
+                Fique por dentro das últimas informações e comunicados importantes do condomínio em tempo real
+            </p>
+        </div>
+        
+        <!-- Barra de Controles -->
+        <div class="mb-8 space-y-4">
+            <!-- Search Bar -->
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="material-icons-outlined text-gray-400 text-xl">search</i>
+                </div>
+                <input type="text" id="search-input" 
+                       placeholder="Buscar por título, conteúdo ou assunto..." 
+                       class="search-input w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-primary-500 transition-all shadow-sm">
             </div>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="todos"><i class="material-icons-outlined">all_inbox</i>Todos</button>
-                <button class="filter-btn" data-filter="urgente"><i class="material-icons-outlined">error_outline</i>Urgentes</button>
+            
+            <!-- Filtros -->
+            <div class="flex flex-wrap gap-2 sm:gap-3">
+                <button data-filter="todos" 
+                        class="filter-btn-active filter-btn px-4 sm:px-6 py-2.5 rounded-xl text-sm sm:text-base font-medium transition-all flex items-center gap-2 shadow-sm">
+                    <i class="material-icons-outlined text-lg">all_inbox</i>
+                    <span>Todos</span>
+                </button>
+                <button data-filter="urgente" 
+                        class="filter-btn px-4 sm:px-6 py-2.5 rounded-xl text-sm sm:text-base font-medium transition-all flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200">
+                    <i class="material-icons-outlined text-lg">error_outline</i>
+                    <span>Urgentes</span>
+                </button>
             </div>
         </div>
-        <div id="avisos-grid" class="avisos-grid">
-            </div>
+        
+        <!-- Grid de Avisos -->
+        <div id="avisos-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 sm:gap-6">
+            <!-- Skeletons serão inseridos aqui -->
+        </div>
     </main>
 
-    <div id="avisoModalOverlay" class="modal-overlay">
-        <div class="modal-container">
-            <button class="modal-close-btn"><i class="material-icons-outlined">close</i></button>
-            <div class="modal-body" id="modalConteudo"></div>
+    <!-- Modal -->
+    <div id="avisoModalOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden justify-center items-center z-[1000] p-4">
+        <div class="modal-content relative bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl">
+            <button class="modal-close-btn absolute top-4 right-4 w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all z-10">
+                <i class="material-icons-outlined text-gray-600">close</i>
+            </button>
+            <div class="modal-body p-6 sm:p-8 overflow-y-auto h-full" id="modalConteudo"></div>
         </div>
     </div>
     
-<script>
-// Script CORRIGIDO de Notificação de Encomendas
-(function() {
-    console.log('Iniciando script de encomendas...');
-    
-    // Aguarda o Firebase ser carregado
-    const checkFirebase = setInterval(() => {
-        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-            clearInterval(checkFirebase);
-            initEncomendas();
-        }
-    }, 100);
-
-    function initEncomendas() {
-        console.log('Firebase carregado, iniciando encomendas...');
-
-        // Estilos do sino
-        const style = document.createElement('style');
-        style.textContent = `
-            .encomenda-notification {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 10000;
-                cursor: pointer;
-            }
-                        .encomenda-bell {
-                width: 50px;
-                height: 50px;
-                background: #4A90E2;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-                position: relative;
-                top: 600px;
-                transition: transform 0.3s ease;
-            }
-            .encomenda-bell:hover {
-                transform: scale(1.1);
-            }
-            .encomenda-bell i {
-                color: white;
-                font-size: 24px;
-            }
-            .encomenda-badge {
-                position: absolute;
-                top: -5px;
-                right: -5px;
-                background: #ff4444;
-                color: white;
-                border-radius: 50%;
-                width: 20px;
-                height: 20px;
-                font-size: 12px;
-                font-weight: bold;
-                display: none;
-                align-items: center;
-                justify-content: center;
-                animation: pulse 1.5s infinite;
-            }
-            .encomenda-modal {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 10001;
-                align-items: center;
-                justify-content: center;
-            }
-            .encomenda-modal-content {
-                background: white;
-                border-radius: 10px;
-                padding: 20px;
-                max-width: 300px;
-                width: 90%;
-                text-align: center;
-                animation: modalAppear 0.3s ease;
-            }
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.1); }
-                100% { transform: scale(1); }
-            }
-            @keyframes modalAppear {
-                from { opacity: 0; transform: scale(0.8); }
-                to { opacity: 1; transform: scale(1); }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Cria o sino
-        const bellHtml = `
-            <div class="encomenda-notification">
-                <div class="encomenda-bell">
-                    <i class="material-icons">notifications</i>
-                    <div class="encomenda-badge" id="encomendaBadge">0</div>
-                </div>
-            </div>
-            <div class="encomenda-modal" id="encomendaModal">
-                <div class="encomenda-modal-content">
-                    <h3 style="margin-bottom: 15px; color: #333;">📦 Suas Encomendas</h3>
-                    <div id="encomendaMessage"></div>
-                    <button onclick="document.getElementById('encomendaModal').style.display='none'" 
-                            style="margin-top: 15px; padding: 8px 16px; background: #4A90E2; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: inherit;">
-                        Fechar
-                    </button>
-                </div>
-            </div>
-        `;
+    <script>
+    // Script de Notificação de Encomendas (mantido igual)
+    (function() {
+        console.log('Iniciando script de encomendas...');
         
-        document.body.insertAdjacentHTML('beforeend', bellHtml);
+        const checkFirebase = setInterval(() => {
+            if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                clearInterval(checkFirebase);
+                initEncomendas();
+            }
+        }, 100);
 
-        // TESTE: Vamos monitorar TODAS as encomendas primeiro para ver se funciona
-        console.log('Iniciando monitoramento de encomendas...');
-        
-        // Monitora TODAS as encomendas pendentes (para teste)
-        firebase.database().ref('encomendas')
-            .orderByChild('status')
-            .equalTo('pendente')
-            .on('value', snapshot => {
-                let totalEncomendas = 0;
-                
-                if (snapshot.exists()) {
-                    snapshot.forEach(item => {
-                        const encomenda = item.val();
-                        console.log('Encomenda encontrada:', encomenda);
-                        totalEncomendas++;
+        function initEncomendas() {
+            console.log('Firebase carregado, iniciando encomendas...');
+
+            const style = document.createElement('style');
+            style.textContent = `
+                .encomenda-notification {
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    z-index: 10000;
+                    cursor: pointer;
+                }
+                .encomenda-bell {
+                    width: 56px;
+                    height: 56px;
+                    background: linear-gradient(135deg, #4A90E2, #3A73B5);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+                    transition: all 0.3s ease;
+                }
+                .encomenda-bell:hover {
+                    transform: scale(1.1);
+                    box-shadow: 0 12px 28px rgba(74, 144, 226, 0.4);
+                }
+                .encomenda-bell i {
+                    color: white;
+                    font-size: 28px;
+                }
+                .encomenda-badge {
+                    position: absolute;
+                    top: -5px;
+                    right: -5px;
+                    background: #FF5252;
+                    color: white;
+                    border-radius: 50%;
+                    min-width: 22px;
+                    height: 22px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0 5px;
+                    animation: pulse 1.5s infinite;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                }
+                .encomenda-modal {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.6);
+                    backdrop-filter: blur(4px);
+                    z-index: 10001;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .encomenda-modal-content {
+                    background: white;
+                    border-radius: 24px;
+                    padding: 24px;
+                    max-width: 320px;
+                    width: 90%;
+                    text-align: center;
+                    animation: modalAppear 0.3s ease;
+                }
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.15); }
+                }
+                @keyframes modalAppear {
+                    from { opacity: 0; transform: scale(0.9); }
+                    to { opacity: 1; transform: scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            const bellHtml = `
+                <div class="encomenda-notification">
+                    <div class="encomenda-bell">
+                        <i class="material-icons">notifications</i>
+                        <div class="encomenda-badge" id="encomendaBadge">0</div>
+                    </div>
+                </div>
+                <div class="encomenda-modal" id="encomendaModal">
+                    <div class="encomenda-modal-content">
+                        <div class="text-5xl mb-3">📦</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Suas Encomendas</h3>
+                        <div id="encomendaMessage"></div>
+                        <button onclick="document.getElementById('encomendaModal').style.display='none'" 
+                                class="mt-4 px-6 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-medium hover:shadow-lg transition-all">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', bellHtml);
+
+            firebase.database().ref('encomendas')
+                .orderByChild('status')
+                .equalTo('pendente')
+                .on('value', snapshot => {
+                    let totalEncomendas = 0;
+                    
+                    if (snapshot.exists()) {
+                        snapshot.forEach(item => {
+                            const encomenda = item.val();
+                            console.log('Encomenda encontrada:', encomenda);
+                            totalEncomendas++;
+                        });
+                    }
+                    
+                    console.log('Total de encomendas pendentes:', totalEncomendas);
+                    updateBadge(totalEncomendas);
+                });
+
+            function updateBadge(count) {
+                const badge = document.getElementById('encomendaBadge');
+                if (count > 0) {
+                    badge.style.display = 'flex';
+                    badge.textContent = count > 99 ? '99+' : count;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            setTimeout(() => {
+                const bellElement = document.querySelector('.encomenda-notification');
+                if (bellElement) {
+                    bellElement.addEventListener('click', function() {
+                        const badge = document.getElementById('encomendaBadge');
+                        const count = parseInt(badge.textContent) || 0;
+                        const modal = document.getElementById('encomendaModal');
+                        const message = document.getElementById('encomendaMessage');
+                        
+                        if (count > 0) {
+                            message.innerHTML = `
+                                <p class="mb-3">Você tem <strong class="text-primary-500 text-lg">${count}</strong> encomenda(s) pendentes!</p>
+                                <p class="text-sm text-gray-500">📦 Dirija-se à portaria para retirar</p>
+                            `;
+                        } else {
+                            message.innerHTML = `
+                                <p class="mb-3">Nenhuma encomenda pendente</p>
+                                <p class="text-sm text-gray-500">📭 Volte mais tarde</p>
+                            `;
+                        }
+                        
+                        modal.style.display = 'flex';
+                    });
+
+                    document.getElementById('encomendaModal').addEventListener('click', function(e) {
+                        if (e.target === this) {
+                            this.style.display = 'none';
+                        }
                     });
                 }
-                
-                console.log('Total de encomendas pendentes:', totalEncomendas);
-                updateBadge(totalEncomendas);
-            });
-
-        // Função para atualizar o badge
-        function updateBadge(count) {
-            const badge = document.getElementById('encomendaBadge');
-            if (count > 0) {
-                badge.style.display = 'flex';
-                badge.textContent = count > 99 ? '99+' : count;
-                console.log('Badge atualizado para:', count);
-            } else {
-                badge.style.display = 'none';
-                console.log('Nenhuma encomenda, badge oculto');
-            }
+            }, 500);
         }
+    })();
+    </script>
 
-        // Configura os cliques
-        setTimeout(() => {
-            const bellElement = document.querySelector('.encomenda-notification');
-            if (bellElement) {
-                bellElement.addEventListener('click', function() {
-                    const badge = document.getElementById('encomendaBadge');
-                    const count = parseInt(badge.textContent) || 0;
-                    const modal = document.getElementById('encomendaModal');
-                    const message = document.getElementById('encomendaMessage');
-                    
-                    if (count > 0) {
-                        message.innerHTML = `
-                            <p style="margin-bottom: 10px;">Você tem <strong style="color: #4A90E2;">${count} encomenda(s)</strong> pendentes!</p>
-                            <p style="font-size: 14px; color: #666;">
-                                📦 Dirija-se à portaria para retirar
-                            </p>
-                        `;
-                    } else {
-                        message.innerHTML = `
-                            <p style="margin-bottom: 10px;">Nenhuma encomenda pendente</p>
-                            <p style="font-size: 14px; color: #666;">
-                                📭 Volte mais tarde
-                            </p>
-                        `;
-                    }
-                    
-                    modal.style.display = 'flex';
-                });
-
-                // Fecha modal ao clicar fora
-                document.getElementById('encomendaModal').addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        this.style.display = 'none';
-                    }
-                });
-
-                console.log('Sino configurado com sucesso!');
-            }
-        }, 500);
-    }
-})();
-</script>
-
-<!-- Adicione também o Material Icons -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-<!-- Adicione também o Material Icons se não estiver incluído -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-<!-- E o Firebase se não estiver incluído -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const firebaseConfig = {
@@ -570,18 +558,23 @@
 
             let allAvisos = [];
 
-            const showSkeletons = (count = 3) => {
+            const showSkeletons = (count = 4) => {
                 avisosGrid.innerHTML = '';
                 for (let i = 0; i < count; i++) {
-                    const skeleton = document.createElement('div');
-                    skeleton.className = 'skeleton-card';
-                    skeleton.innerHTML = `
-                        <div class="skeleton-line title"></div>
-                        <div class="skeleton-line meta"></div>
-                        <div class="skeleton-line content"></div>
-                        <div class="skeleton-line content short"></div>
+                    avisosGrid.innerHTML += `
+                        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm animate-pulse">
+                            <div class="h-6 bg-gray-200 rounded-lg w-3/4 mb-4 shimmer-bg"></div>
+                            <div class="flex gap-4 mb-4">
+                                <div class="h-4 bg-gray-200 rounded w-1/3 shimmer-bg"></div>
+                                <div class="h-4 bg-gray-200 rounded w-1/4 shimmer-bg"></div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="h-4 bg-gray-200 rounded w-full shimmer-bg"></div>
+                                <div class="h-4 bg-gray-200 rounded w-5/6 shimmer-bg"></div>
+                                <div class="h-4 bg-gray-200 rounded w-4/6 shimmer-bg"></div>
+                            </div>
+                        </div>
                     `;
-                    avisosGrid.appendChild(skeleton);
                 }
             };
 
@@ -603,7 +596,7 @@
 
             const applyFiltersAndRender = () => {
                 const currentSearch = searchInput.value.toLowerCase();
-                const currentFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                const currentFilter = document.querySelector('.filter-btn-active')?.dataset.filter || 'todos';
                 
                 const filteredAvisos = allAvisos.filter(aviso => {
                     const matchesFilter = currentFilter === 'todos' || (currentFilter === 'urgente' && aviso.urgente);
@@ -632,8 +625,12 @@
             searchInput.addEventListener('input', applyFiltersAndRender);
             filterButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    filterButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
+                    filterButtons.forEach(b => {
+                        b.classList.remove('filter-btn-active', 'bg-primary-500', 'text-white', 'shadow-md');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    btn.classList.remove('bg-gray-100', 'text-gray-700');
+                    btn.classList.add('filter-btn-active', 'bg-primary-500', 'text-white', 'shadow-md');
                     applyFiltersAndRender();
                 });
             });
@@ -645,48 +642,80 @@
                     return;
                 }
                 
-                const fragment = document.createDocumentFragment();
-                avisos.forEach(aviso => {
+                avisos.forEach((aviso, index) => {
                     const card = createAvisoCard(aviso);
+                    card.style.animationDelay = `${index * 0.05}s`;
+                    card.classList.add('card-enter');
                     card.addEventListener('click', () => openModalWithAviso(aviso));
-                    fragment.appendChild(card);
+                    avisosGrid.appendChild(card);
                 });
-                avisosGrid.appendChild(fragment);
             }
 
             function createAvisoCard(aviso) {
                 const card = document.createElement('div');
-                card.className = `aviso-card ${aviso.urgente ? 'urgente' : 'normal'}`;
-                const dataFormatada = new Date(aviso.data).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+                const isUrgente = aviso.urgente;
+                const borderClass = isUrgente ? 'border-l-4 border-l-red-500' : 'border-l-4 border-l-green-500';
+                const badgeClass = isUrgente ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
+                const badgeText = isUrgente ? 'Urgente' : 'Informativo';
+                const badgeIcon = isUrgente ? 'error_outline' : 'info_outline';
+                
+                const dataFormatada = new Date(aviso.data).toLocaleDateString('pt-BR', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                
+                card.className = `premium-card bg-white rounded-2xl border border-gray-100 p-6 cursor-pointer transition-all shadow-sm hover:shadow-xl ${borderClass}`;
                 
                 card.innerHTML = `
-                    <h2>${aviso.titulo}</h2>
-                    <div class="aviso-meta">
-                        <div class="aviso-meta-item">
-                            <i class="material-icons-outlined">event</i>
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-800 flex-1">${escapeHtml(aviso.titulo)}</h3>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${badgeClass} ml-2">
+                            <i class="material-icons-outlined text-sm">${badgeIcon}</i>
+                            ${badgeText}
+                        </span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-4">
+                        <div class="flex items-center gap-1.5">
+                            <i class="material-icons-outlined text-base">event</i>
                             <span>${dataFormatada}</span>
                         </div>
-                        <div class="aviso-meta-item">
-                            <i class="material-icons-outlined">person_outline</i>
-                            <span>${aviso.autor || 'Administração'}</span>
+                        <div class="flex items-center gap-1.5">
+                            <i class="material-icons-outlined text-base">person_outline</i>
+                            <span>${escapeHtml(aviso.autor || 'Administração')}</span>
                         </div>
                     </div>
-                    <div class="aviso-conteudo">${processMediaLinks(aviso.mensagem)}</div>
+                    <div class="aviso-content-preview text-gray-600 text-sm leading-relaxed">
+                        ${stripHtml(processMediaLinksSimple(aviso.mensagem))}
+                    </div>
                 `;
                 return card;
             }
 
             function openModalWithAviso(aviso) {
-                modalConteudo.innerHTML = processMediaLinks(aviso.mensagem);
+                modalConteudo.innerHTML = processMediaLinksFull(aviso.mensagem);
                 openModal();
             }
 
-            function processMediaLinks(text) {
+            function processMediaLinksSimple(text) {
                 if (!text) return '';
                 const urlRegex = /(https?:\/\/[^\s]+)/g;
+                return text.replace(urlRegex, (url) => {
+                    if (url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)) {
+                        return '[Vídeo]';
+                    } else if (/\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(url)) {
+                        return '[Imagem]';
+                    }
+                    return url;
+                });
+            }
+
+            function processMediaLinksFull(text) {
+                if (!text) return '<p class="text-gray-500">Sem conteúdo</p>';
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
                 
-                return text.split('\n').map(line => {
-                    if (!line.trim()) return ''; // Ignora linhas vazias
+                let processed = text.split('\n').map(line => {
+                    if (!line.trim()) return '';
                     
                     let processedLine = line;
                     const urls = line.match(urlRegex);
@@ -697,32 +726,80 @@
                             const youtubeMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
                             
                             if (youtubeMatch) {
-                                replacement = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${youtubeMatch[1]}" frameborder="0" allowfullscreen></iframe></div>`;
+                                replacement = `<div class="media-container video-wrapper my-4"><iframe src="https://www.youtube.com/embed/${youtubeMatch[1]}" frameborder="0" allowfullscreen></iframe></div>`;
                             } else if (/\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(url)) {
-                                replacement = `<div class="image-container"><img src="${url}" alt="Imagem do aviso" loading="lazy"></div>`;
+                                replacement = `<div class="media-container image-wrapper my-4 rounded-xl overflow-hidden shadow-md"><img src="${url}" alt="Imagem do aviso" loading="lazy" class="w-full"></div>`;
                             } else {
-                                replacement = `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+                                replacement = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary-500 hover:text-primary-600 underline break-all">${url}</a>`;
                             }
                             processedLine = processedLine.replace(url, replacement);
                         });
                     }
                     
-                    return (processedLine.startsWith('<div')) ? processedLine : `<p>${processedLine}</p>`;
+                    if (processedLine.startsWith('<div')) return processedLine;
+                    return `<p class="mb-3 text-gray-700 leading-relaxed">${processedLine}</p>`;
                 }).join('');
+                
+                return `<div class="prose max-w-none">${processed}</div>`;
+            }
+
+            function stripHtml(html) {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                return temp.textContent || temp.innerText || '';
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/[&<>]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    return m;
+                });
             }
 
             function showNoAvisos() { 
-                avisosGrid.innerHTML = `<div class="no-avisos"><i class="material-icons-outlined">notifications_off</i><h3>Nenhum aviso disponível</h3><p>Volte mais tarde para conferir as novidades.</p></div>`;
+                avisosGrid.innerHTML = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
+                            <i class="material-icons-outlined text-4xl text-gray-400">notifications_off</i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Nenhum aviso disponível</h3>
+                        <p class="text-gray-500">Volte mais tarde para conferir as novidades.</p>
+                    </div>
+                `;
             }
+            
             function showNoResults() { 
-                avisosGrid.innerHTML = `<div class="no-results"><i class="material-icons-outlined">search_off</i><h3>Nenhum aviso encontrado</h3><p>Tente ajustar os filtros ou termos de busca.</p></div>`;
+                avisosGrid.innerHTML = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
+                            <i class="material-icons-outlined text-4xl text-gray-400">search_off</i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Nenhum aviso encontrado</h3>
+                        <p class="text-gray-500">Tente ajustar os filtros ou termos de busca.</p>
+                    </div>
+                `;
             }
+            
             function showError(message) { 
-                avisosGrid.innerHTML = `<div class="no-results"><i class="material-icons-outlined">error_outline</i><h3>Ocorreu um erro</h3><p>${message}</p></div>`;
+                avisosGrid.innerHTML = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4">
+                            <i class="material-icons-outlined text-4xl text-red-500">error_outline</i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Ocorreu um erro</h3>
+                        <p class="text-gray-500">${message}</p>
+                    </div>
+                `;
             }
 
-            // Inicia com os skeletons
+            // Inicializa com skeletons
             showSkeletons();
+            
+            // Ajusta classe inicial do botão ativo
+            document.querySelector('.filter-btn-active')?.classList.add('bg-primary-500', 'text-white', 'shadow-md');
         });
     </script>
 </body>
