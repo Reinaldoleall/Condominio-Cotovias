@@ -3,902 +3,564 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Administração</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4A90E2">
+    <title>Painel de Administração - Condomínio Cotovias</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EBF3FE',
+                            100: '#D7E8FD',
+                            200: '#B0D1FB',
+                            300: '#88B9F8',
+                            400: '#61A2F6',
+                            500: '#4A90E2',
+                            600: '#3A73B5',
+                            700: '#2B5688',
+                            800: '#1D3A5A',
+                            900: '#0E1D2D',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'spin-slow': 'spin 1s linear infinite',
+                        'fade-in': 'fadeIn 0.4s ease-in-out',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        spin: {
+                            'from': { transform: 'rotate(0deg)' },
+                            'to': { transform: 'rotate(360deg)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    
     <style>
-        :root {
-            --md-sys-color-primary: #6750A4;
-            --md-sys-color-on-primary: #FFFFFF;
-            --md-sys-color-primary-container: #EADDFF;
-            --md-sys-color-on-primary-container: #21005D;
-            --md-sys-color-secondary: #625B71;
-            --md-sys-color-on-secondary-container: #1D192B;
-            --md-sys-color-error: #B3261E;
-            --md-sys-color-on-error: #FFFFFF;
-            --md-sys-color-background: #F4F5F7;
-            --md-sys-color-surface: #FFFFFF;
-            --md-sys-color-on-surface: #1C1B1F;
-            --md-sys-color-surface-variant: #E7E0EC;
-            --md-sys-color-on-surface-variant: #49454F;
-            --md-sys-color-outline: #79747E;
-            --md-sys-font-family: 'Inter', sans-serif;
-            --md-sys-border-radius: 16px;
-            --md-sys-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12);
-            --md-sys-elevation-2: 0 3px 6px rgba(0, 0, 0, 0.10), 0 3px 6px rgba(0, 0, 0, 0.15);
-        }
-
+        /* Estilos customizados */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-
+        
         body {
-            font-family: var(--md-sys-font-family);
-            background-color: var(--md-sys-color-background);
-            color: var(--md-sys-color-on-background);
-            -webkit-font-smoothing: antialiased;
+            background: linear-gradient(135deg, #F7F8FC 0%, #EEF2F7 100%);
+            font-family: 'Inter', sans-serif;
         }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-size: contain;
-            height: 100vh;
-            width: 100vw;
+        
+        /* Glass effect */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(74, 144, 226, 0.1);
         }
-
-        /* --- Layout --- */
-        .app-header {
-            background-color: var(--md-sys-color-surface);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 64px;
-            padding: 0 24px;
+        
+        ::-webkit-scrollbar-track {
+            background: #E4E6EB;
+            border-radius: 10px;
         }
-
-        .top-bar-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--md-sys-color-primary);
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            border-radius: 10px;
         }
-
-        .tabs-container {
-            overflow-x: auto;
-            scrollbar-width: none;
+        
+        /* Card hover premium */
+        .premium-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .tabs-container::-webkit-scrollbar {
-            display: none;
+        
+        .premium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
         }
-
-        .tabs-bar {
-            display: flex;
-            padding: 0 16px;
-            border-bottom: 1px solid #eee;
+        
+        /* Input focus effect */
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+            border-color: #4A90E2;
         }
-
-        .tab-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 16px;
-            font-family: var(--md-sys-font-family);
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--md-sys-color-on-surface-variant);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .tab-button:hover {
-            color: var(--md-sys-color-primary);
-        }
-
-        .tab-button.active {
-            color: var(--md-sys-color-primary);
-            border-bottom-color: var(--md-sys-color-primary);
-        }
-
-        .page-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* --- Components --- */
-        .card {
-            background-color: var(--md-sys-color-surface);
-            padding: 24px;
-            border-radius: var(--md-sys-border-radius);
-            margin-bottom: 24px;
-            box-shadow: var(--md-sys-elevation-1);
-        }
-
-        .card h2 {
-            font-size: 1.2rem;
-            margin-bottom: 24px;
-            color: var(--md-sys-color-on-surface);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 12px;
-        }
-
-        .btn,
-        .btn-outlined,
-        .btn-text {
-            font-family: var(--md-sys-font-family);
-            border: none;
-            padding: 10px 24px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .btn {
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
-        }
-
-        .btn:hover {
-            filter: brightness(1.1);
-            box-shadow: var(--md-sys-elevation-2);
-            transform: translateY(-1px);
-        }
-
-        .btn-outlined {
-            background-color: transparent;
-            color: var(--md-sys-color-primary);
-            border: 1px solid var(--md-sys-color-outline);
-        }
-
-        .btn-outlined:hover {
-            background-color: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent);
-        }
-
-        .btn-text {
-            color: var(--md-sys-color-primary);
-            background: transparent;
-        }
-
-        .btn.btn-danger {
-            background-color: var(--md-sys-color-error);
-        }
-
-        /* --- Formulário Elegante --- */
-        .form-field {
+        
+        /* Ripple effect */
+        .ripple {
             position: relative;
-            margin-bottom: 24px;
+            overflow: hidden;
         }
-
-        .form-field input,
-        .form-field textarea,
-        .form-field select {
-            width: 100%;
-            padding: 20px 16px 8px 16px;
-            font-size: 1rem;
-            border: 1px solid var(--md-sys-color-outline);
-            border-radius: 8px;
-            background-color: var(--md-sys-color-background);
-            color: var(--md-sys-color-on-surface);
-            transition: border-color 0.2s ease;
-        }
-
-        .form-field textarea {
-            min-height: 100px;
-        }
-
-        .form-field label {
+        
+        .ripple::after {
+            content: '';
             position: absolute;
-            top: 15px;
-            left: 16px;
-            color: var(--md-sys-color-on-surface-variant);
-            pointer-events: none;
-            transition: all 0.2s ease;
-        }
-
-        .form-field input:focus,
-        .form-field textarea:focus,
-        .form-field select:focus {
-            outline: none;
-            border-color: var(--md-sys-color-primary);
-        }
-
-        .form-field input:focus+label,
-        .form-field input:not(:placeholder-shown)+label,
-        .form-field textarea:focus+label,
-        .form-field textarea:not(:placeholder-shown)+label,
-        .form-field select:focus+label,
-        .form-field select:not([value=""])+label {
-            top: 6px;
-            left: 16px;
-            font-size: 0.75rem;
-            color: var(--md-sys-color-primary);
-        }
-
-        /* Override for toggle switch label to make it clickable */
-        .form-field label.toggle-switch {
-            position: relative;
-            top: 0;
-            left: 0;
-            pointer-events: auto;
-        }
-
-        select option {
-            color: var(--md-sys-color-on-surface);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .input-group .form-field {
-            flex-grow: 1;
-            margin-bottom: 0;
-        }
-
-        /* --- Toggle Switch --- */
-        .toggle-switch-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .toggle-switch-container>label {
-            cursor: pointer;
-        }
-
-        /* Make text label clickable */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
+            top: 50%;
+            left: 50%;
             width: 0;
             height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            transition: .4s;
             border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
         }
-
-        input:checked+.slider {
-            background-color: var(--md-sys-color-primary);
+        
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
         }
-
-        input:checked+.slider:before {
-            transform: translateX(20px);
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-
-        /* --- Upload de Imagens --- */
-        .image-upload-container {
-            margin-bottom: 24px;
+        
+        /* Tab active style */
+        .tab-active {
+            color: #4A90E2;
+            border-bottom-color: #4A90E2;
         }
-
+        
+        /* Login card glass */
+        .glass-login {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Toast animation */
+        .toast-slide {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        /* Tag styles */
+        .tag-custom {
+            transition: all 0.2s ease;
+        }
+        
+        .tag-custom:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Image upload area */
         .image-upload-area {
-            border: 2px dashed var(--md-sys-color-outline);
-            border-radius: 8px;
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
             transition: all 0.3s ease;
-            background-color: var(--md-sys-color-background);
         }
-
-        .image-upload-area:hover {
-            border-color: var(--md-sys-color-primary);
-            background-color: color-mix(in srgb, var(--md-sys-color-primary) 5%, transparent);
-        }
-
+        
         .image-upload-area.dragover {
-            border-color: var(--md-sys-color-primary);
-            background-color: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent);
+            border-color: #4A90E2;
+            background-color: rgba(74, 144, 226, 0.1);
         }
-
-        .image-upload-icon {
-            font-size: 48px;
-            color: var(--md-sys-color-outline);
-            margin-bottom: 16px;
-        }
-
-        .image-upload-text {
-            color: var(--md-sys-color-on-surface-variant);
-            margin-bottom: 8px;
-        }
-
-        .image-upload-hint {
-            font-size: 0.8rem;
-            color: var(--md-sys-color-outline);
-        }
-
-        .image-preview-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .image-preview {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--md-sys-elevation-1);
-        }
-
-        .image-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .image-preview-remove {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .upload-progress {
-            margin-top: 12px;
-            width: 100%;
-            height: 6px;
-            background-color: var(--md-sys-color-surface-variant);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .upload-progress-bar {
-            height: 100%;
-            background-color: var(--md-sys-color-primary);
-            transition: width 0.3s ease;
-        }
-
-        /* --- Login Page --- */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 16px;
-            background-color: var(--md-sys-color-background);
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 420px;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .login-card h2 {
-            font-size: 1.8rem;
-            margin-bottom: 24px;
-            color: var(--md-sys-color-on-surface);
-        }
-
-        /* --- Admin Product Grid --- */
-        .admin-products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-        }
-
+        
+        /* Product card */
         .admin-product-card {
-            position: relative;
-            background-color: var(--md-sys-color-surface);
-            border-radius: var(--md-sys-border-radius);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: box-shadow 0.2s ease;
+            transition: all 0.3s ease;
         }
-
+        
         .admin-product-card:hover {
-            box-shadow: var(--md-sys-elevation-2);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px -6px rgba(0, 0, 0, 0.1);
         }
-
-        .admin-product-card__image {
-            width: 100%;
-            padding-top: 75%;
-            background-size: cover;
-            background-position: center;
-            background-color: var(--md-sys-color-background);
+        
+        /* Modal animation */
+        .modal-scale {
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .admin-product-card__info {
-            padding: 16px;
-            flex-grow: 1;
-        }
-
-        .admin-product-card__name {
-            font-weight: 500;
-            font-size: 1.1rem;
-        }
-
-        .admin-product-card__price {
-            color: var(--md-sys-color-primary);
-            font-weight: 700;
-            margin-top: 8px;
-        }
-
-        .admin-product-card__actions {
-            padding: 8px;
-            display: flex;
-            gap: 8px;
-            border-top: 1px solid #eee;
-        }
-
-        .admin-product-card__actions .btn-text {
-            flex: 1;
-        }
-
-        .outofstock-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background-color: var(--md-sys-color-secondary-container);
-            color: var(--md-sys-color-on-secondary-container);
-            padding: 4px 10px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            border-radius: 12px;
-            z-index: 2;
-        }
-
-        .product-filters {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        /* --- Tags & Modal & Toast --- */
-        .tag-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .tag {
-            background-color: var(--md-sys-color-primary-container);
-            color: var(--md-sys-color-on-primary-container);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tag .delete-btn {
+        
+        /* Color input custom */
+        input[type="color"] {
             cursor: pointer;
-            font-size: 1rem;
         }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 16px;
+        
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
         }
-
-        .modal-overlay.show {
-            display: flex;
-            animation: fadeIn 0.3s ease;
+        
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 8px;
         }
-
-        .modal-container {
-            background: var(--md-sys-color-surface);
-            border-radius: 28px;
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--md-sys-elevation-2);
-            transform: scale(0.95);
-            animation: zoomIn 0.3s ease forwards;
-        }
-
-        @keyframes zoomIn {
-            to {
-                transform: scale(1);
-            }
-        }
-
-        .modal-header {
-            padding: 24px;
-            font-size: 1.4rem;
-        }
-
-        .modal-body {
-            padding: 0 24px 24px;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .modal-footer {
-            padding: 16px 24px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-            border-top: 1px solid #eee;
-        }
-
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .toast {
-            background-color: #323232;
-            color: #FFFFFF;
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            box-shadow: var(--md-sys-elevation-2);
-            animation: toast-in 0.5s ease;
-        }
-
-        @keyframes toast-in {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* --- Responsive --- */
-        @media (min-width: 768px) {
-            .product-filters {
-                flex-direction: row;
-                align-items: flex-end;
-            }
-
-            .product-filters .form-field {
-                flex-grow: 1;
-            }
+        
+        /* Loading spinner */
+        .loading-spinner-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
     </style>
 </head>
 
-<body>
-    <div id="auth-container" class="login-container">
-        <div class="card login-card">
+<body class="antialiased">
+
+    <!-- Auth Container (Login) -->
+    <div id="auth-container" class="login-container min-h-screen flex items-center justify-center p-4">
+        <div class="glass-login rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i class="material-icons text-white text-3xl">admin_panel_settings</i>
+            </div>
             <div id="login-form">
-                <h2>Acessar Painel</h2>
-                <div class="form-field"><input type="email" id="login-email" placeholder=" "><label
-                        for="login-email">E-mail</label></div>
-                <div class="form-field"><input type="password" id="login-password" placeholder=" "><label
-                        for="login-password">Senha</label></div>
-                <button id="login-btn" class="btn" style="width: 100%;">Entrar</button>
-                <button id="show-register-btn" class="btn-text" style="margin-top: 10px;">Criar Conta</button>
+                <h2 class="text-2xl font-bold gradient-text mb-6">Acessar Painel</h2>
+                <div class="form-field mb-4">
+                    <input type="email" id="login-email" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                    <label class="text-gray-500 text-sm mt-1 block text-left">E-mail</label>
+                </div>
+                <div class="form-field mb-6">
+                    <input type="password" id="login-password" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                    <label class="text-gray-500 text-sm mt-1 block text-left">Senha</label>
+                </div>
+                <button id="login-btn" class="btn w-full py-3 bg-primary-500 text-white rounded-xl font-semibold hover:bg-primary-600 transition-all ripple">Entrar</button>
+                <button id="show-register-btn" class="btn-text mt-4 text-primary-500 hover:text-primary-600 transition-all">Criar Conta</button>
             </div>
             <div id="register-form" style="display: none;">
-                <h2>Criar Nova Conta</h2>
-                <div class="form-field"><input type="email" id="register-email" placeholder=" "><label
-                        for="register-email">E-mail</label></div>
-                <div class="form-field"><input type="password" id="register-password" placeholder=" "><label
-                        for="register-password">Senha</label></div>
-                <button id="register-btn" class="btn" style="width: 100%;">Cadastrar</button>
-                <button id="show-login-btn" class="btn-text" style="margin-top: 10px;">Já tenho conta</button>
+                <h2 class="text-2xl font-bold gradient-text mb-6">Criar Nova Conta</h2>
+                <div class="form-field mb-4">
+                    <input type="email" id="register-email" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                    <label class="text-gray-500 text-sm mt-1 block text-left">E-mail</label>
+                </div>
+                <div class="form-field mb-6">
+                    <input type="password" id="register-password" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                    <label class="text-gray-500 text-sm mt-1 block text-left">Senha</label>
+                </div>
+                <button id="register-btn" class="btn w-full py-3 bg-primary-500 text-white rounded-xl font-semibold hover:bg-primary-600 transition-all ripple">Cadastrar</button>
+                <button id="show-login-btn" class="btn-text mt-4 text-primary-500 hover:text-primary-600 transition-all">Já tenho conta</button>
             </div>
         </div>
     </div>
 
+    <!-- App Container (Admin Panel) -->
     <div id="app-container" style="display: none;">
-        <header class="app-header">
-            <div class="top-bar">
-                <span class="top-bar-title">Meu Painel</span>
-                <button id="logout-btn" class="btn-outlined">Sair</button>
+        <header class="glass-header sticky top-0 z-50 shadow-sm">
+            <div class="top-bar flex justify-between items-center h-16 px-4 sm:px-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center shadow-md">
+                        <i class="material-icons text-white text-lg">admin_panel_settings</i>
+                    </div>
+                    <span class="top-bar-title text-lg sm:text-xl font-bold gradient-text">Meu Painel</span>
+                </div>
+                <button id="logout-btn" class="px-4 py-2 border border-gray-200 rounded-xl text-gray-600 hover:border-primary-500 hover:text-primary-500 transition-all flex items-center gap-2">
+                    <i class="material-icons-outlined text-sm">exit_to_app</i>
+                    Sair
+                </button>
             </div>
-            <div class="tabs-container">
-                <nav id="tabs-bar" class="tabs-bar">
-                    <button class="tab-button active" data-tab="config"><i class="material-icons-outlined">tune</i>
-                        Configurações</button>
-                    <button class="tab-button" data-tab="categories"><i class="material-icons-outlined">category</i>
-                        Categorias</button>
-                    <button class="tab-button" data-tab="products"><i class="material-icons-outlined">inventory_2</i>
-                        Produtos</button>
-                    <button class="tab-button" id="view-store-btn"><i class="material-icons-outlined">storefront</i>
-                        Visualizar Loja</button>
+            <div class="tabs-container overflow-x-auto hide-scrollbar border-b border-gray-200">
+                <nav id="tabs-bar" class="tabs-bar flex px-4 gap-2">
+                    <button class="tab-button px-4 py-3 font-medium text-gray-600 hover:text-primary-500 transition-all whitespace-nowrap flex items-center gap-2 active" data-tab="config">
+                        <i class="material-icons-outlined text-lg">tune</i> Configurações
+                    </button>
+                    <button class="tab-button px-4 py-3 font-medium text-gray-600 hover:text-primary-500 transition-all whitespace-nowrap flex items-center gap-2" data-tab="categories">
+                        <i class="material-icons-outlined text-lg">category</i> Categorias
+                    </button>
+                    <button class="tab-button px-4 py-3 font-medium text-gray-600 hover:text-primary-500 transition-all whitespace-nowrap flex items-center gap-2" data-tab="products">
+                        <i class="material-icons-outlined text-lg">inventory_2</i> Produtos
+                    </button>
+                    <button id="view-store-btn" class="tab-button px-4 py-3 font-medium text-gray-600 hover:text-primary-500 transition-all whitespace-nowrap flex items-center gap-2">
+                        <i class="material-icons-outlined text-lg">storefront</i> Visualizar Loja
+                    </button>
                 </nav>
             </div>
         </header>
 
-        <main class="page-container">
+        <main class="page-container max-w-6xl mx-auto px-4 sm:px-6 py-6">
             <!-- Configurações Tab -->
-            <section id="config-tab" class="tab-content active">
-                <div class="card">
-                    <h2>Informações da Loja</h2>
-                    <div class="form-field"><input type="text" id="store-name" placeholder=" "><label
-                            for="store-name">Nome da Loja</label></div>
-                    <div class="form-field"><textarea id="store-description" placeholder=" "></textarea><label
-                            for="store-description">Descrição da Loja</label></div>
+            <section id="config-tab" class="tab-content active animate-fade-in">
+                <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-6 premium-card">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
+                        <i class="material-icons-outlined text-primary-500">store</i>
+                        Informações da Loja
+                    </h2>
+                    <div class="form-field mb-4">
+                        <input type="text" id="store-name" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                        <label class="text-gray-500 text-sm mt-1 block">Nome da Loja</label>
+                    </div>
+                    <div class="form-field mb-4">
+                        <textarea id="store-description" rows="3" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all resize-none" placeholder=" "></textarea>
+                        <label class="text-gray-500 text-sm mt-1 block">Descrição da Loja</label>
+                    </div>
 
                     <!-- Upload do Banner Principal -->
-                    <div class="image-upload-container">
-                        <label style="position:static; font-size:0.75rem; margin-bottom:4px; display:block;">Banner
-                            Principal</label>
-                        <div id="banner-upload-area" class="image-upload-area">
-                            <div class="image-upload-icon">
-                                <i class="material-icons-outlined">image</i>
+                    <div class="image-upload-container mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Banner Principal</label>
+                        <div id="banner-upload-area" class="image-upload-area border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-primary-500 transition-all">
+                            <div class="image-upload-icon mb-3">
+                                <i class="material-icons-outlined text-4xl text-gray-400">image</i>
                             </div>
-                            <div class="image-upload-text">Clique ou arraste uma imagem aqui</div>
-                            <div class="image-upload-hint">Tamanho recomendado: 1200x400px</div>
+                            <div class="image-upload-text text-gray-500 mb-1">Clique ou arraste uma imagem aqui</div>
+                            <div class="image-upload-hint text-xs text-gray-400">Tamanho recomendado: 1200x400px</div>
                             <input type="file" id="banner-upload-input" accept="image/*" style="display: none;">
                         </div>
-                        <div id="banner-preview-container" class="image-preview-container"></div>
-                        <div id="banner-upload-progress" class="upload-progress" style="display: none;">
-                            <div id="banner-progress-bar" class="upload-progress-bar"></div>
+                        <div id="banner-preview-container" class="image-preview-container flex flex-wrap gap-3 mt-3"></div>
+                        <div id="banner-upload-progress" class="upload-progress mt-2 h-1 bg-gray-200 rounded-full overflow-hidden" style="display: none;">
+                            <div id="banner-progress-bar" class="upload-progress-bar h-full bg-primary-500 transition-all" style="width: 0%;"></div>
                         </div>
                     </div>
 
-                    <div class="form-field"><input type="tel" id="store-whatsapp" placeholder=" "><label
-                            for="store-whatsapp">Nº do WhatsApp (ex: 5521999999999)</label></div>
-                    <div class="form-field"><label style="position:static; font-size:0.75rem; margin-bottom:4px;">Cor
-                            Principal da Loja</label><input type="color" id="store-color" value="#6750A4"
-                            style="width:100%; height:48px; padding:5px; border-radius:8px;"></div>
-                    <button id="save-store-btn" class="btn">Salvar Informações</button>
-                </div>
-                <div class="card">
-                    <h2>Formas de Pagamento</h2>
-                    <div class="form-group input-group">
-                        <div class="form-field"><input type="text" id="new-payment-method-input" placeholder=" "><label
-                                for="new-payment-method-input">Ex: Pix</label></div><button id="add-payment-method-btn"
-                            class="btn">Adicionar</button>
+                    <div class="form-field mb-4">
+                        <input type="tel" id="store-whatsapp" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                        <label class="text-gray-500 text-sm mt-1 block">Nº do WhatsApp (ex: 5521999999999)</label>
                     </div>
-                    <br>
-                    <div id="payment-methods-list" class="tag-list"></div>
-                </div>
-                <div class="card">
-                    <h2>Opções de Entrega</h2>
-                    <div class="form-group input-group">
-                        <div class="form-field"><input type="text" id="new-delivery-option-input" placeholder=" "><label
-                                for="new-delivery-option-input">Ex: Entrega via Motoboy</label></div><button
-                            id="add-delivery-option-btn" class="btn">Adicionar</button>
+                    <div class="form-field mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Cor Principal da Loja</label>
+                        <input type="color" id="store-color" value="#4A90E2" class="w-full h-12 p-1 border border-gray-200 rounded-xl cursor-pointer">
                     </div>
-                    <br>
-                    <div id="delivery-options-list" class="tag-list"></div>
+                    <button id="save-store-btn" class="btn px-6 py-2.5 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-all ripple">Salvar Informações</button>
+                </div>
+
+                <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-6 premium-card">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
+                        <i class="material-icons-outlined text-primary-500">payments</i>
+                        Formas de Pagamento
+                    </h2>
+                    <div class="flex gap-3 mb-4">
+                        <div class="form-field flex-1">
+                            <input type="text" id="new-payment-method-input" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                            <label class="text-gray-500 text-sm mt-1 block">Ex: Pix</label>
+                        </div>
+                        <button id="add-payment-method-btn" class="btn px-5 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-all">Adicionar</button>
+                    </div>
+                    <div id="payment-methods-list" class="tag-list flex flex-wrap gap-2"></div>
+                </div>
+
+                <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 premium-card">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
+                        <i class="material-icons-outlined text-primary-500">local_shipping</i>
+                        Opções de Entrega
+                    </h2>
+                    <div class="flex gap-3 mb-4">
+                        <div class="form-field flex-1">
+                            <input type="text" id="new-delivery-option-input" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                            <label class="text-gray-500 text-sm mt-1 block">Ex: Entrega via Motoboy</label>
+                        </div>
+                        <button id="add-delivery-option-btn" class="btn px-5 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-all">Adicionar</button>
+                    </div>
+                    <div id="delivery-options-list" class="tag-list flex flex-wrap gap-2"></div>
                 </div>
             </section>
 
             <!-- Categorias Tab -->
-            <section id="categories-tab" class="tab-content">
-                <div class="card">
-                    <h2>Adicionar Nova Categoria</h2>
-                    <div class="form-group input-group">
-                        <div class="form-field"><input type="text" id="new-category-name" placeholder=" "><label
-                                for="new-category-name">Nome da Categoria</label></div><button id="add-category-btn"
-                            class="btn">Adicionar</button>
+            <section id="categories-tab" class="tab-content hidden">
+                <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-6 premium-card">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
+                        <i class="material-icons-outlined text-primary-500">add_circle</i>
+                        Adicionar Nova Categoria
+                    </h2>
+                    <div class="flex gap-3">
+                        <div class="form-field flex-1">
+                            <input type="text" id="new-category-name" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                            <label class="text-gray-500 text-sm mt-1 block">Nome da Categoria</label>
+                        </div>
+                        <button id="add-category-btn" class="btn px-5 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-all">Adicionar</button>
                     </div>
                 </div>
-                <div class="card">
-                    <h2>Categorias Existentes</h2>
-                    <div id="categories-list" class="tag-list"></div>
+                <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 premium-card">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
+                        <i class="material-icons-outlined text-primary-500">list</i>
+                        Categorias Existentes
+                    </h2>
+                    <div id="categories-list" class="tag-list flex flex-wrap gap-2"></div>
                 </div>
             </section>
 
             <!-- Produtos Tab -->
-            <section id="products-tab" class="tab-content">
-                <div class="card">
-                    <h2>Adicionar Novo Produto</h2>
-                    <div class="form-field"><input type="text" id="product-name" placeholder=" "><label
-                            for="product-name">Nome do Produto</label></div>
-                    <div class="form-field"><textarea id="product-description" placeholder=" "></textarea><label
-                            for="product-description">Descrição</label></div>
-                    <div class="form-field"><input type="number" id="product-price" step="0.01" placeholder=" "><label
-                            for="product-price">Preço (R$)</label></div>
+            <section id="products-tab" class="tab-content hidden">
+                <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-6 premium-card">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
+                        <i class="material-icons-outlined text-primary-500">add_box</i>
+                        Adicionar Novo Produto
+                    </h2>
+                    <div class="form-field mb-4">
+                        <input type="text" id="product-name" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                        <label class="text-gray-500 text-sm mt-1 block">Nome do Produto</label>
+                    </div>
+                    <div class="form-field mb-4">
+                        <textarea id="product-description" rows="3" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all resize-none" placeholder=" "></textarea>
+                        <label class="text-gray-500 text-sm mt-1 block">Descrição</label>
+                    </div>
+                    <div class="form-field mb-4">
+                        <input type="number" id="product-price" step="0.01" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                        <label class="text-gray-500 text-sm mt-1 block">Preço (R$)</label>
+                    </div>
 
                     <!-- Upload de Imagem do Produto -->
-                    <div class="image-upload-container">
-                        <label style="position:static; font-size:0.75rem; margin-bottom:4px; display:block;">Imagem do
-                            Produto</label>
-                        <div id="product-image-upload-area" class="image-upload-area">
-                            <div class="image-upload-icon">
-                                <i class="material-icons-outlined">image</i>
+                    <div class="image-upload-container mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Imagem do Produto</label>
+                        <div id="product-image-upload-area" class="image-upload-area border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-primary-500 transition-all">
+                            <div class="image-upload-icon mb-3">
+                                <i class="material-icons-outlined text-4xl text-gray-400">image</i>
                             </div>
-                            <div class="image-upload-text">Clique ou arraste uma imagem aqui</div>
-                            <div class="image-upload-hint">Tamanho recomendado: 600x600px</div>
+                            <div class="image-upload-text text-gray-500 mb-1">Clique ou arraste uma imagem aqui</div>
+                            <div class="image-upload-hint text-xs text-gray-400">Tamanho recomendado: 600x600px</div>
                             <input type="file" id="product-image-upload-input" accept="image/*" style="display: none;">
                         </div>
-                        <div id="product-image-preview-container" class="image-preview-container"></div>
-                        <div id="product-image-upload-progress" class="upload-progress" style="display: none;">
-                            <div id="product-image-progress-bar" class="upload-progress-bar"></div>
+                        <div id="product-image-preview-container" class="image-preview-container flex flex-wrap gap-3 mt-3"></div>
+                        <div id="product-image-upload-progress" class="upload-progress mt-2 h-1 bg-gray-200 rounded-full overflow-hidden" style="display: none;">
+                            <div id="product-image-progress-bar" class="upload-progress-bar h-full bg-primary-500 transition-all" style="width: 0%;"></div>
                         </div>
                     </div>
 
-                    <div class="form-field">
-                        <select id="product-category" value="">
+                    <div class="form-field mb-4">
+                        <select id="product-category" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
                             <option value="" disabled selected></option>
                         </select>
-                        <label for="product-category">Categoria</label>
+                        <label class="text-gray-500 text-sm mt-1 block">Categoria</label>
                     </div>
-                    <div class="form-field toggle-switch-container">
-                        <label class="toggle-switch" for="product-available"><input type="checkbox"
-                                id="product-available" checked><span class="slider"></span></label>
-                        <label for="product-available">Produto disponível?</label>
+                    <div class="form-field mb-6 flex items-center gap-3">
+                        <label class="toggle-switch relative inline-block w-11 h-6">
+                            <input type="checkbox" id="product-available" checked class="opacity-0 w-0 h-0">
+                            <span class="slider absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all before:absolute before:content-[''] before:h-5 before:w-5 before:left-0.5 before:bottom-0.5 before:bg-white before:rounded-full before:transition-all"></span>
+                        </label>
+                        <label for="product-available" class="text-gray-700 cursor-pointer">Produto disponível?</label>
                     </div>
-                    <button id="add-product-btn" class="btn">Adicionar Produto</button>
+                    <button id="add-product-btn" class="btn px-6 py-2.5 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-all ripple">Adicionar Produto</button>
                 </div>
-                <div class="card">
-                    <h2>Seus Produtos</h2>
-                    <div class="product-filters">
-                        <div class="form-field"><input type="text" id="admin-product-search" placeholder=" "><label
-                                for="admin-product-search">Buscar por nome</label></div>
-                        <div class="form-field">
-                            <select id="admin-product-category-filter" value="all">
-                                <option value="all" disabled selected></option>
+
+                <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 premium-card">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
+                        <i class="material-icons-outlined text-primary-500">inventory</i>
+                        Seus Produtos
+                    </h2>
+                    <div class="product-filters flex flex-col sm:flex-row gap-3 mb-4">
+                        <div class="form-field flex-1">
+                            <input type="text" id="admin-product-search" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                            <label class="text-gray-500 text-sm mt-1 block">Buscar por nome</label>
+                        </div>
+                        <div class="form-field flex-1">
+                            <select id="admin-product-category-filter" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
+                                <option value="all" selected>Todas as Categorias</option>
                             </select>
-                            <label for="admin-product-category-filter">Filtrar por categoria</label>
+                            <label class="text-gray-500 text-sm mt-1 block">Filtrar por categoria</label>
                         </div>
                     </div>
-                    <div id="products-list" class="admin-products-grid"></div>
+                    <div id="products-list" class="admin-products-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
             </section>
         </main>
     </div>
 
     <!-- Modal de Edição -->
-    <div id="edit-product-modal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">Editar Produto</div>
-            <div class="modal-body">
+    <div id="edit-product-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] hidden items-center justify-center p-4">
+        <div class="modal-container bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-hidden modal-scale">
+            <div class="modal-header p-6 border-b border-gray-100">
+                <h3 class="text-xl font-bold text-gray-800">Editar Produto</h3>
+            </div>
+            <div class="modal-body p-6 overflow-y-auto">
                 <input type="hidden" id="edit-product-id">
-                <div class="form-field"><input type="text" id="edit-product-name" placeholder=" "><label
-                        for="edit-product-name">Nome</label></div>
-                <div class="form-field"><textarea id="edit-product-description" placeholder=" "></textarea><label
-                        for="edit-product-description">Descrição</label></div>
-                <div class="form-field"><input type="number" id="edit-product-price" step="0.01" placeholder=" "><label
-                        for="edit-product-price">Preço (R$)</label></div>
+                <div class="form-field mb-4">
+                    <input type="text" id="edit-product-name" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                    <label class="text-gray-500 text-sm mt-1 block">Nome</label>
+                </div>
+                <div class="form-field mb-4">
+                    <textarea id="edit-product-description" rows="3" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all resize-none" placeholder=" "></textarea>
+                    <label class="text-gray-500 text-sm mt-1 block">Descrição</label>
+                </div>
+                <div class="form-field mb-4">
+                    <input type="number" id="edit-product-price" step="0.01" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all" placeholder=" ">
+                    <label class="text-gray-500 text-sm mt-1 block">Preço (R$)</label>
+                </div>
 
                 <!-- Upload de Imagem na Edição -->
-                <div class="image-upload-container">
-                    <label style="position:static; font-size:0.75rem; margin-bottom:4px; display:block;">Imagem do
-                        Produto</label>
-                    <div id="edit-product-image-upload-area" class="image-upload-area">
-                        <div class="image-upload-icon">
-                            <i class="material-icons-outlined">image</i>
+                <div class="image-upload-container mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Imagem do Produto</label>
+                    <div id="edit-product-image-upload-area" class="image-upload-area border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-primary-500 transition-all">
+                        <div class="image-upload-icon mb-3">
+                            <i class="material-icons-outlined text-4xl text-gray-400">image</i>
                         </div>
-                        <div class="image-upload-text">Clique ou arraste uma imagem aqui</div>
-                        <div class="image-upload-hint">Tamanho recomendado: 600x600px</div>
+                        <div class="image-upload-text text-gray-500 mb-1">Clique ou arraste uma imagem aqui</div>
+                        <div class="image-upload-hint text-xs text-gray-400">Tamanho recomendado: 600x600px</div>
                         <input type="file" id="edit-product-image-upload-input" accept="image/*" style="display: none;">
                     </div>
-                    <div id="edit-product-image-preview-container" class="image-preview-container"></div>
-                    <div id="edit-product-image-upload-progress" class="upload-progress" style="display: none;">
-                        <div id="edit-product-image-progress-bar" class="upload-progress-bar"></div>
+                    <div id="edit-product-image-preview-container" class="image-preview-container flex flex-wrap gap-3 mt-3"></div>
+                    <div id="edit-product-image-upload-progress" class="upload-progress mt-2 h-1 bg-gray-200 rounded-full overflow-hidden" style="display: none;">
+                        <div id="edit-product-image-progress-bar" class="upload-progress-bar h-full bg-primary-500 transition-all" style="width: 0%;"></div>
                     </div>
                 </div>
 
-                <div class="form-field">
-                    <select id="edit-product-category">
+                <div class="form-field mb-4">
+                    <select id="edit-product-category" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
                         <option value="" disabled selected></option>
                     </select>
-                    <label for="edit-product-category">Categoria</label>
+                    <label class="text-gray-500 text-sm mt-1 block">Categoria</label>
                 </div>
-                <div class="form-field toggle-switch-container">
-                    <label class="toggle-switch" for="edit-product-available"><input type="checkbox"
-                            id="edit-product-available"><span class="slider"></span></label>
-                    <label for="edit-product-available">Produto disponível?</label>
+                <div class="form-field mb-4 flex items-center gap-3">
+                    <label class="toggle-switch relative inline-block w-11 h-6">
+                        <input type="checkbox" id="edit-product-available" class="opacity-0 w-0 h-0">
+                        <span class="slider absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all before:absolute before:content-[''] before:h-5 before:w-5 before:left-0.5 before:bottom-0.5 before:bg-white before:rounded-full before:transition-all"></span>
+                    </label>
+                    <label for="edit-product-available" class="text-gray-700 cursor-pointer">Produto disponível?</label>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button id="cancel-edit-btn" class="btn-text">Cancelar</button>
-                <button id="save-edit-btn" class="btn">Salvar Alterações</button>
+            <div class="modal-footer p-5 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <button id="cancel-edit-btn" class="px-5 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition-all">Cancelar</button>
+                <button id="save-edit-btn" class="px-5 py-2 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-all ripple">Salvar Alterações</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Confirmação -->
-    <div id="confirm-modal" class="modal-overlay">
-        <div class="modal-container" style="max-width: 400px;">
-            <div class="modal-header">Confirmar Ação</div>
-            <div class="modal-body">
-                <p id="confirm-modal-text">Você tem certeza?</p>
+    <div id="confirm-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] hidden items-center justify-center p-4">
+        <div class="modal-container bg-white rounded-2xl max-w-md w-full modal-scale">
+            <div class="modal-header p-6 border-b border-gray-100">
+                <h3 class="text-xl font-bold text-gray-800">Confirmar Ação</h3>
             </div>
-            <div class="modal-footer">
-                <button id="confirm-modal-cancel" class="btn-text">Cancelar</button>
-                <button id="confirm-modal-ok" class="btn btn-danger">Confirmar</button>
+            <div class="modal-body p-6">
+                <p id="confirm-modal-text" class="text-gray-600">Você tem certeza?</p>
+            </div>
+            <div class="modal-footer p-5 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <button id="confirm-modal-cancel" class="px-5 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition-all">Cancelar</button>
+                <button id="confirm-modal-ok" class="px-5 py-2 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-all">Confirmar</button>
             </div>
         </div>
     </div>
 
-    <div class="toast-container" id="toast-container"></div>
+    <div class="toast-container fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[2000] flex flex-col gap-2 items-center"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -929,7 +591,6 @@
             const authContainer = document.getElementById('auth-container');
             const appContainer = document.getElementById('app-container');
 
-            // Variáveis para armazenar URLs de imagens
             let currentBannerUrl = '';
             let currentProductImageUrl = '';
             let currentEditProductImageUrl = '';
@@ -937,7 +598,7 @@
             const showToast = (message, duration = 3000) => {
                 const toastContainer = document.getElementById('toast-container');
                 const toast = document.createElement('div');
-                toast.className = 'toast';
+                toast.className = 'toast bg-gray-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm toast-slide';
                 toast.textContent = message;
                 toastContainer.appendChild(toast);
                 setTimeout(() => toast.remove(), duration);
@@ -946,10 +607,16 @@
             const confirmAction = (text, onConfirm) => {
                 const modal = document.getElementById('confirm-modal');
                 document.getElementById('confirm-modal-text').textContent = text;
-                modal.classList.add('show');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
                 const okBtn = document.getElementById('confirm-modal-ok');
                 const cancelBtn = document.getElementById('confirm-modal-cancel');
-                const close = () => modal.classList.remove('show');
+                const close = () => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.style.overflow = '';
+                };
                 okBtn.onclick = () => { onConfirm(); close(); };
                 cancelBtn.onclick = close;
             };
@@ -981,7 +648,6 @@
             function getDbRef(path = '') { return ref(db, `stores/${currentUser.uid}/${path}`); }
             function getStorageRef(path = '') { return storageRef(storage, `stores/${currentUser.uid}/${path}`); }
 
-            // Configuração de upload de imagens
             function setupImageUpload(uploadAreaId, fileInputId, previewContainerId, progressContainerId, progressBarId, onUploadComplete) {
                 const uploadArea = document.getElementById(uploadAreaId);
                 const fileInput = document.getElementById(fileInputId);
@@ -989,10 +655,8 @@
                 const progressContainer = document.getElementById(progressContainerId);
                 const progressBar = document.getElementById(progressBarId);
 
-                // Clique para selecionar arquivo
                 uploadArea.addEventListener('click', () => fileInput.click());
 
-                // Arrastar e soltar
                 uploadArea.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     uploadArea.classList.add('dragover');
@@ -1011,7 +675,6 @@
                     }
                 });
 
-                // Seleção de arquivo via input
                 fileInput.addEventListener('change', (e) => {
                     if (e.target.files.length) {
                         handleFileSelect(e.target.files[0]);
@@ -1024,18 +687,16 @@
                         return;
                     }
 
-                    // Limpar preview anterior
                     previewContainer.innerHTML = '';
 
-                    // Criar preview local
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const preview = document.createElement('div');
-                        preview.className = 'image-preview';
+                        preview.className = 'image-preview relative w-24 h-24 rounded-lg overflow-hidden shadow-sm';
                         preview.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview">
-                            <div class="image-preview-remove">
-                                <i class="material-icons-outlined">close</i>
+                            <img src="${e.target.result}" alt="Preview" class="w-full h-full object-cover">
+                            <div class="image-preview-remove absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center cursor-pointer">
+                                <i class="material-icons-outlined text-sm">close</i>
                             </div>
                         `;
 
@@ -1043,14 +704,13 @@
                             e.stopPropagation();
                             preview.remove();
                             fileInput.value = '';
-                            onUploadComplete(''); // Limpar URL
+                            onUploadComplete('');
                         });
 
                         previewContainer.appendChild(preview);
                     };
                     reader.readAsDataURL(file);
 
-                    // Fazer upload para Firebase Storage
                     uploadImage(file, progressContainer, progressBar, onUploadComplete);
                 }
             }
@@ -1082,7 +742,6 @@
                 );
             }
 
-            // Configurar uploads
             setupImageUpload(
                 'banner-upload-area',
                 'banner-upload-input',
@@ -1116,19 +775,18 @@
                     document.getElementById('store-name').value = data.name || '';
                     document.getElementById('store-description').value = data.description || '';
                     document.getElementById('store-whatsapp').value = data.whatsapp || '';
-                    document.getElementById('store-color').value = data.color || '#6750A4';
+                    document.getElementById('store-color').value = data.color || '#4A90E2';
 
-                    // Carregar banner se existir
                     if (data.logo) {
                         currentBannerUrl = data.logo;
                         const previewContainer = document.getElementById('banner-preview-container');
                         previewContainer.innerHTML = '';
                         const preview = document.createElement('div');
-                        preview.className = 'image-preview';
+                        preview.className = 'image-preview relative w-24 h-24 rounded-lg overflow-hidden shadow-sm';
                         preview.innerHTML = `
-                            <img src="${data.logo}" alt="Banner Preview">
-                            <div class="image-preview-remove">
-                                <i class="material-icons-outlined">close</i>
+                            <img src="${data.logo}" alt="Banner Preview" class="w-full h-full object-cover">
+                            <div class="image-preview-remove absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center cursor-pointer">
+                                <i class="material-icons-outlined text-sm">close</i>
                             </div>
                         `;
                         preview.querySelector('.image-preview-remove').addEventListener('click', (e) => {
@@ -1148,11 +806,6 @@
 
                     populateCategorySelects(data.categories || {});
                     populateCategoryFilter(data.categories || {});
-
-                    // Trigger label animation for pre-filled fields
-                    document.querySelectorAll('input, textarea, select').forEach(el => {
-                        if (el.value) el.nextElementSibling?.classList.add('active');
-                    });
                 });
             }
 
@@ -1168,11 +821,13 @@
 
             function setupAddTag(inputId, path) {
                 const input = document.getElementById(inputId);
-                const addButton = input.closest('.input-group').querySelector('button');
-                addButton.onclick = () => {
-                    const value = input.value.trim();
-                    if (value) push(getDbRef(path), value).then(() => input.value = '');
-                };
+                const addButton = input.closest('.flex')?.querySelector('button') || document.getElementById(`add-${path.split('/')[0]}-btn`);
+                if (addButton) {
+                    addButton.onclick = () => {
+                        const value = input.value.trim();
+                        if (value) push(getDbRef(path), value).then(() => input.value = '');
+                    };
+                }
             }
             setupAddTag('new-category-name', 'categories');
             setupAddTag('new-payment-method-input', 'paymentMethods');
@@ -1182,9 +837,9 @@
                 container.innerHTML = '';
                 Object.entries(data).forEach(([key, value]) => {
                     const tag = document.createElement('div');
-                    tag.className = 'tag';
-                    tag.innerHTML = `<span>${value}</span><i class="material-icons-outlined delete-btn">close</i>`;
-                    tag.querySelector('.delete-btn').onclick = () => remove(getDbRef(`${path}/${key}`));
+                    tag.className = 'tag tag-custom bg-primary-50 text-primary-700 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2';
+                    tag.innerHTML = `<span>${value}</span><i class="material-icons-outlined text-sm cursor-pointer hover:text-red-500">close</i>`;
+                    tag.querySelector('i').onclick = () => remove(getDbRef(`${path}/${key}`));
                     container.appendChild(tag);
                 });
             }
@@ -1195,7 +850,7 @@
                     const currentVal = select.value;
                     select.innerHTML = '<option value="" disabled selected></option>';
                     Object.entries(categoriesData).forEach(([id, name]) => select.innerHTML += `<option value="${id}">${name}</option>`);
-                    select.value = currentVal;
+                    if (currentVal) select.value = currentVal;
                 });
             }
 
@@ -1228,7 +883,7 @@
             function populateCategoryFilter(categoriesData) {
                 adminCategoryFilter.innerHTML = '<option value="all" selected>Todas as Categorias</option>';
                 Object.entries(categoriesData).forEach(([id, name]) => adminCategoryFilter.innerHTML += `<option value="${id}">${name}</option>`);
-                adminCategoryFilter.value = 'all'; // Força a seleção inicial
+                adminCategoryFilter.value = 'all';
             }
 
             function applyAdminProductFilters() {
@@ -1245,25 +900,26 @@
                 grid.innerHTML = '';
                 products.forEach(product => {
                     const card = document.createElement('div');
-                    card.className = 'admin-product-card';
-                    const badgeHTML = product.available ? '' : `<div class="outofstock-badge">Esgotado</div>`;
+                    card.className = 'admin-product-card bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100';
+                    const badgeHTML = product.available ? '' : `<div class="outofstock-badge absolute top-2 right-2 bg-orange-500 text-white px-2 py-0.5 rounded-full text-xs font-medium">Esgotado</div>`;
                     card.innerHTML = `
-                        ${badgeHTML}
-                        <div class="admin-product-card__image" style="background-image: url('${product.image || ''}')"></div>
-                        <div class="admin-product-card__info">
-                            <div class="admin-product-card__name">${product.name}</div>
-                            <div class="admin-product-card__price">R$ ${(product.price || 0).toFixed(2).replace('.', ',')}</div>
+                        <div class="relative">
+                            ${badgeHTML}
+                            <div class="admin-product-card__image h-40 bg-cover bg-center bg-gray-100" style="background-image: url('${product.image || ''}')"></div>
                         </div>
-                        <div class="admin-product-card__actions">
-                            <button class="btn-text edit-btn"><i class="material-icons-outlined">edit</i> Editar</button>
-                            <button class="btn-text delete-btn" style="color: var(--md-sys-color-error);"><i class="material-icons-outlined">delete</i> Excluir</button>
+                        <div class="admin-product-card__info p-4">
+                            <div class="admin-product-card__name font-semibold text-gray-800 mb-1">${product.name}</div>
+                            <div class="admin-product-card__price text-primary-500 font-bold">R$ ${(product.price || 0).toFixed(2).replace('.', ',')}</div>
+                        </div>
+                        <div class="admin-product-card__actions flex p-3 border-t border-gray-100 gap-2">
+                            <button class="edit-btn flex-1 px-3 py-1.5 text-primary-500 hover:bg-primary-50 rounded-lg transition-all flex items-center justify-center gap-1 text-sm"><i class="material-icons-outlined text-sm">edit</i> Editar</button>
+                            <button class="delete-btn flex-1 px-3 py-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all flex items-center justify-center gap-1 text-sm"><i class="material-icons-outlined text-sm">delete</i> Excluir</button>
                         </div>
                     `;
                     card.querySelector('.edit-btn').onclick = () => showEditModal(product.id, product);
                     card.querySelector('.delete-btn').onclick = () => {
                         confirmAction(`Excluir "${product.name}"? Esta ação não pode ser desfeita.`, () => {
                             remove(getDbRef(`products/${product.id}`));
-                            // Opcional: deletar a imagem do storage também
                             if (product.image && product.image.includes('firebasestorage')) {
                                 const imageRef = storageRef(storage, product.image);
                                 deleteObject(imageRef).catch(error => {
@@ -1285,18 +941,17 @@
                 document.getElementById('edit-product-category').value = product.category || '';
                 document.getElementById('edit-product-available').checked = product.available;
 
-                // Configurar preview da imagem existente
                 const previewContainer = document.getElementById('edit-product-image-preview-container');
                 previewContainer.innerHTML = '';
                 currentEditProductImageUrl = product.image || '';
 
                 if (product.image) {
                     const preview = document.createElement('div');
-                    preview.className = 'image-preview';
+                    preview.className = 'image-preview relative w-24 h-24 rounded-lg overflow-hidden shadow-sm';
                     preview.innerHTML = `
-                        <img src="${product.image}" alt="Preview">
-                        <div class="image-preview-remove">
-                            <i class="material-icons-outlined">close</i>
+                        <img src="${product.image}" alt="Preview" class="w-full h-full object-cover">
+                        <div class="image-preview-remove absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center cursor-pointer">
+                            <i class="material-icons-outlined text-sm">close</i>
                         </div>
                     `;
                     preview.querySelector('.image-preview-remove').addEventListener('click', (e) => {
@@ -1307,9 +962,17 @@
                     previewContainer.appendChild(preview);
                 }
 
-                editModal.classList.add('show');
+                editModal.classList.remove('hidden');
+                editModal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
             }
-            document.getElementById('cancel-edit-btn').onclick = () => editModal.classList.remove('show');
+            
+            document.getElementById('cancel-edit-btn').onclick = () => {
+                editModal.classList.add('hidden');
+                editModal.classList.remove('flex');
+                document.body.style.overflow = '';
+            };
+            
             document.getElementById('save-edit-btn').onclick = () => {
                 const id = document.getElementById('edit-product-id').value;
                 const updatedProduct = {
@@ -1322,13 +985,40 @@
                 };
                 if (updatedProduct.name && updatedProduct.price > 0) {
                     update(getDbRef(`products/${id}`), updatedProduct).then(() => {
-                        editModal.classList.remove('show');
+                        editModal.classList.add('hidden');
+                        editModal.classList.remove('flex');
+                        document.body.style.overflow = '';
                         showToast('Produto atualizado!');
                     });
                 } else { showToast('Nome e preço são obrigatórios.'); }
             };
         });
     </script>
+    
+    <style>
+        /* Estilos adicionais para toggle switch */
+        .toggle-switch input:checked + .slider {
+            background-color: #4A90E2;
+        }
+        
+        .toggle-switch input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .tab-button.active {
+            color: #4A90E2;
+            border-bottom: 2px solid #4A90E2;
+        }
+    </style>
 </body>
 
-</html>
+    </html>
