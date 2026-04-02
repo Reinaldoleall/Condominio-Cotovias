@@ -2,184 +2,330 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-   <meta name="viewport" content="width=1280">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4A90E2">
     <title>Portaria Ágil - Controle e Relatórios</title>
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <meta name="theme-color" content="#f8fafc">
-
-<style>
-    /* 1. CONFIGURAÇÃO GERAL E TEMAS */
-    :root {
-        --primary-color: #2563eb; /* Azul */
-        --primary-color-light: #eff6ff;
-        --success-color: #16a34a; /* Verde */
-        --danger-color: #dc2626; /* Vermelho */
-        
-        --bg-color: #f8fafc; /* Fundo Principal (Quase Branco) */
-        --surface-color: #ffffff; /* Cor dos Cards */
-        --outline-color: #e2e8f0; /* Bordas */
-        
-        --text-primary: #0f172a; /* Texto Principal (Escuro) */
-        --text-secondary: #64748b; /* Texto Secundário (Cinza) */
-
-        --font-family: 'Inter', sans-serif;
-        --border-radius: 0.75rem; /* 12px */
-        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-        --transition: all 0.2s ease-in-out;
-    }
-
-    [data-theme="dark"] {
-        --primary-color: #3b82f6;
-        --primary-color-light: #1e293b;
-        --bg-color: #0f172a;
-        --surface-color: #1e293b;
-        --outline-color: #334155;
-        --text-primary: #f8fafc;
-        --text-secondary: #94a3b8;
-    }
-
-    /* Reset Básico */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { -webkit-tap-highlight-color: transparent; }
-    body {
-        font-family: var(--font-family);
-        background-color: var(--bg-color);
-        color: var(--text-primary);
-        line-height: 1.5;
-        font-size: 16px;
-        transition: var(--transition);
-    }
-
-    /* 2. LAYOUT PRINCIPAL */
-    .app-container { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .app-title { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 0.5rem; }
-    .header-controls { display: flex; align-items: center; gap: 0.5rem; }
-    .user-info { font-weight: 500; color: var(--text-secondary); }
-
-    /* 3. COMPONENTES */
-    .card { background-color: var(--surface-color); border-radius: var(--border-radius); box-shadow: var(--shadow); border: 1px solid var(--outline-color); padding: 1.5rem; margin-bottom: 2rem; transition: var(--transition); }
-    #entry-form { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
-    .input-group { flex: 1 1 200px; }
-    label { font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.5rem; }
-    input[type="text"] { width: 100%; height: 48px; padding: 0 1rem; font-size: 1rem; border: 1px solid var(--outline-color); border-radius: 0.5rem; background-color: var(--bg-color); color: var(--text-primary); transition: var(--transition); }
-    input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-color-light); outline: none; }
-    #placa { text-transform: uppercase; font-weight: 600; }
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 48px; padding: 0 1.5rem; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: var(--transition); text-decoration: none; }
-    .btn-sm { height: 40px; padding: 0 1rem; font-size: 0.875rem; }
-    .btn-primary { background-color: var(--primary-color); color: white; }
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-secondary { background-color: var(--surface-color); color: var(--text-secondary); border: 1px solid var(--outline-color); }
-    .btn-secondary:hover { background-color: var(--primary-color-light); color: var(--primary-color); }
-    .btn-icon { background: none; border: none; padding: 0.5rem; border-radius: 50%; color: var(--text-secondary); }
-    .btn-icon:hover { color: var(--text-primary); background-color: var(--primary-color-light); }
-
-    .log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
-    .log-title { font-size: 1.25rem; font-weight: 600; }
-    .controls-group { display: flex; gap: 0.5rem; align-items: center; }
-    .filter-btn-group button { border: 1px solid var(--outline-color); background: var(--surface-color); color: var(--text-secondary); }
-    .filter-btn-group button.active { background-color: var(--primary-color-light); color: var(--primary-color); border-color: var(--primary-color); }
-    .filter-btn-group button:first-child { border-radius: 0.5rem 0 0 0.5rem; }
-    .filter-btn-group button:last-child { border-radius: 0 0.5rem 0.5rem 0; border-left: 0; }
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    .log-list ul { list-style: none; }
-    .log-list li { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--outline-color); transition: var(--transition); }
-    .log-list li:hover { background-color: var(--primary-color-light); }
-    .log-list li:last-child { border-bottom: none; }
-    .vehicle-info .placa { font-size: 1.125rem; font-weight: 600; color: var(--text-primary); }
-    .vehicle-info .details { font-size: 0.875rem; color: var(--text-secondary); }
-    .log-actions { display: flex; align-items: center; }
-    .exited-log { opacity: 0.6; }
-    .exited-log .placa { text-decoration: line-through; }
-    .exited-log .btn-exit { display: none; }
-    .empty-state { text-align: center; padding: 3rem; border: 2px dashed var(--outline-color); border-radius: var(--border-radius); }
-
-    /* Loading e Notificações */
-    #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(5px); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-    [data-theme="dark"] #loadingOverlay { background: rgba(15, 23, 42, 0.7); }
-    .spinner { width: 48px; height: 48px; border: 5px solid var(--outline-color); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; }
-    .toast { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); color: white; animation: toast-in 0.5s ease, toast-out 0.5s 4.5s ease forwards; }
-    .toast-success { background-color: var(--success-color); }
-    .toast-error { background-color: var(--danger-color); }
-    @keyframes toast-in { from { transform: translateX(120%); } to { transform: translateX(0); } }
-    @keyframes toast-out { from { transform: translateX(0); } to { transform: translateX(120%); } }
-
-    @media (max-width: 768px) {
-        .log-header { flex-direction: column; align-items: stretch; }
-        .log-list li { grid-template-columns: 1fr; text-align: center; }
-        .log-actions { justify-content: center; margin-top: 0.5rem; }
-    }
-</style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EBF3FE',
+                            100: '#D7E8FD',
+                            200: '#B0D1FB',
+                            300: '#88B9F8',
+                            400: '#61A2F6',
+                            500: '#4A90E2',
+                            600: '#3A73B5',
+                            700: '#2B5688',
+                            800: '#1D3A5A',
+                            900: '#0E1D2D',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'shimmer': 'shimmer 2s infinite',
+                        'toast-in': 'toastIn 0.3s ease-out',
+                        'toast-out': 'toastOut 0.3s ease-in forwards',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                        toastIn: {
+                            '0%': { transform: 'translateX(100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        toastOut: {
+                            '0%': { transform: 'translateX(0)', opacity: '1' },
+                            '100%': { transform: 'translateX(100%)', opacity: '0' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        /* Estilos customizados */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #F7F8FC 0%, #EEF2F7 100%);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Tema escuro */
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        }
+        
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #E4E6EB;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            border-radius: 10px;
+        }
+        
+        /* Glass effect para header */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+        }
+        
+        [data-theme="dark"] .glass-header {
+            background: rgba(30, 41, 59, 0.95);
+        }
+        
+        /* Card premium */
+        .premium-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .premium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Loading spinner */
+        .loading-spinner-custom {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #E4E6EB;
+            border-top-color: #4A90E2;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Ripple effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(74, 144, 226, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        
+        /* Input focus effect */
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+        }
+        
+        /* List item animation */
+        .list-item-enter {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Status badge */
+        .status-badge {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Filtro button active effect */
+        .filter-btn-active {
+            background-color: #4A90E2 !important;
+            color: white !important;
+            border-color: #4A90E2 !important;
+        }
+        
+        [data-theme="dark"] .filter-btn-active {
+            background-color: #3B82F6 !important;
+        }
+        
+        /* Empty state animation */
+        .empty-state-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Toast custom */
+        .toast-custom {
+            animation: toastIn 0.3s ease-out;
+        }
+        
+        /* Transição para tema */
+        * {
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+    </style>
 </head>
 
-<body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<body class="antialiased">
 
-    <div id="loadingOverlay">
-        <div class="spinner"></div>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm z-[10000] hidden items-center justify-center">
+        <div class="flex flex-col items-center gap-4">
+            <div class="loading-spinner-custom"></div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm animate-pulse">Carregando...</p>
+        </div>
     </div>
-    <div id="toastContainer" class="toast-container"></div>
 
-    <div class="app-container">
-        <header>
-            <div class="app-title">
-                <span class="material-icons-outlined">shield</span>
-                <span>Portaria Ágil</span>
-            </div>
-            <div class="header-controls">
-                <div class="user-info"><span id="nomePorteiroLogado"></span></div>
-                <button class="btn-icon" id="theme-toggle" aria-label="Alternar tema"><span class="material-icons-outlined">dark_mode</span></button>
-                <button id="btnLogout" class="btn-icon" aria-label="Sair"><span class="material-icons-outlined" style="color: var(--danger-color);">logout</span></button>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container fixed bottom-6 right-6 z-[9999] space-y-2"></div>
+
+    <div class="app-container max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <!-- Header com efeito glass -->
+        <header class="glass-header sticky top-0 z-50 -mt-6 -mx-4 px-4 sm:px-6 py-4 mb-6 rounded-b-2xl shadow-sm">
+            <div class="max-w-4xl mx-auto flex justify-between items-center">
+                <div class="app-title flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="material-icons text-white text-2xl">shield</i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold gradient-text">Portaria Ágil</h1>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Controle de Acesso</p>
+                    </div>
+                </div>
+                <div class="header-controls flex items-center gap-2">
+                    <div class="user-info text-sm text-gray-600 dark:text-gray-400 font-medium">
+                        <span id="nomePorteiroLogado"></span>
+                    </div>
+                    <button class="btn-icon w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-700 transition-all" id="theme-toggle" aria-label="Alternar tema">
+                        <span class="material-icons-outlined text-gray-600 dark:text-gray-400">dark_mode</span>
+                    </button>
+                    <button id="btnLogout" class="btn-icon w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-700 transition-all" aria-label="Sair">
+                        <span class="material-icons-outlined text-red-500">logout</span>
+                    </button>
+                </div>
             </div>
         </header>
 
         <main>
-            <section class="card no-print">
-                <form id="entry-form">
-                    <div class="input-group">
-                        <label for="placa">Placa do Veículo*</label>
-                        <input type="text" id="placa" name="placa" required autocomplete="off">
+            <!-- Formulário de Entrada -->
+            <section class="card bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-5 sm:p-6 mb-6 transition-all">
+                <form id="entry-form" class="flex flex-wrap gap-4 items-start">
+                    <div class="input-group flex-1 min-w-[180px]">
+                        <label for="placa" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Placa do Veículo *</label>
+                        <input type="text" id="placa" name="placa" required autocomplete="off" 
+                               class="w-full h-12 px-4 text-base border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-200 focus:border-primary-500 focus:outline-none input-focus transition-all uppercase font-semibold">
                     </div>
-                    <div class="input-group">
-                        <label for="obs">Observações (Opcional)</label>
-                        <input type="text" id="obs" name="obs" autocomplete="off" placeholder="Ex: Gol Prata, Bloco 5">
+                    <div class="input-group flex-1 min-w-[180px]">
+                        <label for="obs" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Observações</label>
+                        <input type="text" id="obs" name="obs" autocomplete="off" placeholder="Ex: Gol Prata, Bloco 5" 
+                               class="w-full h-12 px-4 text-base border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-200 focus:border-primary-500 focus:outline-none input-focus transition-all">
                     </div>
                     <div style="padding-top: 1.75rem;">
-                        <button type="submit" class="btn btn-primary" id="btnRegistrar"><span class="material-icons-outlined">login</span> Registrar Entrada</button>
+                        <button type="submit" id="btnRegistrar" class="btn btn-primary h-12 px-6 bg-primary-500 text-white rounded-xl font-semibold flex items-center gap-2 hover:bg-primary-600 transition-all ripple">
+                            <span class="material-icons-outlined text-lg">login</span> Registrar Entrada
+                        </button>
                     </div>
                 </form>
             </section>
             
+            <!-- Lista de Registros -->
             <section>
-                <div class="log-header">
-                    <h2 class="log-title">Registros de Veículos</h2>
-                    <div class="controls-group no-print">
-                         <div class="filter-btn-group">
-                            <button id="filter-present" class="btn btn-sm active">No Pátio</button>
-                            <button id="filter-all" class="btn btn-sm">Histórico Completo</button>
+                <div class="log-header flex flex-wrap justify-between items-center gap-4 mb-4">
+                    <h2 class="log-title text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <i class="material-icons-outlined text-primary-500">history</i>
+                        Registros de Veículos
+                    </h2>
+                    <div class="controls-group flex gap-2">
+                        <div class="filter-btn-group flex rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700">
+                            <button id="filter-present" class="btn-filter px-4 py-2 text-sm font-medium bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all active">No Pátio</button>
+                            <button id="filter-all" class="btn-filter px-4 py-2 text-sm font-medium bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all">Histórico</button>
                         </div>
-                        <button id="export-csv" class="btn btn-sm btn-secondary"><span class="material-icons-outlined">description</span>CSV</button>
-                        <button id="export-pdf" class="btn btn-sm btn-secondary"><span class="material-icons-outlined">picture_as_pdf</span>PDF</button>
+                        <button id="export-csv" class="btn btn-secondary h-10 px-4 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-gray-600 dark:text-gray-400 font-medium flex items-center gap-2 hover:border-primary-500 hover:text-primary-500 transition-all">
+                            <span class="material-icons-outlined text-lg">description</span> CSV
+                        </button>
+                        <button id="export-pdf" class="btn btn-secondary h-10 px-4 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-gray-600 dark:text-gray-400 font-medium flex items-center gap-2 hover:border-primary-500 hover:text-primary-500 transition-all">
+                            <span class="material-icons-outlined text-lg">picture_as_pdf</span> PDF
+                        </button>
                     </div>
                 </div>
-                <div class="log-list card">
-                    <ul id="vehicle-list"></ul>
-                    <div id="emptyState" class="empty-state" style="display: none;">
-                        <h3>Nenhum registro encontrado</h3>
-                        <p>A lista de veículos aparecerá aqui.</p>
+                
+                <div class="log-list bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
+                    <ul id="vehicle-list" class="divide-y divide-gray-100 dark:divide-slate-700"></ul>
+                    <div id="emptyState" class="empty-state text-center py-12 hidden">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-slate-700 rounded-full mb-4 empty-state-icon">
+                            <i class="material-icons-outlined text-3xl text-gray-400">inbox</i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Nenhum registro encontrado</h3>
+                        <p class="text-gray-500 dark:text-gray-400">A lista de veículos aparecerá aqui.</p>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -196,7 +342,10 @@
             messagingSenderId: "770195193538",
             appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
         };
-        firebase.initializeApp(firebaseConfig);
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         
         // --- 2. REFERÊNCIAS ---
         const auth = firebase.auth();
@@ -222,18 +371,24 @@
 
         let allEntries = [];
         let currentUser = null;
-        let currentView = 'present'; // 'present' ou 'all'
+        let currentView = 'present';
 
         // --- 3. FUNÇÕES DE UI E UTILITÁRIOS ---
         const showLoading = (show) => { UI.loading.style.display = show ? 'flex' : 'none'; };
+        
         const showToast = (message, type = 'success') => {
             const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.innerHTML = `<span class="material-icons-outlined">${type === 'success' ? 'check_circle' : 'error'}</span> ${message}`;
+            toast.className = `toast-custom flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`;
+            toast.innerHTML = `<span class="material-icons-outlined text-lg">${type === 'success' ? 'check_circle' : 'error'}</span> ${message}`;
             UI.toastContainer.appendChild(toast);
-            setTimeout(() => toast.remove(), 5000);
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.3s ease-in forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
         };
+        
         const formatDate = (ts) => ts ? new Date(ts).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short'}) : '—';
+        
         const formatPlacaMask = (value) => {
             value = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
             if (value.length > 3) return value.slice(0, 3) + '-' + value.slice(3, 7);
@@ -249,42 +404,53 @@
             UI.vehicleList.innerHTML = '';
             UI.emptyState.style.display = entriesToDisplay.length === 0 ? 'block' : 'none';
 
-            entriesToDisplay.forEach(entry => {
+            entriesToDisplay.forEach((entry, index) => {
                 const isExited = entry.status === 'saida';
                 const li = document.createElement('li');
-                li.className = isExited ? 'exited-log' : '';
+                li.className = `flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 transition-all hover:bg-gray-50 dark:hover:bg-slate-700/50 list-item-enter`;
+                li.style.animationDelay = `${index * 0.03}s`;
                 
                 li.innerHTML = `
-                    <div class="vehicle-info">
-                        <div class="placa">${entry.placa}</div>
-                        <div class="details">
-                            <span>Entrada: <b>${formatDate(entry.entryTimestamp)}</b></span>
-                            ${entry.observacoes ? `&bull; ${entry.observacoes}` : ''}
-                            ${isExited ? `&bull; Saída: <b>${formatDate(entry.exitTimestamp)}</b>` : ''}
+                    <div class="vehicle-info flex-1">
+                        <div class="placa font-bold text-lg text-gray-800 dark:text-gray-200 ${isExited ? 'line-through opacity-60' : ''}">${entry.placa}</div>
+                        <div class="details text-sm text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-2">
+                            <span class="flex items-center gap-1"><i class="material-icons-outlined text-base">login</i> ${formatDate(entry.entryTimestamp)}</span>
+                            ${entry.observacoes ? `<span class="flex items-center gap-1"><i class="material-icons-outlined text-base">description</i> ${entry.observacoes}</span>` : ''}
+                            ${isExited ? `<span class="flex items-center gap-1"><i class="material-icons-outlined text-base">logout</i> ${formatDate(entry.exitTimestamp)}</span>` : ''}
                         </div>
                     </div>
                     <div class="log-actions">
-                        <button class="btn btn-secondary btn-sm btn-exit" data-id="${entry.id}">
-                            <span class="material-icons-outlined">logout</span> Sair
-                        </button>
+                        ${!isExited ? `<button class="btn-exit px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all ripple" data-id="${entry.id}">
+                            <span class="material-icons-outlined text-base">logout</span> Registrar Saída
+                        </button>` : ''}
                     </div>
                 `;
                 
-                li.querySelector('.btn-exit').addEventListener('click', () => {
-                    if (confirm(`Confirmar saída do veículo ${entry.placa}?`)) {
-                        registerExit(entry.id);
-                    }
-                });
+                const exitBtn = li.querySelector('.btn-exit');
+                if (exitBtn) {
+                    exitBtn.addEventListener('click', () => {
+                        if (confirm(`Confirmar saída do veículo ${entry.placa}?`)) {
+                            registerExit(entry.id);
+                        }
+                    });
+                }
                 UI.vehicleList.appendChild(li);
             });
         };
 
         const registerExit = (id) => {
+            showLoading(true);
             vehicleRef.child(id).update({
                 status: 'saida',
                 exitTimestamp: firebase.database.ServerValue.TIMESTAMP,
                 porteiroSaida: { uid: currentUser.uid, nome: currentUser.nome }
-            }).catch(err => showToast('Erro ao registrar saída.', 'error'));
+            }).then(() => {
+                showToast('Saída registrada com sucesso!');
+            }).catch(err => {
+                showToast('Erro ao registrar saída.', 'error');
+            }).finally(() => {
+                showLoading(false);
+            });
         };
         
         // --- 5. EXPORTAÇÃO ---
@@ -300,12 +466,12 @@
                     `"${entry.porteiroEntrada?.nome || ''}"`,
                     `"${formatDate(entry.exitTimestamp)}"`,
                     `"${entry.porteiroSaida?.nome || ''}"`,
-                    entry.status
+                    entry.status === 'presente' ? 'No Pátio' : 'Finalizado'
                 ];
                 csvRows.push(values.join(','));
             }
 
-            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('hidden', '');
@@ -314,6 +480,7 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            showToast('CSV gerado com sucesso!');
         };
 
         const exportToPDF = () => {
@@ -327,7 +494,7 @@
                     entry.observacoes || '-',
                     formatDate(entry.entryTimestamp),
                     formatDate(entry.exitTimestamp),
-                    entry.status
+                    entry.status === 'presente' ? 'No Pátio' : 'Finalizado'
                 ];
                 tableRows.push(ticketData);
             });
@@ -337,8 +504,11 @@
                 body: tableRows,
                 startY: 20,
                 theme: 'striped',
-                headStyles: { fillColor: [37, 99, 235] } // Cor azul do tema
+                headStyles: { fillColor: [74, 144, 226] },
+                alternateRowStyles: { fillColor: [248, 250, 252] }
             });
+            doc.setFontSize(16);
+            doc.setTextColor(37, 99, 235);
             doc.text("Relatório de Veículos - Portaria Ágil", 14, 15);
             doc.save(`relatorio_portaria_${new Date().toISOString().slice(0,10)}.pdf`);
             showToast('PDF gerado com sucesso!');
@@ -358,8 +528,11 @@
                             allEntries.push({ id: child.key, ...child.val() });
                         });
                     }
-                    allEntries.reverse(); // Mais novos primeiro
+                    allEntries.reverse();
                     renderList();
+                    showLoading(false);
+                }, error => {
+                    showToast('Erro ao carregar dados.', 'error');
                     showLoading(false);
                 });
             } else {
@@ -371,8 +544,12 @@
         UI.form.addEventListener('submit', (e) => {
             e.preventDefault();
             const placa = UI.placaInput.value.trim();
-            if (!placa) return;
+            if (!placa) {
+                showToast('Por favor, informe a placa do veículo.', 'error');
+                return;
+            }
 
+            showLoading(true);
             vehicleRef.push({
                 placa,
                 observacoes: UI.obsInput.value.trim(),
@@ -383,7 +560,11 @@
                 showToast(`Entrada de ${placa} registrada!`);
                 UI.form.reset();
                 UI.placaInput.focus();
-            }).catch(err => showToast('Erro ao registrar entrada.', 'error'));
+            }).catch(err => {
+                showToast('Erro ao registrar entrada.', 'error');
+            }).finally(() => {
+                showLoading(false);
+            });
         });
 
         UI.placaInput.addEventListener('input', (e) => { e.target.value = formatPlacaMask(e.target.value); });
@@ -393,28 +574,42 @@
 
         UI.filterPresentBtn.addEventListener('click', () => {
             currentView = 'present';
-            UI.filterPresentBtn.classList.add('active');
-            UI.filterAllBtn.classList.remove('active');
+            UI.filterPresentBtn.classList.add('filter-btn-active');
+            UI.filterAllBtn.classList.remove('filter-btn-active');
             renderList();
         });
+        
         UI.filterAllBtn.addEventListener('click', () => {
             currentView = 'all';
-            UI.filterAllBtn.classList.add('active');
-            UI.filterPresentBtn.classList.remove('active');
+            UI.filterAllBtn.classList.add('filter-btn-active');
+            UI.filterPresentBtn.classList.remove('filter-btn-active');
             renderList();
         });
         
         // Tema Escuro / Claro
         const applyTheme = (theme) => {
             document.documentElement.setAttribute('data-theme', theme);
-            UI.themeToggle.querySelector('.material-icons-outlined').textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+            const icon = UI.themeToggle.querySelector('.material-icons-outlined');
+            icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
             localStorage.setItem('portaria-agil-theme', theme);
+            
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         };
+        
         UI.themeToggle.addEventListener('click', () => {
             const newTheme = (document.documentElement.getAttribute('data-theme') || 'light') === 'light' ? 'dark' : 'light';
             applyTheme(newTheme);
         });
-        applyTheme(localStorage.getItem('portaria-agil-theme') || 'light');
+        
+        const savedTheme = localStorage.getItem('portaria-agil-theme') || 'light';
+        applyTheme(savedTheme);
+        
+        // Inicializar estado dos filtros
+        UI.filterPresentBtn.classList.add('filter-btn-active');
     });
     </script>
 </body>
