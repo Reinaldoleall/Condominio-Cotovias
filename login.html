@@ -2,65 +2,282 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-   <meta name="viewport" content="width=1280">
-    <title>Login - Sistema de Encomendas</title>
-    
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4A90E2">
+    <title>Login - Sistema Condomínio Cotovias</title>
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     
-    <!-- Material Design Variables -->
-   
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EBF3FE',
+                            100: '#D7E8FD',
+                            200: '#B0D1FB',
+                            300: '#88B9F8',
+                            400: '#61A2F6',
+                            500: '#4A90E2',
+                            600: '#3A73B5',
+                            700: '#2B5688',
+                            800: '#1D3A5A',
+                            900: '#0E1D2D',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 2s infinite',
+                        'shake': 'shake 0.5s ease-in-out',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '25%': { transform: 'translateX(-10px)' },
+                            '75%': { transform: 'translateX(10px)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        /* Estilos customizados */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Efeito de bolhas no fundo */
+        .bubble {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            animation: floatBubble 20s infinite ease-in-out;
+        }
+        
+        @keyframes floatBubble {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            75% { transform: translateY(20px) translateX(-10px); }
+        }
+        
+        /* Glass effect para o card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Input focus effect */
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+            border-color: #4A90E2;
+        }
+        
+        /* Ripple effect para o botão */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        
+        /* Loading spinner */
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Message animations */
+        .message-slide {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Link hover effect */
+        .link-hover {
+            position: relative;
+        }
+        
+        .link-hover::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #4A90E2, #3A73B5);
+            transition: width 0.3s ease;
+        }
+        
+        .link-hover:hover::after {
+            width: 100%;
+        }
+        
+        /* Input icon animation */
+        .input-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .input-container:focus-within .input-icon {
+            color: #4A90E2;
+            transform: scale(1.1);
+        }
+        
+        /* Logo animation */
+        .logo-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .glass-card {
+                margin: 16px;
+                max-width: calc(100% - 32px);
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="card__header">
-                <h1 class="card__title">Login</h1>
+
+    <!-- Bolhas decorativas -->
+    <div class="bubble" style="width: 300px; height: 300px; top: -100px; right: -100px; animation-duration: 25s;"></div>
+    <div class="bubble" style="width: 200px; height: 200px; bottom: -50px; left: -50px; animation-duration: 20s;"></div>
+    <div class="bubble" style="width: 150px; height: 150px; top: 50%; left: 10%; animation-duration: 30s;"></div>
+    <div class="bubble" style="width: 100px; height: 100px; bottom: 20%; right: 15%; animation-duration: 22s;"></div>
+
+    <div class="container min-h-screen flex items-center justify-center p-4">
+        <div class="glass-card rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
+            <!-- Header -->
+            <div class="card__header text-center pt-8 pb-4 px-6">
+                <div class="logo-icon w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="material-icons text-white text-4xl">shield</i>
+                </div>
+                <h1 class="card__title text-3xl font-bold gradient-text mb-2">Bem-vindo</h1>
+                <p class="text-gray-500 text-sm">Sistema de Gestão Condominial</p>
             </div>
             
-            <div class="card__body">
+            <!-- Body -->
+            <div class="card__body p-6 pt-2">
                 <!-- Email -->
-                <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
-                    <div class="input-container">
-                        <span class="material-icons input-icon">email</span>
-                        <input id="email" type="email" class="input-field" required>
+                <div class="form-group mb-5">
+                    <label for="email" class="form-label block text-sm font-medium text-gray-700 mb-2">
+                        Email
+                    </label>
+                    <div class="input-container relative">
+                        <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg transition-all">email</span>
+                        <input id="email" type="email" class="input-field w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all input-focus" required placeholder="seu@email.com">
                     </div>
-                    <span class="helper-text">Informe seu email cadastrado</span>
+                    <span class="helper-text text-xs text-gray-400 mt-1 block">Informe seu email cadastrado</span>
                 </div>
                 
                 <!-- Senha -->
-                <div class="form-group">
-                    <label for="senha" class="form-label">Senha</label>
-                    <div class="input-container">
-                        <span class="material-icons input-icon">lock</span>
-                        <input id="senha" type="password" class="input-field" required>
+                <div class="form-group mb-6">
+                    <label for="senha" class="form-label block text-sm font-medium text-gray-700 mb-2">
+                        Senha
+                    </label>
+                    <div class="input-container relative">
+                        <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg transition-all">lock</span>
+                        <input id="senha" type="password" class="input-field w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all input-focus" required placeholder="••••••">
                     </div>
-                    <span class="helper-text">Mínimo 6 caracteres</span>
+                    <span class="helper-text text-xs text-gray-400 mt-1 block">Mínimo 6 caracteres</span>
                 </div>
                 
                 <!-- Botão de Login -->
-                <button id="btnLogin" class="btn">
-                    <span class="material-icons btn__icon">login</span>
+                <button id="btnLogin" class="btn w-full py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 hover:from-primary-600 hover:to-primary-700 transition-all ripple">
+                    <span class="material-icons text-lg">login</span>
                     Entrar
                 </button>
                 
                 <!-- Links -->
-                <div class="link-container">
-                    <a href="#" id="esqueciSenha" class="link">Esqueci minha senha</a>
+                <div class="link-container text-center mt-6">
+                    <a href="#" id="esqueciSenha" class="link text-sm text-primary-500 hover:text-primary-600 transition-colors link-hover">
+                        Esqueci minha senha
+                    </a>
                 </div>
                 
-                <div class="link-container">
-                    Não tem uma conta? <a href="cadastro.html" class="link">Cadastre-se</a>
+                <div class="link-container text-center mt-4 text-sm text-gray-600">
+                    Não tem uma conta? 
+                    <a href="cadastro.html" class="link text-primary-500 hover:text-primary-600 font-medium transition-colors link-hover">
+                        Cadastre-se
+                    </a>
                 </div>
                 
                 <!-- Container para mensagens -->
-                <div id="messageContainer" class="message-container"></div>
+                <div id="messageContainer" class="message-container mt-4"></div>
             </div>
         </div>
     </div>
@@ -70,7 +287,277 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-    <script src="js/login.js"></script>
-</body>
+    <script>
+        // ============================================
+        // JAVASCRIPT ORIGINAL - NENHUMA ALTERAÇÃO NA LÓGICA
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configuração do Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+                authDomain: "rifas-c414b.firebaseapp.com",
+                databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+                projectId: "rifas-c414b",
+                storageBucket: "rifas-c414b.firebasestorage.app",
+                messagingSenderId: "770195193538",
+                appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+            };
 
-</html>
+            // Inicializa Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+
+            const auth = firebase.auth();
+            const database = firebase.database();
+
+            // Elementos DOM
+            const btnLogin = document.getElementById('btnLogin');
+            const emailInput = document.getElementById('email');
+            const senhaInput = document.getElementById('senha');
+            const messageContainer = document.getElementById('messageContainer');
+            const esqueciSenhaLink = document.getElementById('esqueciSenha');
+
+            // Função para mostrar mensagens
+            function showMessage(message, type = 'error') {
+                messageContainer.innerHTML = '';
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message-slide p-3 rounded-lg flex items-center gap-2 ${
+                    type === 'success' ? 'bg-green-50 text-green-800 border-l-4 border-green-500' : 
+                    'bg-red-50 text-red-800 border-l-4 border-red-500'
+                }`;
+                messageDiv.innerHTML = `
+                    <i class="material-icons text-sm">${type === 'success' ? 'check_circle' : 'error'}</i>
+                    <span class="text-sm">${message}</span>
+                `;
+                messageContainer.appendChild(messageDiv);
+                
+                // Auto-esconder após 5 segundos
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.style.opacity = '0';
+                        messageDiv.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            if (messageDiv.parentNode) {
+                                messageDiv.remove();
+                            }
+                        }, 300);
+                    }
+                }, 5000);
+            }
+
+            // Função de validação
+            function validateForm() {
+                const email = emailInput.value.trim();
+                const senha = senhaInput.value.trim();
+                
+                if (!email) {
+                    showMessage('Por favor, informe seu email.');
+                    emailInput.focus();
+                    return false;
+                }
+                
+                if (!isValidEmail(email)) {
+                    showMessage('Por favor, informe um email válido.');
+                    emailInput.focus();
+                    return false;
+                }
+                
+                if (!senha) {
+                    showMessage('Por favor, informe sua senha.');
+                    senhaInput.focus();
+                    return false;
+                }
+                
+                if (senha.length < 6) {
+                    showMessage('A senha deve ter no mínimo 6 caracteres.');
+                    senhaInput.focus();
+                    return false;
+                }
+                
+                return true;
+            }
+
+            // Função para validar email
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            // Função para mostrar loading no botão
+            function setLoading(loading) {
+                if (loading) {
+                    btnLogin.disabled = true;
+                    btnLogin.style.opacity = '0.7';
+                    btnLogin.innerHTML = `
+                        <div class="loading-spinner"></div>
+                        <span>Entrando...</span>
+                    `;
+                } else {
+                    btnLogin.disabled = false;
+                    btnLogin.style.opacity = '1';
+                    btnLogin.innerHTML = `
+                        <span class="material-icons text-lg">login</span>
+                        Entrar
+                    `;
+                }
+            }
+
+            // Função de login
+            async function fazerLogin() {
+                if (!validateForm()) return;
+                
+                const email = emailInput.value.trim();
+                const senha = senhaInput.value.trim();
+                
+                setLoading(true);
+                
+                try {
+                    // Autentica o usuário
+                    const userCredential = await auth.signInWithEmailAndPassword(email, senha);
+                    const user = userCredential.user;
+                    
+                    // Busca dados adicionais do usuário no Realtime Database
+                    const userSnapshot = await database.ref(`users/${user.uid}`).once('value');
+                    const userData = userSnapshot.val();
+                    
+                    if (!userData) {
+                        throw new Error('Dados do usuário não encontrados');
+                    }
+                    
+                    // Verifica o tipo de usuário e redireciona
+                    switch (userData.tipo) {
+                        case 'porteiro':
+                            window.location.href = 'portaria.html';
+                            break;
+                        case 'morador':
+                            window.location.href = 'usuario.html';
+                            break;
+                        case 'admin':
+                            window.location.href = 'admin.html';
+                            break;
+                        default:
+                            // Se for um usuário sem tipo definido, redireciona para a página apropriada
+                            if (userData.isAdmin) {
+                                window.location.href = 'admin.html';
+                            } else {
+                                window.location.href = 'usuario.html';
+                            }
+                    }
+                    
+                } catch (error) {
+                    console.error('Erro no login:', error);
+                    
+                    // Tratamento de erros específicos
+                    switch (error.code) {
+                        case 'auth/user-not-found':
+                            showMessage('Usuário não encontrado. Verifique seu email ou cadastre-se.');
+                            break;
+                        case 'auth/wrong-password':
+                            showMessage('Senha incorreta. Tente novamente.');
+                            senhaInput.value = '';
+                            senhaInput.focus();
+                            break;
+                        case 'auth/invalid-email':
+                            showMessage('Email inválido. Verifique o formato do email.');
+                            break;
+                        case 'auth/user-disabled':
+                            showMessage('Usuário desabilitado. Entre em contato com o administrador.');
+                            break;
+                        case 'auth/too-many-requests':
+                            showMessage('Muitas tentativas. Tente novamente mais tarde.');
+                            break;
+                        default:
+                            showMessage('Erro ao fazer login. Verifique sua conexão e tente novamente.');
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            // Função para reset de senha
+            async function resetarSenha() {
+                const email = emailInput.value.trim();
+                
+                if (!email) {
+                    showMessage('Informe seu email para resetar a senha.');
+                    emailInput.focus();
+                    return;
+                }
+                
+                if (!isValidEmail(email)) {
+                    showMessage('Informe um email válido.');
+                    emailInput.focus();
+                    return;
+                }
+                
+                setLoading(true);
+                
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    showMessage('Email de recuperação enviado! Verifique sua caixa de entrada.', 'success');
+                } catch (error) {
+                    console.error('Erro ao resetar senha:', error);
+                    
+                    switch (error.code) {
+                        case 'auth/user-not-found':
+                            showMessage('Usuário não encontrado com este email.');
+                            break;
+                        case 'auth/invalid-email':
+                            showMessage('Email inválido.');
+                            break;
+                        default:
+                            showMessage('Erro ao enviar email de recuperação. Tente novamente.');
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            // Event Listeners
+            btnLogin.addEventListener('click', fazerLogin);
+            
+            // Permitir login com Enter
+            const inputs = [emailInput, senhaInput];
+            inputs.forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        fazerLogin();
+                    }
+                });
+            });
+            
+            esqueciSenhaLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                resetarSenha();
+            });
+            
+            // Verifica se já está logado
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // Se já estiver logado, redireciona baseado no tipo
+                    database.ref(`users/${user.uid}`).once('value').then((snapshot) => {
+                        const userData = snapshot.val();
+                        if (userData) {
+                            switch (userData.tipo) {
+                                case 'porteiro':
+                                    window.location.href = 'portaria.html';
+                                    break;
+                                case 'morador':
+                                    window.location.href = 'usuario.html';
+                                    break;
+                                case 'admin':
+                                    window.location.href = 'admin.html';
+                                    break;
+                                default:
+                                    window.location.href = userData.isAdmin ? 'admin.html' : 'usuario.html';
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+    </html>
