@@ -2,581 +2,476 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vivendas das Cotovias</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4A90E2">
+    <title>Salão de Festas - Vivendas das Cotovias</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EBF3FE',
+                            100: '#D7E8FD',
+                            200: '#B0D1FB',
+                            300: '#88B9F8',
+                            400: '#61A2F6',
+                            500: '#4A90E2',
+                            600: '#3A73B5',
+                            700: '#2B5688',
+                            800: '#1D3A5A',
+                            900: '#0E1D2D',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'spin-slow': 'spin 1s linear infinite',
+                        'pulse-slow': 'pulse 2s infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        spin: {
+                            'from': { transform: 'rotate(0deg)' },
+                            'to': { transform: 'rotate(360deg)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
     
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-            --success: #27ae60;
-            --warning: #f39c12;
-        }
-        
+        /* Estilos customizados */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            background-color: #f5f7fa;
-            color: var(--dark);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        .user-info {
-  display: none !important;
-}
-
-        
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
+            background: linear-gradient(135deg, #F7F8FC 0%, #EEF2F7 100%);
+            font-family: 'Inter', sans-serif;
         }
         
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 20px;
-            text-align: center;
+        /* Glass effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 10px;
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
         
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        main {
-            padding-top: 20px;
+        ::-webkit-scrollbar-track {
+            background: #E4E6EB;
+            border-radius: 10px;
         }
         
-        /* Estilo para a imagem de tela cheia */
-        #fullscreen-image {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-           
-            background-position: center;
-            background-repeat: no-repeat;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            border-radius: 10px;
+        }
+        
+        /* Card hover premium */
+        .premium-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .premium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Loading spinner */
+        .loading-spinner-custom {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #E4E6EB;
+            border-top-color: #4A90E2;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Badge styles */
+        .badge-custom {
+            display: inline-flex;
             align-items: center;
-        }
-        
-        #fullscreen-image .image-overlay {
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 80%;
-            backdrop-filter: blur(5px);
-        }
-        
-        #fullscreen-image h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        
-        #fullscreen-image p {
-            font-size: 1.3rem;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-        
-        #fullscreen-image .contact-info {
-            margin-top: 30px;
-            font-size: 1.1rem;
-        }
-        
-        .user-info {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 10px 15px;
-            background-color: var(--light);
-            border-radius: 8px;
-        }
-        #user-display {
-            font-weight: bold;
-            margin-right: 15px;
-        }
-        #logout-button {
-            padding: 5px 10px;
-            background-color: var(--accent);
-        }
-        #logout-button:hover {
-            background-color: #c0392b;
-        }
-
-        .tabs {
-            display: flex;
-            justify-content: center;
-            border-bottom: 1px solid #ddd;
-            flex-wrap: wrap;
-        }
-        
-        .tab {
-            padding: 12px 20px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        
-        .tab.active {
-            border-bottom-color: var(--secondary);
-            color: var(--secondary);
-            font-weight: bold;
-        }
-        
-        .tab-content {
-            display: none;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 25px rgba(0,0,0,0.08);
-            margin-top: 20px;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-
-        .calendar-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .calendar-controls button {
-            background: none;
-            border: 1px solid #ddd;
-            padding: 8px 12px;
-        }
-         .calendar-controls button:hover {
-            background: var(--light);
-            border-color: #ccc;
-        }
-        #current-month {
-            font-size: 1.2rem;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
-
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-            margin-top: 20px;
+        
+        .badge-pending {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
         }
         
-        .calendar-header {
-            text-align: center;
-            font-weight: bold;
-            padding: 10px 5px;
-            background-color: var(--light);
-            border-radius: 5px;
-            font-size: 0.9rem;
+        .badge-confirmed {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
         }
         
+        .badge-cancelled {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+        }
+        
+        /* Calendar styles */
         .calendar-day {
-            border: 1px solid #ddd;
-            padding: 8px;
-            min-height: 100px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            display: flex;
-            flex-direction: column;
+            transition: all 0.3s ease;
         }
-        .calendar-day-number {
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .calendar-day:hover {
-            background-color: var(--light);
+        
+        .calendar-day.available:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
         }
+        
         .calendar-day.reserved {
-            background-color: #ffeaa7;
-            border-color: var(--warning);
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            border-color: #F59E0B;
         }
+        
         .calendar-day.available {
-            background-color: #d1f7c4;
-            border-color: var(--success);
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            border-color: #10B981;
         }
+        
         .calendar-day.past {
-            background-color: #f0f0f0;
-            color: #aaa;
+            background: #F3F4F6;
+            color: #9CA3AF;
             cursor: not-allowed;
         }
-        .reservation-info-wrapper {
-            margin-top: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
+        
+        /* Reservation status colors */
+        .status-pending {
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            color: #92400E;
         }
-        .reservation-info {
-            font-size: 0.7rem;
-            padding: 2px 4px;
+        
+        .status-confirmed {
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            color: #065F46;
+        }
+        
+        .status-cancelled {
+            background: linear-gradient(135deg, #FEE2E2, #FECACA);
+            color: #991B1B;
+        }
+        
+        /* Tab styles */
+        .tab-custom {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-custom.active {
+            color: #4A90E2;
+        }
+        
+        .tab-custom.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4A90E2, #3A73B5);
             border-radius: 3px;
-            font-weight: 500;
-            text-align: center;
-        }
-        .reservation-info.confirmed { background-color: var(--success); color: white; }
-        .reservation-info.pending { background-color: var(--warning); color: var(--dark); }
-
-        .legend {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-        }
-        .legend-color {
-            width: 18px;
-            height: 18px;
-            margin-right: 8px;
-            border-radius: 4px;
         }
         
-        .reservation-form {
-            display: grid;
-            gap: 15px;
-            margin-top: 20px;
+        /* Input focus effect */
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
         }
         
-        .form-group {
-            display: flex;
-            flex-direction: column;
+        /* Ripple effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
         }
         
-        label {
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        
-        input, select {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: #f9f9f9;
-        }
-         input:focus, select:focus {
-            outline: 2px solid var(--secondary);
-            background-color: white;
-        }
-        
-        button {
-            padding: 12px 20px;
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-        
-        button:hover {
-            background-color: #2980b9;
-        }
-        .btn-danger {
-            background-color: var(--accent);
-        }
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-        .btn-success {
-            background-color: var(--success);
-        }
-        .btn-success:hover {
-            background-color: #229954;
-        }
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 0.8rem;
-        }
-
-        .reservations-list {
-            margin-top: 20px;
-            display: grid;
-            gap: 15px;
-        }
-        
-        .reservation-item {
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .reservation-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .reservation-date {
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .reservation-status {
-            padding: 3px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .status-pending { background-color: #fff3cd; color: #856404; }
-        .status-confirmed { background-color: #d4edda; color: #155724; }
-        .status-cancelled { background-color: #f8d7da; color: #721c24; }
-        
-        .reservation-details { display: grid; gap: 5px; font-size: 0.9rem; }
-        .reservation-actions { margin-top: 15px; display: flex; gap: 10px; }
-        
-        .notification {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            border: 1px solid transparent;
-            text-align: center;
-        }
-        .notification.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
-        .notification.error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
-        
-        .loader {
-            border: 6px solid var(--light);
-            border-top: 6px solid var(--secondary);
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 40px auto;
+            background: rgba(74, 144, 226, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
         }
-
-        dialog {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 0 2em rgba(0, 0, 0, 0.3);
-            padding: 1.5em;
-            width: 90%;
-            max-width: 400px;
-            margin: auto;
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        dialog::backdrop {
-            background: rgba(0, 0, 0, 0.5);
+        
+        /* Fullscreen overlay */
+        .fullscreen-overlay {
+            background: linear-gradient(135deg, #1E293B, #0F172A);
         }
-        .modal-content p {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
+        
+        /* Modal animation */
+        .modal-scale {
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
+        
+        /* Legend colors */
+        .legend-color {
+            transition: all 0.2s ease;
         }
-
-        /* --- MELHORIAS PARA CELULAR --- */
+        
+        /* Responsive calendar */
         @media (max-width: 768px) {
-            body {
-                font-size: 95%;
-            }
-            .container {
-                padding: 10px;
-            }
-            .logo {
-                font-size: 1.5rem;
-            }
-            header p {
-                font-size: 1rem;
-            }
-            main {
-                padding-top: 10px;
-            }
-            .tab {
-                flex-grow: 1;
-                text-align: center;
-                padding: 10px 5px;
-                font-size: 0.8rem;
-            }
-            .user-info {
-                flex-direction: column;
-                gap: 10px;
-                padding: 15px;
-            }
-            .calendar {
-                gap: 5px;
-            }
-            .calendar-header {
-                font-size: 0.7rem;
-                padding: 8px 2px;
-            }
             .calendar-day {
                 min-height: 70px;
-                padding: 5px;
-                font-size: 0.8rem;
-                border-radius: 5px;
+                font-size: 0.75rem;
             }
-            .calendar-controls {
-                margin-bottom: 15px;
-            }
-            #current-month {
-                font-size: 1rem;
-                text-align: center;
-                margin: 0 10px;
-            }
-             .calendar-controls button {
-                padding: 8px 10px;
-            }
-            .reservation-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            .tab-content {
-                padding: 15px;
-            }
-            #fullscreen-image h2 {
-                font-size: 1.8rem;
-            }
-            #fullscreen-image p {
-                font-size: 1.1rem;
-            }
-            #fullscreen-image .image-overlay {
-                padding: 25px;
+            
+            .calendar-header {
+                font-size: 0.7rem;
+                padding: 8px 4px;
             }
         }
     </style>
 </head>
-<body>
 
-   <div id="fullscreen-image">
-    <div class="image-overlay">
-        <h2>Salão de Festas</h2>
-       
-        
-       <p style="color: #ffcc00; font-weight: bold; margin-top: 15px;">
-    🔒 Para acessar e agendar o salão de festas, faça login na aba de <strong>Usuários</strong>.
-</p>
- 
-        <div class="contact-info">
-           
+<body class="antialiased">
+
+    <!-- Fullscreen Image Overlay (Login Required) -->
+    <div id="fullscreen-image" class="fullscreen-overlay fixed inset-0 z-[2000] flex items-center justify-center hidden">
+        <div class="text-center max-w-md mx-auto px-6">
+            <div class="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-float">
+                <i class="material-icons text-5xl text-primary-500">celebration</i>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Salão de Festas</h2>
+            <p class="text-gray-300 mb-6">Espaço exclusivo para momentos especiais</p>
+            <div class="bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-4 mb-6">
+                <p class="text-yellow-400 font-medium flex items-center justify-center gap-2">
+                    <i class="material-icons text-sm">lock</i>
+                    🔒 Para acessar e agendar o salão de festas, faça login na aba de Usuários
+                </p>
+            </div>
+            <div class="contact-info text-gray-400 text-sm">
+                <p>📞 Dúvidas? Entre em contato com a administração</p>
+            </div>
         </div>
     </div>
-</div>
 
-
-    <main class="container">
-        <div id="main-content" style="display:none;">
-            <div class="user-info">
-                <span id="user-display"></span>
-                <button id="logout-button" class="btn-small">Sair</button>
-            </div>
-            
-            <div class="tabs">
-                <div class="tab active" data-tab="calendar">🗓️ Calendário</div>
-                <div class="tab" data-tab="reservation">📝 Fazer Reserva</div>
-                <div class="tab" data-tab="my-reservations">📋 Minhas Reservas</div>
-                <div class="tab" data-tab="admin" id="admin-tab" style="display:none;">👑 Admin</div>
-            </div>
-            
-            <div id="notification" class="notification"></div>
-            <div id="loader" class="loader" style="display:none;"></div>
-            
-            <div id="calendar" class="tab-content active">
-                <h2>Calendário</h2>
-                <div class="calendar-controls">
-                    <button id="prev-month" aria-label="Mês anterior">&#9664;</button>
-                    <h3 id="current-month"></h3>
-                    <button id="next-month" aria-label="Próximo mês">&#9654;</button>
+    <!-- Main Content -->
+    <main class="container max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div id="main-content" style="display: none;">
+            <!-- User Info Bar -->
+            <div class="flex justify-between items-center mb-6 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="material-icons text-white text-xl">celebration</i>
+                    </div>
+                    <div>
+                        <span id="user-display" class="font-semibold text-gray-800"></span>
+                        <p class="text-xs text-gray-500">Morador</p>
+                    </div>
                 </div>
-                <div class="calendar" id="calendar-grid"></div>
-                <div class="legend">
-                    <div class="legend-item"><div class="legend-color" style="background-color: #d1f7c4;"></div><span>Disponível</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background-color: #ffeaa7;"></div><span>Reservado</span></div>
+                <button id="logout-button" class="px-4 py-2 bg-red-500 text-white rounded-xl font-medium flex items-center gap-2 hover:bg-red-600 transition-all ripple text-sm">
+                    <i class="material-icons text-sm">exit_to_app</i>
+                    Sair
+                </button>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs flex gap-2 sm:gap-4 border-b border-gray-200 mb-6 overflow-x-auto pb-1">
+                <div class="tab-custom px-4 py-2 cursor-pointer font-medium text-gray-600 hover:text-primary-500 transition-colors whitespace-nowrap active" data-tab="calendar">
+                    <i class="material-icons-outlined text-lg mr-2 align-middle">calendar_today</i>
+                    Calendário
+                </div>
+                <div class="tab-custom px-4 py-2 cursor-pointer font-medium text-gray-600 hover:text-primary-500 transition-colors whitespace-nowrap" data-tab="reservation">
+                    <i class="material-icons-outlined text-lg mr-2 align-middle">event_available</i>
+                    Fazer Reserva
+                </div>
+                <div class="tab-custom px-4 py-2 cursor-pointer font-medium text-gray-600 hover:text-primary-500 transition-colors whitespace-nowrap" data-tab="my-reservations">
+                    <i class="material-icons-outlined text-lg mr-2 align-middle">assignment</i>
+                    Minhas Reservas
+                </div>
+                <div class="tab-custom px-4 py-2 cursor-pointer font-medium text-gray-600 hover:text-primary-500 transition-colors whitespace-nowrap" id="admin-tab" style="display: none;" data-tab="admin">
+                    <i class="material-icons-outlined text-lg mr-2 align-middle">admin_panel_settings</i>
+                    Admin
                 </div>
             </div>
             
-            <div id="reservation" class="tab-content">
-                <h2>Fazer Reserva</h2>
-                <form id="reservation-form" class="reservation-form">
-                    <div class="form-group"><label for="reservation-date">Data da Reserva</label><input type="date" id="reservation-date" required></div>
-                    <div class="form-group"><label for="reservation-period">Período</label><select id="reservation-period" required><option value="">Selecione...</option><option value="manha">Manhã (8h-12h)</option><option value="tarde">Tarde (13h-17h)</option><option value="noite">Noite (18h-22h)</option></select></div>
-                    <div class="form-group"><label for="event-type">Tipo de Evento</label><input type="text" id="event-type" placeholder="Ex: Aniversário" required></div>
-                    <div class="form-group"><label for="guests">Nº de Convidados (máx: 50)</label><input type="number" id="guests" min="1" max="50" required></div>
-                    <button type="submit">Enviar Solicitação</button>
+            <!-- Notification -->
+            <div id="notification" class="notification hidden mb-4 p-4 rounded-xl border-l-4"></div>
+            
+            <!-- Loader -->
+            <div id="loader" class="loader hidden flex justify-center py-8">
+                <div class="loading-spinner-custom"></div>
+            </div>
+            
+            <!-- Calendar Tab -->
+            <div id="calendar" class="tab-content active bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="material-icons-outlined text-primary-500">calendar_month</i>
+                    Calendário de Reservas
+                </h2>
+                <div class="calendar-controls flex justify-between items-center mb-6">
+                    <button id="prev-month" class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-primary-500 transition-all">
+                        <i class="material-icons">chevron_left</i>
+                    </button>
+                    <h3 id="current-month" class="text-lg font-semibold text-gray-800"></h3>
+                    <button id="next-month" class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-primary-500 transition-all">
+                        <i class="material-icons">chevron_right</i>
+                    </button>
+                </div>
+                <div class="calendar grid grid-cols-7 gap-2 sm:gap-3" id="calendar-grid"></div>
+                <div class="legend flex flex-wrap justify-center gap-4 mt-6 pt-4 border-t border-gray-100">
+                    <div class="legend-item flex items-center gap-2 text-sm text-gray-600">
+                        <div class="legend-color w-4 h-4 rounded-full bg-green-200 border border-green-500"></div>
+                        <span>Disponível</span>
+                    </div>
+                    <div class="legend-item flex items-center gap-2 text-sm text-gray-600">
+                        <div class="legend-color w-4 h-4 rounded-full bg-yellow-200 border border-yellow-500"></div>
+                        <span>Reservado</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reservation Form Tab -->
+            <div id="reservation" class="tab-content hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="material-icons-outlined text-primary-500">event_note</i>
+                    Nova Reserva
+                </h2>
+                <form id="reservation-form" class="reservation-form grid gap-4">
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Data da Reserva</label>
+                        <input type="date" id="reservation-date" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
+                    </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Período</label>
+                        <select id="reservation-period" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
+                            <option value="">Selecione...</option>
+                            <option value="manha">🌅 Manhã (8h-12h)</option>
+                            <option value="tarde">☀️ Tarde (13h-17h)</option>
+                            <option value="noite">🌙 Noite (18h-22h)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Evento</label>
+                        <input type="text" id="event-type" placeholder="Ex: Aniversário, Casamento, Confraternização" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
+                    </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nº de Convidados (máx: 50)</label>
+                        <input type="number" id="guests" min="1" max="50" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
+                    </div>
+                    <button type="submit" class="btn-primary-custom px-6 py-3 bg-primary-500 text-white rounded-xl font-semibold hover:bg-primary-600 transition-all ripple flex items-center justify-center gap-2">
+                        <i class="material-icons">send</i>
+                        Enviar Solicitação
+                    </button>
                 </form>
             </div>
             
-            <div id="my-reservations" class="tab-content">
-                <h2>Minhas Reservas</h2>
-                <div class="reservations-list" id="user-reservations-list"></div>
+            <!-- My Reservations Tab -->
+            <div id="my-reservations" class="tab-content hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="material-icons-outlined text-primary-500">folder</i>
+                    Minhas Reservas
+                </h2>
+                <div class="reservations-list grid gap-4" id="user-reservations-list"></div>
             </div>
             
-            <div id="admin" class="tab-content">
-                <h2>Administração</h2>
-                <div class="form-group"><label for="admin-filter">Filtrar por Status</label><select id="admin-filter"><option value="all">Todas</option><option value="pending">Pendentes</option><option value="confirmed">Confirmadas</option><option value="cancelled">Canceladas</option></select></div>
-                <div class="reservations-list" id="admin-reservations-list"></div>
+            <!-- Admin Tab -->
+            <div id="admin" class="tab-content hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="material-icons-outlined text-primary-500">admin_panel_settings</i>
+                    Administração
+                </h2>
+                <div class="form-group mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Status</label>
+                    <select id="admin-filter" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
+                        <option value="all">Todas as Reservas</option>
+                        <option value="pending">Pendentes</option>
+                        <option value="confirmed">Confirmadas</option>
+                        <option value="cancelled">Canceladas</option>
+                    </select>
+                </div>
+                <div class="reservations-list grid gap-4" id="admin-reservations-list"></div>
             </div>
         </div>
     </main>
 
-    <dialog id="confirm-modal">
-        <div class="modal-content">
-            <p id="modal-text">Você tem certeza?</p>
-            <div class="modal-actions">
-                <button id="modal-confirm-btn" class="btn-danger">Confirmar</button>
-                <button id="modal-cancel-btn">Cancelar</button>
+    <!-- Confirm Modal -->
+    <dialog id="confirm-modal" class="rounded-2xl shadow-2xl p-0 backdrop:bg-black/50">
+        <div class="modal-content p-6 max-w-sm">
+            <p id="modal-text" class="text-gray-800 text-lg mb-6">Você tem certeza?</p>
+            <div class="modal-actions flex justify-end gap-3">
+                <button id="modal-cancel-btn" class="px-4 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">Cancelar</button>
+                <button id="modal-confirm-btn" class="px-4 py-2 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-all">Confirmar</button>
             </div>
         </div>
     </dialog>
 
+    <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore-compat.js"></script>
 
     <script>
+        // ============================================
+        // JAVASCRIPT ORIGINAL - NENHUMA ALTERAÇÃO NA LÓGICA
+        // ============================================
+        
         document.addEventListener('DOMContentLoaded', () => {
-            
             const firebaseConfig = {
                 apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
                 authDomain: "rifas-c414b.firebaseapp.com",
@@ -587,7 +482,10 @@
                 appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
             };
 
-            firebase.initializeApp(firebaseConfig);
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            
             const db = firebase.firestore();
             const auth = firebase.auth();
 
@@ -636,17 +534,17 @@
             });
 
             function showLoginUI() {
-                // Apenas a imagem em tela cheia é exibida quando não há usuário
                 mainContent.style.display = 'none';
                 fullscreenImage.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
             }
 
             async function initializeAppUI() {
-                // Oculta a imagem e mostra o conteúdo principal quando o usuário está logado
                 fullscreenImage.style.display = 'none';
                 mainContent.style.display = 'block';
+                document.body.style.overflow = 'auto';
                 document.getElementById('user-display').textContent = `Olá, ${currentUser.name || currentUser.email}`;
-                document.getElementById('admin-tab').style.display = currentUser.isAdmin ? 'block' : 'none';
+                document.getElementById('admin-tab').style.display = currentUser.isAdmin ? 'flex' : 'none';
                 await loadDataFromFirestore();
             }
 
@@ -675,16 +573,23 @@
                 calendarGrid.innerHTML = '';
                 const month = currentDate.getMonth();
                 const year = currentDate.getFullYear();
-                currentMonthEl.textContent = `${new Date(year, month).toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}`;
+                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                currentMonthEl.textContent = `${monthNames[month]} ${year}`;
 
                 const firstDay = new Date(year, month, 1).getDay();
                 const lastDate = new Date(year, month + 1, 0).getDate();
 
                 const daysOfWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
-                calendarGrid.innerHTML = daysOfWeek.map(day => `<div class="calendar-header">${day}</div>`).join('');
+                daysOfWeek.forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'calendar-header text-center font-semibold text-gray-600 py-2 text-sm';
+                    header.textContent = day;
+                    calendarGrid.appendChild(header);
+                });
 
                 for (let i = 0; i < firstDay; i++) {
-                    calendarGrid.insertAdjacentHTML('beforeend', '<div></div>');
+                    const emptyDiv = document.createElement('div');
+                    calendarGrid.appendChild(emptyDiv);
                 }
                 
                 const today = new Date();
@@ -692,84 +597,108 @@
 
                 for (let day = 1; day <= lastDate; day++) {
                     const dayEl = document.createElement('div');
-                    dayEl.className = 'calendar-day';
+                    dayEl.className = 'calendar-day rounded-xl p-2 cursor-pointer transition-all';
                     const dayDate = new Date(year, month, day);
                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     
-                    dayEl.innerHTML = `<div class="calendar-day-number">${day}</div><div class="reservation-info-wrapper"></div>`;
-
                     const reservationsOnDay = allReservations.filter(r => r.date === dateStr && r.status !== 'cancelled');
+                    const hasReservations = reservationsOnDay.length > 0;
 
                     if (dayDate < today) {
-                        dayEl.classList.add('past');
-                    } else if (reservationsOnDay.length > 0) {
-                        dayEl.classList.add('reserved');
-                        const infoWrapper = dayEl.querySelector('.reservation-info-wrapper');
-                        reservationsOnDay.forEach(res => {
-                             const infoEl = document.createElement('div');
-                             infoEl.className = `reservation-info ${res.status}`;
-                             infoEl.textContent = `${res.period.charAt(0).toUpperCase()}`;
-                             infoWrapper.appendChild(infoEl);
-                        });
+                        dayEl.classList.add('past', 'opacity-50', 'cursor-not-allowed', 'bg-gray-100');
+                    } else if (hasReservations) {
+                        dayEl.classList.add('reserved', 'bg-yellow-50', 'border', 'border-yellow-400');
                     } else {
-                        dayEl.classList.add('available');
+                        dayEl.classList.add('available', 'bg-green-50', 'border', 'border-green-400', 'hover:shadow-md');
+                    }
+
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'calendar-day-number font-semibold text-gray-700 mb-1';
+                    dayNumber.textContent = day;
+                    dayEl.appendChild(dayNumber);
+
+                    if (hasReservations && dayDate >= today) {
+                        const infoWrapper = document.createElement('div');
+                        infoWrapper.className = 'reservation-info-wrapper flex flex-col gap-1';
+                        reservationsOnDay.forEach(res => {
+                            const periodMap = { manha: '🌅', tarde: '☀️', noite: '🌙' };
+                            const infoEl = document.createElement('div');
+                            infoEl.className = `reservation-info text-xs px-1 py-0.5 rounded text-center font-medium ${res.status === 'confirmed' ? 'bg-green-500 text-white' : 'bg-yellow-500 text-white'}`;
+                            infoEl.textContent = periodMap[res.period] || res.period.charAt(0).toUpperCase();
+                            infoWrapper.appendChild(infoEl);
+                        });
+                        dayEl.appendChild(infoWrapper);
+                    }
+
+                    if (!hasReservations && dayDate >= today) {
                         dayEl.addEventListener('click', () => {
                             document.getElementById('reservation-date').value = dateStr;
-                            document.querySelector('.tab[data-tab="reservation"]').click();
+                            document.querySelector('.tab-custom[data-tab="reservation"]').click();
                         });
                     }
+                    
                     calendarGrid.appendChild(dayEl);
                 }
             }
 
             function renderUserReservations() {
                 const userReservations = allReservations.filter(r => r.userId === currentUser.uid);
-                userReservationsList.innerHTML = userReservations.length === 0 ? '<p>Você não possui reservas.</p>' : '';
+                userReservationsList.innerHTML = '';
+                if (userReservations.length === 0) {
+                    userReservationsList.innerHTML = '<div class="text-center py-8 text-gray-500">📭 Você não possui reservas.</div>';
+                    return;
+                }
                 userReservations.forEach(res => userReservationsList.appendChild(createReservationItem(res, 'user')));
             }
 
             function renderAdminReservations() {
                 const filter = document.getElementById('admin-filter').value;
                 const filtered = filter === 'all' ? allReservations : allReservations.filter(r => r.status === filter);
-                adminReservationsList.innerHTML = filtered.length === 0 ? '<p>Nenhuma reserva encontrada.</p>' : '';
+                adminReservationsList.innerHTML = '';
+                if (filtered.length === 0) {
+                    adminReservationsList.innerHTML = '<div class="text-center py-8 text-gray-500">📋 Nenhuma reserva encontrada.</div>';
+                    return;
+                }
                 filtered.forEach(res => adminReservationsList.appendChild(createReservationItem(res, 'admin')));
             }
 
             function createReservationItem(res, view) {
                 const item = document.createElement('div');
-                item.className = 'reservation-item';
+                item.className = 'reservation-item bg-gray-50 rounded-xl p-4 border border-gray-100 transition-all hover:shadow-md';
                 const date = new Date(res.date + 'T00:00:00-03:00').toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'});
-                const periodMap = { manha: "Manhã", tarde: "Tarde", noite: "Noite" };
+                const periodMap = { manha: "🌅 Manhã (8h-12h)", tarde: "☀️ Tarde (13h-17h)", noite: "🌙 Noite (18h-22h)" };
+                const statusMap = { pending: 'Pendente', confirmed: 'Confirmada', cancelled: 'Cancelada' };
+                const statusClass = `status-${res.status}`;
                 
                 let adminInfo = '';
                 if(view === 'admin') {
-                    adminInfo = `<div><strong>Morador:</strong> ${res.userName} (Apto ${res.userApt})</div>`;
+                    adminInfo = `<div class="text-sm text-gray-600 mt-1"><strong>Morador:</strong> ${res.userName} (Apto ${res.userApt})</div>`;
                 }
 
                 let actions = '';
                 if (view === 'user' && res.status === 'pending') {
-                    actions = `<button class="btn-small btn-danger" onclick="window.confirmAction('Deseja cancelar esta reserva?', () => window.handleDelete('${res.id}'))">Cancelar</button>`;
+                    actions = `<button class="btn-cancel btn-small px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-all" onclick="window.confirmAction('Deseja cancelar esta reserva?', () => window.handleDelete('${res.id}'))">Cancelar</button>`;
                 }
                 if (view === 'admin') {
                     if (res.status === 'pending') {
-                        actions += `<button class="btn-small btn-success" onclick="window.handleStatusUpdate('${res.id}', 'confirmed')">Confirmar</button>`;
+                        actions += `<button class="btn-confirm btn-small px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-all mr-2" onclick="window.handleStatusUpdate('${res.id}', 'confirmed')">Confirmar</button>`;
                     }
                     if (res.status !== 'cancelled') {
-                        actions += `<button class="btn-small btn-danger" onclick="window.handleStatusUpdate('${res.id}', 'cancelled')">Cancelar</button>`;
+                        actions += `<button class="btn-cancel btn-small px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-all" onclick="window.handleStatusUpdate('${res.id}', 'cancelled')">Cancelar</button>`;
                     }
                 }
 
                 item.innerHTML = `
-                    <div class="reservation-header">
-                        <div class="reservation-date">${date} - ${periodMap[res.period]}</div>
-                        <div class="reservation-status status-${res.status}">${res.status}</div>
+                    <div class="reservation-header flex flex-wrap justify-between items-start gap-2 mb-3">
+                        <div class="reservation-date font-semibold text-primary-600">${date} - ${periodMap[res.period]}</div>
+                        <div class="reservation-status ${statusClass} px-3 py-1 rounded-full text-xs font-semibold">${statusMap[res.status]}</div>
                     </div>
-                    <div class="reservation-details">
+                    <div class="reservation-details space-y-1">
                         ${adminInfo}
-                        <div><strong>Evento:</strong> ${res.eventType}</div>
-                        <div><strong>Convidados:</strong> ${res.guests}</div>
+                        <div class="text-sm"><strong class="text-gray-700">🎉 Evento:</strong> <span class="text-gray-600">${res.eventType}</span></div>
+                        <div class="text-sm"><strong class="text-gray-700">👥 Convidados:</strong> <span class="text-gray-600">${res.guests} pessoas</span></div>
                     </div>
-                    <div class="reservation-actions">${actions}</div>
+                    <div class="reservation-actions mt-3 flex gap-2">${actions}</div>
                 `;
                 return item;
             }
@@ -807,7 +736,7 @@
                     showNotification('Reserva enviada com sucesso!', 'success');
                     reservationForm.reset();
                     await loadDataFromFirestore();
-                    document.querySelector('.tab[data-tab="my-reservations"]').click();
+                    document.querySelector('.tab-custom[data-tab="my-reservations"]').click();
                 } catch (error) {
                     console.error("Erro ao criar reserva:", error);
                     showNotification('Erro ao criar reserva. Verifique o console para detalhes.', 'error');
@@ -830,7 +759,7 @@
             };
             
             window.handleDelete = async (id) => {
-                 showLoader(true);
+                showLoader(true);
                 try {
                     await reservationsCollection.doc(id).delete();
                     showNotification('Reserva removida com sucesso!', 'success');
@@ -847,12 +776,12 @@
                 showLoginUI();
             });
 
-            document.querySelectorAll('.tab').forEach(tab => {
+            document.querySelectorAll('.tab-custom').forEach(tab => {
                 tab.addEventListener('click', function() {
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.querySelectorAll('.tab-custom').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
                     this.classList.add('active');
-                    document.getElementById(this.dataset.tab).classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.remove('hidden');
                 });
             });
 
@@ -866,11 +795,13 @@
             });
             document.getElementById('admin-filter').addEventListener('change', renderAdminReservations);
 
-            function showLoader(show) { loader.style.display = show ? 'block' : 'none'; }
+            function showLoader(show) { 
+                loader.style.display = show ? 'flex' : 'none'; 
+            }
             
             function showNotification(message, type) {
                 notification.textContent = message;
-                notification.className = `notification ${type}`;
+                notification.className = `notification ${type} p-4 rounded-xl border-l-4 ${type === 'success' ? 'bg-green-50 border-green-500 text-green-800' : 'bg-red-50 border-red-500 text-red-800'}`;
                 notification.style.display = 'block';
                 setTimeout(() => { notification.style.display = 'none'; }, 5000);
             }
@@ -879,7 +810,8 @@
                 document.getElementById('modal-text').textContent = text;
                 confirmAction = callback;
                 confirmModal.showModal();
-            }
+            };
+            
             document.getElementById('modal-cancel-btn').addEventListener('click', () => confirmModal.close());
             document.getElementById('modal-confirm-btn').addEventListener('click', () => {
                 if(confirmAction) confirmAction();
