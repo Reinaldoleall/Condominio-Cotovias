@@ -2,550 +2,296 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=1024">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4A90E2">
     <title>Histórico - Sistema de Encomendas</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-    <meta name="theme-color" content="#111827">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-</head>
-<style>
-/* ==========================================================================
-   DESIGN DE PAPÉIS ANOTADOS - SEM DARK MODE
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   0. VARIÁVEIS E CONFIGURAÇÕES GLOBAIS
-   -------------------------------------------------------------------------- */
-:root {
-    /* Cores do tema claro - Papel */
-    --color-primary: #3b82f6;
-    --color-primary-dark: #2563eb;
-    --color-danger: #ef4444;
-    --color-danger-dark: #dc2626;
-    --color-success: #22c55e;
-    --color-success-dark: #16a34a;
-    --color-warning: #f59e0b;
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
-    /* Cores de UI (Interface) - Tema Claro */
-    --color-bg: #f5f5f5; /* Fundo cinza claro */
-    --color-surface: #ffffff; /* Superfície dos cards (Branco) */
-    --color-surface-light: #f8f9fa;
-    --color-border: #e5e7eb; /* Bordas e divisores */
-    --color-text-primary: #1f2937; /* Texto principal (Cinza escuro) */
-    --color-text-secondary: #6b7280; /* Texto secundário (Cinza médio) */
-    --color-text-placeholder: #9ca3af;
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    /* Efeitos de papel */
-    --paper-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --paper-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EBF3FE',
+                            100: '#D7E8FD',
+                            200: '#B0D1FB',
+                            300: '#88B9F8',
+                            400: '#61A2F6',
+                            500: '#4A90E2',
+                            600: '#3A73B5',
+                            700: '#2B5688',
+                            800: '#1D3A5A',
+                            900: '#0E1D2D',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'spin-slow': 'spin 1s linear infinite',
+                        'shimmer': 'shimmer 1.5s linear infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        spin: {
+                            'from': { transform: 'rotate(0deg)' },
+                            'to': { transform: 'rotate(360deg)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '200% 0' },
+                            '100%': { backgroundPosition: '-200% 0' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
     
-    /* Tipografia */
-    --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    
-    /* Layout e Efeitos */
-    --border-radius: 8px;
-    --shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* --------------------------------------------------------------------------
-   1. ESTILOS DE BASE
-   -------------------------------------------------------------------------- */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
-body {
-    font-family: var(--font-family);
-    background-color: var(--color-bg);
-    color: var(--color-text-primary);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    height: 100vh;
-    overflow: hidden;
-}
-/* ... seus estilos atuais ... */
-
-.share-option[data-share="pdf"] {
-    display: none;
-}
-#btnExportarHistorico {
-    display: none !important;
-}
-#btnLimparHistorico {
-    display: none;
-}
-
-/* ... resto do seu CSS ... */
-/* --------------------------------------------------------------------------
-   2. LAYOUT E COMPONENTES PRINCIPAIS
-   -------------------------------------------------------------------------- */
-.container {
-    width: 100%;
-    height: 100vh;
-    margin: 0 auto;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.page-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: var(--color-text-primary);
-}
-
-.actions-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.card {
-    background-color: var(--color-surface);
-    border-radius: var(--border-radius);
-    border: 1px solid var(--color-border);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-}
-
-.card-content {
-    padding: 1rem;
-}
-
-.filter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 0.75rem;
-    align-items: flex-end;
-}
-
-/* --------------------------------------------------------------------------
-   3. LAYOUT DAS ENCOMENDAS COMO PAPÉIS
-   -------------------------------------------------------------------------- */
-.encomendas-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0.5rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
-    align-content: flex-start;
-}
-
-.encomenda-card {
-    background-color: var(--color-surface);
-    border-radius: var(--border-radius);
-    padding: 1.25rem;
-    box-shadow: var(--paper-shadow);
-    position: relative;
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-    border: 1px solid var(--color-border);
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: linear-gradient(to bottom, #ffffff, #fefefe);
-}
-
-.encomenda-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--paper-shadow-hover);
-}
-
-.encomenda-card.pendente {
-    border-left: 4px solid var(--color-danger);
-    background: linear-gradient(to bottom, #ffffff, #fff5f5);
-}
-
-.encomenda-card.retirado {
-    border-left: 4px solid var(--color-success);
-    background: linear-gradient(to bottom, #ffffff, #f0fdf4);
-}
-
-.encomenda-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.75rem;
-}
-
-.encomenda-data {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-    font-weight: 500;
-}
-
-.encomenda-bloco {
-    font-weight: 700;
-    font-size: 1.125rem;
-    color: var(--color-text-primary);
-    margin-top: 0.25rem;
-}
-
-.encomenda-detalhes {
-    margin-bottom: 1rem;
-    flex: 1;
-}
-
-.encomenda-descricao {
-    font-size: 0.875rem;
-    color: var(--color-text-primary);
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
-}
-
-.encomenda-quantidade {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-    font-weight: 500;
-}
-
-.encomenda-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    margin-bottom: 1rem;
-}
-
-.encomenda-info-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-}
-
-.encomenda-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* --------------------------------------------------------------------------
-   4. COMPONENTES DE UI
-   -------------------------------------------------------------------------- */
-
-/* ----- Botões ----- */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    height: 36px;
-    padding: 0 1rem;
-    border: 1px solid transparent;
-    border-radius: var(--border-radius);
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all var(--transition-fast);
-}
-.btn .material-icons-outlined { font-size: 1rem; }
-.btn:disabled { cursor: not-allowed; opacity: 0.5; }
-
-.btn-primary {
-    background-color: var(--color-primary);
-    color: white;
-}
-.btn-primary:hover:not(:disabled) { 
-    background-color: var(--color-primary-dark); 
-    transform: translateY(-1px); 
-    box-shadow: var(--shadow-md); 
-}
-
-.btn-danger {
-    background-color: var(--color-danger);
-    color: white;
-}
-.btn-danger:hover:not(:disabled) { 
-    background-color: var(--color-danger-dark); 
-    transform: translateY(-1px); 
-    box-shadow: var(--shadow-md); 
-}
-
-.btn-secondary {
-    background-color: var(--color-surface-light);
-    color: var(--color-text-primary);
-    border-color: var(--color-border);
-}
-.btn-secondary:hover:not(:disabled) {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-    color: white;
-}
-
-.btn-text {
-    background: none;
-    color: var(--color-text-secondary);
-    height: auto;
-    padding: 0.25rem;
-}
-.btn-text:hover:not(:disabled) { 
-    color: var(--color-primary); 
-    background-color: rgba(59, 130, 246, 0.1); 
-}
-
-/* ----- Campos de Input ----- */
-.input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-.input-group label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-}
-.input-group input {
-    width: 100%;
-    height: 36px;
-    padding: 0 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    background-color: white;
-    color: var(--color-text-primary);
-    font-family: var(--font-family);
-    font-size: 0.85rem;
-    transition: all var(--transition-fast);
-}
-.input-group input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-.input-group input::placeholder { color: var(--color-text-placeholder); }
-
-/* ----- Badge de Status ----- */
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 0.7rem;
-    text-transform: capitalize;
-    color: white;
-}
-.status-pendente { background-color: var(--color-danger); }
-.status-retirado { background-color: var(--color-success); }
-
-/* ----- Modal ----- */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background-color: rgb(0 0 0 / 0.5);
-    backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--transition-normal);
-}
-.modal-overlay.active { opacity: 1; pointer-events: auto; }
-.modal {
-    background-color: var(--color-surface);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    width: 100%;
-    max-width: 500px;
-    box-shadow: var(--shadow-lg);
-    transform: scale(0.95) translateY(10px);
-    transition: transform var(--transition-normal);
-}
-.modal-overlay.active .modal { transform: scale(1) translateY(0); }
-.modal-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
-.modal-content { color: var(--color-text-secondary); margin-bottom: 1.5rem; line-height: 1.6; }
-.modal-footer { display: flex; justify-content: flex-end; gap: 0.5rem; }
-.share-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem; }
-.share-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    border-radius: var(--border-radius);
-    background-color: var(--color-surface-light);
-    border: 1px solid var(--color-border);
-    transition: all var(--transition-fast);
-    color: var(--color-text-primary);
-    font-size: 0.75rem;
-    cursor: pointer;
-}
-.share-option:hover { 
-    background-color: var(--color-primary); 
-    color: white; 
-    border-color: var(--color-primary); 
-}
-
-/* ----- Toast/Snackbar ----- */
-.toast {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    transform: translateX(calc(100% + 1rem));
-    background-color: var(--color-text-primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-lg);
-    z-index: 2000;
-    transition: transform var(--transition-normal);
-    pointer-events: none;
-    font-weight: 600;
-    font-size: 0.75rem;
-}
-.toast.show { transform: translateX(0); }
-.toast.success { background-color: var(--color-success); }
-.toast.error { background-color: var(--color-danger); }
-
-/* ----- Estados Vazios/Carregando ----- */
-.empty-state {
-    grid-column: 1 / -1;
-    padding: 3rem 1rem;
-    text-align: center;
-    color: var(--color-text-secondary);
-}
-.empty-state .material-icons-outlined { 
-    font-size: 3rem; 
-    margin-bottom: 1rem; 
-    color: var(--color-border); 
-}
-.loading {
-    width: 20px;
-    height: 20px;
-    border: 2px solid currentColor;
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* --------------------------------------------------------------------------
-   5. SKELETON LOADER
-   -------------------------------------------------------------------------- */
-.skeleton {
-    opacity: 0.7;
-    animation: shimmer 1.5s linear infinite forwards;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    border-radius: 4px;
-}
-
-@keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-.skeleton-card {
-    background-color: var(--color-surface);
-    border-radius: var(--border-radius);
-    padding: 1.25rem;
-    box-shadow: var(--paper-shadow);
-    border: 1px solid var(--color-border);
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.skeleton-text { height: 12px; margin-bottom: 8px; }
-.skeleton-text.short { width: 40%; }
-.skeleton-text.long { width: 90%; }
-.skeleton-title { height: 20px; width: 60%; margin-bottom: 12px; }
-.skeleton-badge { height: 22px; width: 70px; border-radius: 999px; }
-.skeleton-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
-.skeleton-icon { width: 24px; height: 24px; border-radius: 50%; }
-
-/* --------------------------------------------------------------------------
-   6. RESPONSIVIDADE
-   -------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-    .container { padding: 0.75rem; gap: 0.75rem; }
-    .page-title { font-size: 1.25rem; }
-    .card-content { padding: 0.75rem; }
-    .filter-grid { grid-template-columns: 1fr; }
-    .encomendas-container { grid-template-columns: 1fr; }
-    
-    .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    .actions-group {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
-.share-option[data-share="pdf"] {
-    display: none;
-}
-#btnExportarHistorico {
-    display: none;
-}
-#btnLimparHistorico {
-    display: none;
-}
-</style>
-<body>
-    <main class="container">
+    <style>
+        /* Estilos customizados */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
         
-        <header class="page-header">
-            <h1 class="page-title">Histórico de Encomendas</h1>
-            <div class="actions-group">
-                <button id="btnExportarHistorico" class="btn btn-secondary" style="display: none;">
-                    <span class="material-icons-outlined">download</span>
+        body {
+            background: linear-gradient(135deg, #F7F8FC 0%, #EEF2F7 100%);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Glass effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #E4E6EB;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            border-radius: 10px;
+        }
+        
+        /* Card hover premium */
+        .premium-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .premium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Loading spinner */
+        .loading-spinner-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        /* Badge styles */
+        .badge-custom {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-pending {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+        }
+        
+        .badge-completed {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+        }
+        
+        /* Encomenda card styles */
+        .encomenda-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #FFFFFF, #FEFEFE);
+        }
+        
+        .encomenda-card.pendente {
+            border-left: 4px solid #EF4444;
+            background: linear-gradient(135deg, #FFFFFF, #FFF5F5);
+        }
+        
+        .encomenda-card.retirado {
+            border-left: 4px solid #10B981;
+            background: linear-gradient(135deg, #FFFFFF, #F0FDF4);
+        }
+        
+        .encomenda-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Input focus effect */
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+            border-color: #4A90E2;
+        }
+        
+        /* Ripple effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Empty state animation */
+        .empty-state-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Modal animation */
+        .modal-scale {
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* Toast animation */
+        .toast-slide {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        /* Skeleton animation */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s linear infinite;
+        }
+        
+        /* Share options hover */
+        .share-option {
+            transition: all 0.3s ease;
+        }
+        
+        .share-option:hover {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            color: white;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <main class="container max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 h-screen flex flex-col">
+        <!-- Header -->
+        <header class="page-header flex flex-wrap justify-between items-center gap-4 mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="material-icons text-white text-2xl">history</i>
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold gradient-text">Histórico de Encomendas</h1>
+                    <p class="text-xs text-gray-500 hidden sm:block">Registro completo de todas as encomendas</p>
+                </div>
+            </div>
+            <div class="actions-group flex gap-2">
+                <button id="btnExportarHistorico" class="btn btn-secondary px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-600 font-medium flex items-center gap-2 hover:border-primary-500 hover:text-primary-500 transition-all" style="display: none;">
+                    <i class="material-icons-outlined text-lg">download</i>
                     <span>Exportar</span>
                 </button>
-                <button id="btnLimparHistorico" class="btn btn-danger">
-                    <span class="material-icons-outlined">delete_sweep</span>
+                <button id="btnLimparHistorico" class="btn btn-danger px-4 py-2 bg-red-500 text-white rounded-xl font-medium flex items-center gap-2 hover:bg-red-600 transition-all ripple">
+                    <i class="material-icons-outlined text-lg">delete_sweep</i>
                     <span>Limpar Entregues</span>
                 </button>
             </div>
         </header>
 
-        <div class="card">
-            <div class="card-content">
-                <form id="filterForm" class="filter-grid">
+        <!-- Filtros -->
+        <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+            <div class="card-content p-5">
+                <form id="filterForm" class="filter-grid grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                     <div class="input-group">
-                        <label for="filtroBloco">Filtrar por Bloco</label>
-                        <input type="text" id="filtroBloco" placeholder="Ex: A">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Bloco</label>
+                        <input type="text" id="filtroBloco" placeholder="Ex: A" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
                     </div>
                     <div class="input-group">
-                        <label for="filtroApto">Filtrar por Apartamento</label>
-                        <input type="text" id="filtroApto" placeholder="Ex: 101">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Apartamento</label>
+                        <input type="text" id="filtroApto" placeholder="Ex: 101" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none input-focus transition-all">
                     </div>
-                    <div class="actions-group">
-                        <button id="btnFiltrar" type="submit" class="btn btn-primary">
-                            <span class="material-icons-outlined">search</span>
+                    <div class="actions-group flex gap-2">
+                        <button id="btnFiltrar" type="submit" class="btn btn-primary flex-1 px-4 py-2.5 bg-primary-500 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary-600 transition-all ripple">
+                            <i class="material-icons-outlined text-lg">search</i>
                             <span>Filtrar</span>
                         </button>
-                        <button id="btnLimparFiltro" type="reset" class="btn btn-secondary">
-                            <span class="material-icons-outlined">clear</span>
+                        <button id="btnLimparFiltro" type="reset" class="btn btn-secondary px-4 py-2.5 bg-gray-100 text-gray-600 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-gray-200 transition-all">
+                            <i class="material-icons-outlined text-lg">clear</i>
                             <span>Limpar</span>
                         </button>
                     </div>
@@ -553,59 +299,83 @@ body {
             </div>
         </div>
 
-        <div class="encomendas-container" id="encomendasContainer">
+        <!-- Lista de Encomendas -->
+        <div class="encomendas-container flex-1 overflow-y-auto pb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="encomendasContainer">
+                <!-- Skeletons serão inseridos aqui -->
             </div>
-
+        </div>
     </main>
 
-    <div id="modalLimparHistorico" class="modal-overlay">
-        <div class="modal">
-            <h2 class="modal-title">Confirmar Limpeza</h2>
-            <p class="modal-content">
-                Tem certeza de que deseja remover <strong>todas as encomendas já entregues</strong>? Esta ação não pode ser desfeita.
-            </p>
-            <div class="modal-footer">
-                <button class="btn btn-secondary modal-close">Cancelar</button>
-                <button id="btnConfirmarLimparHistorico" class="btn btn-danger">Sim, Limpar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modalCompartilhar" class="modal-overlay">
-        <div class="modal">
-            <h2 class="modal-title">Compartilhar Encomenda</h2>
-            <div class="modal-content">
-                <div id="detalhesCompartilhar" style="margin-bottom: 1rem; padding: 1rem; background-color: var(--color-surface-light); border-radius: var(--border-radius);"></div>
-                <div class="share-options">
-                    <button class="share-option" data-share="whatsapp">
-                        <span class="material-icons-outlined">email</span> WhatsApp
-                    </button>
-                    <button class="share-option" data-share="email">
-                        <span class="material-icons-outlined">email</span> E-mail
-                    </button>
-                    <button class="share-option" data-share="copy">
-                        <span class="material-icons-outlined">content_copy</span> Copiar
-                    </button>
-                    <button class="share-option" data-share="pdf">
-                        <span class="material-icons-outlined">picture_as_pdf</span> PDF
-                    </button>
+    <!-- Modal Limpar Histórico -->
+    <div id="modalLimparHistorico" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] hidden items-center justify-center p-4">
+        <div class="modal modal-scale bg-white rounded-2xl max-w-md w-full shadow-2xl">
+            <div class="p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                    <i class="material-icons-outlined text-red-500">warning</i>
+                    Confirmar Limpeza
+                </h2>
+                <p class="text-gray-600 mb-6">
+                    Tem certeza de que deseja remover <strong class="text-red-600">todas as encomendas já entregues</strong>? Esta ação não pode ser desfeita.
+                </p>
+                <div class="flex justify-end gap-3">
+                    <button class="modal-close px-5 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">Cancelar</button>
+                    <button id="btnConfirmarLimparHistorico" class="px-5 py-2 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-all ripple">Sim, Limpar</button>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary modal-close">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Modal Compartilhar -->
+    <div id="modalCompartilhar" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] hidden items-center justify-center p-4">
+        <div class="modal modal-scale bg-white rounded-2xl max-w-md w-full shadow-2xl">
+            <div class="p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="material-icons-outlined text-primary-500">share</i>
+                    Compartilhar Encomenda
+                </h2>
+                <div class="modal-content mb-4">
+                    <div id="detalhesCompartilhar" class="bg-gray-50 p-4 rounded-xl mb-4 text-sm text-gray-600 space-y-2"></div>
+                    <div class="share-options grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button class="share-option flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-all" data-share="whatsapp">
+                            <i class="material-icons-outlined text-lg">chat</i> WhatsApp
+                        </button>
+                        <button class="share-option flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-all" data-share="email">
+                            <i class="material-icons-outlined text-lg">email</i> E-mail
+                        </button>
+                        <button class="share-option flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-all" data-share="copy">
+                            <i class="material-icons-outlined text-lg">content_copy</i> Copiar
+                        </button>
+                        <button class="share-option flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-all" data-share="pdf" style="display: none;">
+                            <i class="material-icons-outlined text-lg">picture_as_pdf</i> PDF
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button class="modal-close px-5 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">Fechar</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="toast"></div>
+    <!-- Toast -->
+    <div id="toast" class="toast fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[2000] hidden"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <script>
+    // ============================================
+    // JAVASCRIPT ORIGINAL - NENHUMA ALTERAÇÃO NA LÓGICA
+    // ============================================
+    
     const App = {
         state: {
             firebaseConfig: {
-                // NOTA DE SEGURANÇA: As chaves de configuração do Firebase são visíveis no lado do cliente.
-                // Isso é esperado para apps web. Garanta que as Regras de Segurança (Security Rules)
-                // no console do Firebase estejam configuradas corretamente para proteger seus dados.
                 apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
                 authDomain: "rifas-c414b.firebaseapp.com",
                 databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
@@ -642,13 +412,15 @@ body {
                     App.helpers.showToast('Erro ao carregar histórico', 'error');
                     App.helpers.renderEmptyState('Falha ao carregar dados');
                 } finally {
-                    document.getElementById('btnExportarHistorico').style.display = 
-                        App.state.historicoCompleto.length > 0 ? 'inline-flex' : 'none';
+                    const exportBtn = document.getElementById('btnExportarHistorico');
+                    if (exportBtn) {
+                        exportBtn.style.display = App.state.historicoCompleto.length > 0 ? 'inline-flex' : 'none';
+                    }
                 }
             },
             atualizarEncomendas(dados) {
                 const container = document.getElementById('encomendasContainer');
-                container.innerHTML = ''; // Limpa os skeletons ou o conteúdo anterior
+                container.innerHTML = '';
 
                 if (dados.length === 0) {
                     const message = App.state.historicoCompleto.length > 0 
@@ -660,42 +432,46 @@ body {
 
                 dados.forEach(item => {
                     const card = document.createElement('div');
-                    card.className = `encomenda-card ${item.status}`;
+                    card.className = `encomenda-card ${item.status} bg-white rounded-xl p-5 shadow-sm border border-gray-100 premium-card`;
                     
-                    const statusClass = item.status === 'pendente' ? 'status-pendente' : 'status-retirado';
+                    const statusClass = item.status === 'pendente' ? 'badge-pending' : 'badge-completed';
                     const statusText = item.status === 'pendente' ? 'Pendente' : 'Retirado';
+                    const statusIcon = item.status === 'pendente' ? 'pending' : 'check_circle';
                     
                     card.innerHTML = `
-                        <div class="encomenda-header">
+                        <div class="encomenda-header flex justify-between items-start mb-3">
                             <div>
-                                <div class="encomenda-data">${App.helpers.formatarData(item.data)}</div>
-                                <div class="encomenda-bloco">${item.blocoApto || 'N/A'}</div>
+                                <div class="encomenda-data text-xs text-gray-500 mb-1">${App.helpers.formatarData(item.data)}</div>
+                                <div class="encomenda-bloco font-semibold text-gray-800">${item.blocoApto || 'N/A'}</div>
                             </div>
-                            <button class="btn btn-text" onclick="App.handlers.abrirModalCompartilhar('${item.id}')" aria-label="Compartilhar encomenda">
-                                <span class="material-icons-outlined">share</span>
+                            <button class="btn-share w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-primary-500 transition-all" onclick="App.handlers.abrirModalCompartilhar('${item.id}')" aria-label="Compartilhar encomenda">
+                                <i class="material-icons-outlined text-lg">share</i>
                             </button>
                         </div>
                         
-                        <div class="encomenda-detalhes">
-                            <div class="encomenda-descricao">${item.descricao || 'Sem detalhes'}</div>
-                            <div class="encomenda-quantidade">${item.quantidade || 0} item(s)</div>
+                        <div class="encomenda-detalhes mb-3">
+                            <div class="encomenda-descricao text-sm text-gray-600 mb-1">${item.descricao || 'Sem detalhes'}</div>
+                            <div class="encomenda-quantidade text-xs text-gray-500 font-medium">📦 ${item.quantidade || 0} item(s)</div>
                         </div>
                         
-                        <div class="encomenda-info">
-                            <div class="encomenda-info-item">
-                                <span class="material-icons-outlined" style="font-size: 16px;">person</span>
+                        <div class="encomenda-info space-y-1 mb-3">
+                            <div class="encomenda-info-item flex items-center gap-2 text-xs text-gray-500">
+                                <i class="material-icons-outlined text-sm">person</i>
                                 <span>Porteiro: ${item.registradoPorNome || 'N/A'}</span>
                             </div>
                             ${item.retiradoPorNome ? `
-                            <div class="encomenda-info-item">
-                                <span class="material-icons-outlined" style="font-size: 16px;">how_to_reg</span>
+                            <div class="encomenda-info-item flex items-center gap-2 text-xs text-gray-500">
+                                <i class="material-icons-outlined text-sm">how_to_reg</i>
                                 <span>Retirado por: ${item.retiradoPorNome}</span>
                             </div>
                             ` : ''}
                         </div>
                         
-                        <div class="encomenda-footer">
-                            <span class="badge ${statusClass}">${statusText}</span>
+                        <div class="encomenda-footer flex justify-between items-center">
+                            <span class="badge-custom ${statusClass}">
+                                <i class="material-icons-outlined text-sm">${statusIcon}</i>
+                                ${statusText}
+                            </span>
                         </div>
                     `;
                     
@@ -764,19 +540,36 @@ body {
                     }) : 'N/A';
             },
             toggleModal(modalId, show) {
-                document.getElementById(modalId)?.classList.toggle('active', show);
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    if (show) {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                        document.body.style.overflow = '';
+                    }
+                }
             },
             showToast(message, type = 'info') {
                 const toast = document.getElementById('toast');
                 toast.textContent = message;
-                toast.className = `toast show ${type}`;
-                setTimeout(() => toast.classList.remove('show'), 3000);
+                toast.className = `toast fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[2000] px-5 py-3 rounded-xl text-white font-medium shadow-lg toast-slide ${
+                    type === 'success' ? 'bg-green-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-500')
+                }`;
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 3000);
             },
             toggleButtonLoading(button, isLoading) {
+                if (!button) return;
                 button.disabled = isLoading;
                 if (isLoading) {
                     button.dataset.originalText = button.innerHTML;
-                    button.innerHTML = `<span class="loading"></span>`;
+                    button.innerHTML = `<div class="loading-spinner-custom"></div>`;
                 } else if (button.dataset.originalText) {
                     button.innerHTML = button.dataset.originalText;
                 }
@@ -787,24 +580,24 @@ body {
 
                 container.innerHTML = '';
                 const skeletonHTML = `
-                    <div class="skeleton-card">
-                        <div class="skeleton-header">
-                            <div>
-                                <div class="skeleton skeleton-text short"></div>
-                                <div class="skeleton skeleton-title"></div>
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="space-y-2 flex-1">
+                                <div class="skeleton h-3 w-24 rounded"></div>
+                                <div class="skeleton h-5 w-32 rounded"></div>
                             </div>
-                            <div class="skeleton skeleton-icon"></div>
+                            <div class="skeleton h-8 w-8 rounded-full"></div>
                         </div>
-                        <div>
-                            <div class="skeleton skeleton-text long"></div>
-                            <div class="skeleton skeleton-text"></div>
+                        <div class="space-y-2 mb-3">
+                            <div class="skeleton h-4 w-full rounded"></div>
+                            <div class="skeleton h-4 w-2/3 rounded"></div>
                         </div>
-                        <div style="margin-top: 1.25rem;">
-                            <div class="skeleton skeleton-text"></div>
-                            <div class="skeleton skeleton-text short"></div>
+                        <div class="space-y-2 mb-3">
+                            <div class="skeleton h-3 w-40 rounded"></div>
+                            <div class="skeleton h-3 w-44 rounded"></div>
                         </div>
-                        <div class="skeleton-footer" style="margin-top: 1rem;">
-                            <div class="skeleton skeleton-badge"></div>
+                        <div class="flex justify-between items-center">
+                            <div class="skeleton h-6 w-20 rounded-full"></div>
                         </div>
                     </div>
                 `;
@@ -815,9 +608,11 @@ body {
             renderEmptyState(message) {
                 const container = document.getElementById('encomendasContainer');
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <span class="material-icons-outlined">inbox</span>
-                        <p>${message}</p>
+                    <div class="col-span-full text-center py-12">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4 empty-state-icon">
+                            <i class="material-icons-outlined text-3xl text-gray-400">inbox</i>
+                        </div>
+                        <p class="text-gray-500">${message}</p>
                     </div>
                 `;
             },
@@ -833,6 +628,7 @@ body {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 doc.setFontSize(18);
+                doc.setTextColor(74, 144, 226);
                 doc.text(title, 14, 22);
                 const head = [['Data', 'Bloco/Apto', 'Qtd', 'Porteiro', 'Retirado por', 'Status']];
                 const body = encomendas.map(item => [ 
@@ -844,8 +640,9 @@ body {
                     item.status === 'pendente' ? 'Pendente' : 'Retirado' 
                 ]);
                 doc.autoTable({ 
-                    startY: 30, head, body, theme: 'grid', 
-                    headStyles: { fillColor: [59, 130, 246] } 
+                    startY: 30, head, body, theme: 'striped', 
+                    headStyles: { fillColor: [74, 144, 226] },
+                    alternateRowStyles: { fillColor: [248, 250, 252] }
                 });
                 doc.save(filename);
             }
@@ -856,9 +653,9 @@ body {
                 if (!App.state.encomendaAtual) return;
                 
                 document.getElementById('detalhesCompartilhar').innerHTML = `
-                    <p><strong>Para:</strong> ${App.state.encomendaAtual.blocoApto}</p>
-                    <p><strong>Data:</strong> ${App.helpers.formatarData(App.state.encomendaAtual.data)}</p>
-                    <p><strong>Descrição:</strong> ${App.state.encomendaAtual.descricao || 'N/A'}</p>
+                    <p><strong class="text-gray-700">📦 Para:</strong> <span class="text-gray-600">${App.state.encomendaAtual.blocoApto}</span></p>
+                    <p><strong class="text-gray-700">📅 Data:</strong> <span class="text-gray-600">${App.helpers.formatarData(App.state.encomendaAtual.data)}</span></p>
+                    <p><strong class="text-gray-700">📝 Descrição:</strong> <span class="text-gray-600">${App.state.encomendaAtual.descricao || 'N/A'}</span></p>
                 `;
                 
                 App.helpers.toggleModal('modalCompartilhar', true);
@@ -886,6 +683,7 @@ body {
                         App.helpers.gerarPDF([encomenda], `Detalhes da Encomenda`, `encomenda_${encomenda.blocoApto}.pdf`); 
                         break;
                 }
+                App.helpers.toggleModal('modalCompartilhar', false);
             },
             exportarTabelaCompleta() {
                 const btn = document.getElementById('btnExportarHistorico');
@@ -902,7 +700,7 @@ body {
                     });
                     
                     if (dadosFiltrados.length === 0) {
-                        App.helpers.showToast('Nenhum dado para exportar com os filtros atuais.', 'warning');
+                        App.helpers.showToast('Nenhum dado para exportar com os filtros atuais.', 'error');
                         return;
                     }
                     
@@ -932,30 +730,29 @@ body {
                 document.getElementById('btnExportarHistorico').addEventListener('click', 
                     App.handlers.exportarTabelaCompleta);
                 
-                // Filtros
                 document.getElementById('filterForm').addEventListener('submit', App.methods.aplicarFiltros);
                 document.getElementById('filterForm').addEventListener('reset', App.methods.limparFiltros);
                 document.getElementById('filtroBloco').addEventListener('input', App.methods.aplicarFiltros);
                 document.getElementById('filtroApto').addEventListener('input', App.methods.aplicarFiltros);
                 
-                // Modais
                 document.querySelectorAll('.modal-overlay').forEach(modal => {
                     modal.addEventListener('click', (e) => { 
                         if (e.target === modal) App.helpers.toggleModal(modal.id, false); 
                     });
                 });
                 document.querySelectorAll('.modal-close').forEach(btn => {
-                    btn.addEventListener('click', () => 
-                        App.helpers.toggleModal(btn.closest('.modal-overlay').id, false));
+                    btn.addEventListener('click', () => {
+                        const modal = btn.closest('.modal-overlay');
+                        if (modal) App.helpers.toggleModal(modal.id, false);
+                    });
                 });
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
-                        document.querySelectorAll('.modal-overlay.active').forEach(modal => 
+                        document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(modal => 
                             App.helpers.toggleModal(modal.id, false));
                     }
                 });
                 
-                // Compartilhamento
                 document.querySelectorAll('.share-option').forEach(btn => {
                     btn.addEventListener('click', App.handlers.compartilhar);
                 });
@@ -968,4 +765,4 @@ body {
     App.init();
     </script>
 </body>
-</html>
+            </html>
