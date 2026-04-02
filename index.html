@@ -211,9 +211,41 @@
             50% { transform: scale(1.2); }
         }
         
-        /* Transição suave para iframe */
+        /* Transição suave para iframe - AGORA GARANTINDO 99%+ DE OCUPAÇÃO */
         .content-frame {
             transition: opacity 0.3s ease;
+            width: 100%;
+            height: 100%;
+            min-width: 99%;
+            min-height: 99%;
+        }
+        
+        /* Container principal do conteúdo - Garantia de área interna máxima */
+        .main-content-area {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Wrapper do iframe ocupa virtualmente todo o espaço disponível */
+        .iframe-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            min-height: 0;
+            flex: 1;
+        }
+        
+        iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
         }
         
         /* Nav item active effect */
@@ -261,6 +293,68 @@
             width: 200px;
             height: 200px;
         }
+        
+        /* Safe area para iOS */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* Responsividade para tablets */
+        @media (min-width: 768px) {
+            .chat-float-btn {
+                bottom: 100px;
+                right: 30px;
+                width: 64px;
+                height: 64px;
+            }
+            
+            .chat-float-btn .material-icons {
+                font-size: 32px;
+            }
+            
+            .persistent-notification {
+                bottom: 110px;
+                left: 30px;
+                max-width: 400px;
+            }
+        }
+        
+        /* Efeito de hover para desktop */
+        @media (hover: hover) {
+            .nav-item:hover {
+                color: #4A90E2;
+                transform: translateY(-2px);
+            }
+        }
+        
+        /* Garantia extra: o iframe ocupa pelo menos 99% do container pai */
+        .content-frame {
+            min-width: 99%;
+            min-height: 99%;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Ajuste para o container principal ocupar toda a área disponível */
+        .flex-1.flex.flex-col {
+            min-height: 0;
+            height: 100%;
+        }
+        
+        main {
+            min-height: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .iframe-wrapper {
+            min-height: 0;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -273,12 +367,14 @@
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="flex h-screen">
-        <!-- Content Area -->
-        <div class="flex-1 flex flex-col pb-[65px]">
-            <main class="flex-1 overflow-hidden relative">
-                <iframe id="contentFrame" class="content-frame w-full h-full border-none bg-gray-50" src="aviso.html"></iframe>
+    <!-- Main Container - Estrutura otimizada para máximo aproveitamento de espaço -->
+    <div class="flex h-screen w-full overflow-hidden">
+        <!-- Content Area - Agora com garantia de que o iframe ocupará no mínimo 99% do espaço interno -->
+        <div class="flex-1 flex flex-col min-h-0 h-full w-full pb-[65px]">
+            <main class="flex-1 overflow-hidden relative min-h-0 w-full">
+                <div class="iframe-wrapper w-full h-full">
+                    <iframe id="contentFrame" class="content-frame" src="aviso.html" title="Conteúdo do Condomínio"></iframe>
+                </div>
             </main>
         </div>
     </div>
@@ -288,7 +384,7 @@
         <span class="material-icons">chat</span>
     </a>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation - REMOVIDA A OPÇÃO "CRIAR LOJAS" CONFORME SOLICITADO -->
     <nav class="glass-nav fixed bottom-0 left-0 right-0 h-[65px] flex overflow-x-auto overflow-y-hidden shadow-lg z-[150] pb-safe hide-scrollbar">
         <button class="nav-item active flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="aviso.html" data-title="Avisos">
             <i class="material-icons-outlined text-2xl mb-0.5">campaign</i>
@@ -298,10 +394,7 @@
             <i class="material-icons-outlined text-2xl mb-0.5">storefront</i>
             <span>Lojas</span>
         </button>
-        <button class="nav-item flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="https://reinaldoleall.github.io/criarlojas/" data-title="Criar Loja">
-            <i class="material-icons-outlined text-2xl mb-0.5">add_business</i>
-            <span>Criar Loja</span>
-        </button>
+        <!-- Botão "Criar Loja" completamente REMOVIDO conforme solicitado -->
         <button class="nav-item flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="salao_festas.html" data-title="Salão de Festas">
             <i class="material-icons-outlined text-2xl mb-0.5">celebration</i>
             <span>Salão</span>
@@ -329,13 +422,13 @@
         <button class="notification-close" id="notificationClose" title="Fechar">×</button>
     </div>
 
-    <!-- Firebase e Scripts -->
+    <!-- Firebase e Scripts (Notificações + Autenticação) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        // Configuração Firebase para notificações
+        // Configuração Firebase para notificações (primeiro app)
         (function() {
             const firebaseConfig = {
                 apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
@@ -457,7 +550,7 @@
     </script>
 
     <script>
-        // Configuração Firebase para navegação
+        // Configuração Firebase para navegação (segundo app)
         const firebaseConfigNav = {
             apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
             authDomain: "rifalidiane-fde3b.firebaseapp.com",
@@ -468,11 +561,15 @@
             appId: "1:649359518677:web:879b4ed9fa5150d24d2b5c"
         };
 
+        // Inicializa app secundário apenas se não existir
+        let navApp;
         if (!firebase.apps.some(app => app.name === 'navApp')) {
-            const navApp = firebase.initializeApp(firebaseConfigNav, 'navApp');
+            navApp = firebase.initializeApp(firebaseConfigNav, 'navApp');
+        } else {
+            navApp = firebase.app('navApp');
         }
         
-        const navDatabase = firebase.app('navApp').database();
+        const navDatabase = navApp.database();
 
         function getOrGenerateUserId() {
             let userId = localStorage.getItem('uniqueUserId');
@@ -487,6 +584,24 @@
             const loading = document.getElementById('loading');
             const contentFrame = document.getElementById('contentFrame');
             const menuItems = document.querySelectorAll('.nav-item');
+            
+            // Forçar que o iframe sempre ocupe no mínimo 99% da área visível após cada redimensionamento
+            function enforceIframeSize() {
+                if (contentFrame) {
+                    // Garantia adicional via estilo inline para máxima compatibilidade
+                    contentFrame.style.minWidth = '99%';
+                    contentFrame.style.minHeight = '99%';
+                    contentFrame.style.width = '100%';
+                    contentFrame.style.height = '100%';
+                }
+            }
+            
+            // Executa ao carregar e sempre que houver redimensionamento da janela
+            window.addEventListener('resize', () => {
+                setTimeout(enforceIframeSize, 50);
+            });
+            
+            enforceIframeSize();
 
             const setActiveMenuItem = (pageUrl) => {
                 menuItems.forEach(item => {
@@ -508,20 +623,24 @@
                 }
                 
                 contentFrame.onload = () => {
+                    // Após carregar o iframe, reforçar tamanho mínimo de 99%
+                    enforceIframeSize();
                     setTimeout(() => {
                         loading.style.display = 'none';
+                        enforceIframeSize();
                     }, 300);
                 };
                 
                 setActiveMenuItem(pageUrl);
             };
             
-            const requestAccess = async (accessType) => {
+            // Função para solicitar acesso apenas para ADMIN (pois o botão Criar Loja foi removido)
+            const requestAdminAccess = async () => {
                 const userId = getOrGenerateUserId();
-                const dbPath = accessType === 'admin' ? 'admins/' : 'users/';
-                const pageUrl = accessType === 'admin' ? 'admin.html' : 'criarlojas.html';
-                const pageTitle = accessType === 'admin' ? 'Administração' : 'Criar Loja';
-                const requestText = accessType === 'admin' ? 'acesso de Administrador' : 'acesso para criar uma loja';
+                const dbPath = 'admins/';
+                const pageUrl = 'admin.html';
+                const pageTitle = 'Administração';
+                const requestText = 'acesso de Administrador';
                 
                 loading.style.display = 'flex';
                 
@@ -543,7 +662,7 @@
                         const mensagem = `Olá! Gostaria de solicitar ${requestText}. Meu ID de solicitação é: ${userId}`;
                         const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
 
-                        alert(`Para obter ${requestText}, solicite a liberação.\n\nSeu ID de Solicitação é: ${userId}\n\nVocê será redirecionado para o WhatsApp.`);
+                        alert(`Para obter acesso de Administrador, solicite a liberação.\n\nSeu ID de Solicitação é: ${userId}\n\nVocê será redirecionado para o WhatsApp.`);
                         window.open(urlWhatsApp, '_blank');
                         loading.style.display = 'none';
                     }
@@ -554,73 +673,47 @@
                 }
             };
             
-            // Event Listeners
+            // Event Listeners para navegação (sem o botão criar lojas)
             menuItems.forEach(item => {
                 const page = item.dataset.page;
 
                 if (page === 'admin.html') {
                     item.addEventListener('click', (e) => {
                         e.preventDefault();
-                        requestAccess('admin');
-                    });
-                } else if (page === 'https://reinaldoleall.github.io/criarlojas/') {
-                    item.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        requestAccess('user');
+                        requestAdminAccess();
                     });
                 } else {
                     item.addEventListener('click', () => {
-                        loadPage(item.dataset.page, item.dataset.title);
+                        if (item.dataset.page) {
+                            loadPage(item.dataset.page, item.dataset.title);
+                        }
                     });
                 }
             });
 
-            // Inicialização
+            // Inicialização: carrega a página ativa (Avisos)
             const initialItem = document.querySelector('.nav-item.active');
-            if (initialItem) {
+            if (initialItem && initialItem.dataset.page) {
                 loadPage(initialItem.dataset.page, initialItem.dataset.title);
+            } else if (menuItems.length > 0) {
+                // Fallback: carrega o primeiro item caso não haja active
+                const firstItem = menuItems[0];
+                if (firstItem && firstItem.dataset.page) {
+                    loadPage(firstItem.dataset.page, firstItem.dataset.title);
+                    firstItem.classList.add('active');
+                }
             }
+            
+            // Força novamente o iframe a ter no mínimo 99% após um pequeno delay para garantir
+            setTimeout(() => {
+                enforceIframeSize();
+                // Adicional: monitoramento de mutação para caso algum estilo externo tente reduzir
+                const observer = new ResizeObserver(() => enforceIframeSize());
+                if (contentFrame) {
+                    observer.observe(contentFrame);
+                }
+            }, 200);
         });
     </script>
-
-    <style>
-        /* Safe area para iOS */
-        .pb-safe {
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        /* Esconde botão Criar Loja se necessário */
-        button.nav-item[data-page="https://reinaldoleall.github.io/criarlojas/"] {
-            display: flex;
-        }
-        
-        /* Responsividade para tablets */
-        @media (min-width: 768px) {
-            .chat-float-btn {
-                bottom: 100px;
-                right: 30px;
-                width: 64px;
-                height: 64px;
-            }
-            
-            .chat-float-btn .material-icons {
-                font-size: 32px;
-            }
-            
-            .persistent-notification {
-                bottom: 110px;
-                left: 30px;
-                max-width: 400px;
-            }
-        }
-        
-        /* Efeito de hover para desktop */
-        @media (hover: hover) {
-            .nav-item:hover {
-                color: #4A90E2;
-                transform: translateY(-2px);
-            }
-        }
-    </style>
 </body>
-    </html>
+</html>
