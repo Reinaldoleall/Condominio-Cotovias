@@ -76,6 +76,14 @@
                 },
             },
         }
+#btnAtualizar,
+#btnLogout{
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
     </script>
     
     <style>
@@ -252,7 +260,11 @@
 
     <div class="container max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <!-- Header com ações -->
-
+        <div class="flex justify-end gap-3 mb-6">
+<button id="btnAtualizar" style="display:none">
+<button id="btnLogout" style="display:none">
+    <i class="fas fa-sign-out-alt mr-2"></i> Sair
+</button>
         </div>
         
         <!-- Welcome Section -->
