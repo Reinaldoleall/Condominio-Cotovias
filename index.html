@@ -2,473 +2,463 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4A90E2">
 
     <title>Condomínio Cotovias</title>
-    <meta name="theme-color" content="#FFFFFF">
-
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EBF3FE',
+                            100: '#D7E8FD',
+                            200: '#B0D1FB',
+                            300: '#88B9F8',
+                            400: '#61A2F6',
+                            500: '#4A90E2',
+                            600: '#3A73B5',
+                            700: '#2B5688',
+                            800: '#1D3A5A',
+                            900: '#0E1D2D',
+                        },
+                        dark: {
+                            100: '#1E1E2F',
+                            200: '#16162A',
+                            300: '#0F0F1A',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'pulse-slow': 'pulse 2s infinite',
+                        'spin-slow': 'spin 1s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    
     <style>
-        /* --- SEU CSS ORIGINAL (COM ADAPTAÇÕES) --- */
-        :root {
-            --cor-primaria: #4A90E2; --cor-primaria-hover: #357ABD; --cor-fundo: #F9F9FB;
-            --cor-surface: #FFFFFF; --cor-texto-principal: #333333; --cor-texto-secundario: #777777;
-            --cor-borda: #EAEAEA; --cor-erro: #E74C3C; --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --fonte-principal: 'Inter', sans-serif; --raio-borda: 8px; --bottom-nav-height: 65px;
+        /* Estilos customizados */
+        * {
+            -webkit-tap-highlight-color: transparent;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { height: 100%; overflow: hidden; }
-        body { font-family: var(--fonte-principal); background-color: var(--cor-fundo); color: var(--cor-texto-principal); height: 100vh; height: -webkit-fill-available; width: 100%; overflow: hidden; position: fixed; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-        ::-webkit-scrollbar { display: none; }
-        .container { display: flex; height: 100vh; }
-        .app-content { flex: 1; height: 100vh; display: flex; flex-direction: column; padding-bottom: var(--bottom-nav-height); }
-        .main-content { flex: 1; overflow: auto; position: relative; }
-        .content-frame { width: 100%; height: 100%; border: none; background-color: var(--cor-fundo); }
         
-        /* --- NOVOS ESTILOS PARA NAVEGAÇÃO COM ROLAGEM --- */
-        .bottom-nav { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            height: var(--bottom-nav-height); 
-            background-color: var(--cor-surface); 
-            border-top: 1px solid var(--cor-borda); 
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
-            display: flex; 
-            overflow-x: auto; 
-            overflow-y: hidden; 
-            white-space: nowrap; 
-            z-index: 150; 
-            padding-bottom: env(safe-area-inset-bottom);
-            -webkit-overflow-scrolling: touch;
-        }
-        #adminNavItem {
-    display: none;
-}
-        .nav-item { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            flex: 0 0 auto; 
-            min-width: 70px; 
-            padding: 8px 12px 4px; 
-            color: var(--cor-texto-secundario); 
-            font-size: 0.7rem; 
-            font-weight: 500; 
-            background: none; 
-            border: none; 
-            cursor: pointer; 
-            transition: color 0.2s ease; 
-            text-align: center; 
-        }
-        .nav-item .material-icons-outlined { font-size: 24px; margin-bottom: 2px; }
-        .nav-item:hover { color: var(--cor-texto-principal); }
-        .nav-item.active { color: var(--cor-primaria); }
-        .loading{position:fixed;inset:0;background:rgba(255,255,255,.8);display:none;justify-content:center;align-items:center;z-index:1000}
-        .loading-spinner{width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid var(--cor-primaria);border-radius:50%;animation:spin 1s linear infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
-
         body {
-  margin: 0 auto;
+            background: linear-gradient(135deg, #F7F8FC 0%, #EEF2F7 100%);
+            font-family: 'Inter', sans-serif;
         }
         
-                .chat-toggle-link {
-            /* Posicionamento flutuante no canto da tela */
+        /* Esconde scrollbar mas mantém funcionalidade */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Efeito glass para navegação */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Loading spinner customizado */
+        .loading-spinner-custom {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #E4E6EB;
+            border-top-color: #4A90E2;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Chat button flutuante premium */
+        .chat-float-btn {
             position: fixed;
-            bottom: 80px;
-            right: 24px;
-            z-index: 1000;
-
-            /* Aparência do círculo */
+            bottom: 90px;
+            right: 20px;
             width: 56px;
             height: 56px;
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
             border-radius: 50%;
-            background-color: #6750A4; /* Cor primária do seu app */
-            
-            /* Sombra */
-            box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2), 
-                        0px 6px 10px 0px rgba(0,0,0,0.14), 
-                        0px 1px 18px 0px rgba(0,0,0,0.12);
-
-            /* Alinhamento do ícone no centro */
             display: flex;
             align-items: center;
             justify-content: center;
-
-            /* Remove o sublinhado padrão de links */
-            text-decoration: none;
-            
-            /* Efeito de transição suave */
-            transition: all 0.3s ease;
-        }
-
-        /* Estilo do ícone dentro do botão */
-        .chat-toggle-link .material-icons {
-            color: #FFFFFF; /* Cor branca para o ícone */
-            font-size: 24px;
-        }
-
-        /* Efeito ao passar o mouse */
-        .chat-toggle-link:hover {
-            background-color: #4F378B; /* Uma cor um pouco mais escura para o hover */
-            transform: scale(1.05);
-        }
-         .chat-toggle {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
             cursor: pointer;
             z-index: 1000;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
         }
-
-        .chat-toggle:hover {
-            transform: scale(1.05);
+        
+        .chat-float-btn:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 12px 28px rgba(74, 144, 226, 0.4);
         }
-
-        .unread-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--md-sys-color-error);
-            color: var(--md-sys-color-on-error);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            font-weight: bold;
+        
+        .chat-float-btn .material-icons {
+            color: white;
+            font-size: 28px;
+        }
+        
+        /* Notificação persistente */
+        .persistent-notification {
+            position: fixed;
+            bottom: 100px;
+            left: 16px;
+            right: 16px;
+            max-width: 380px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
             display: none;
-            align-items: center;
-            justify-content: center;
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
         }
-
-        .unread-badge.pulse { animation: pulse 0.5s ease-in-out; }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
+        
+        .persistent-notification.show {
+            display: flex;
         }
-        button.nav-item[data-page="https://reinaldoleall.github.io/criarlojas/"] {
-    display: none;
-}
+        
+        .notification-content {
+            flex: 1;
+            padding: 16px;
+            cursor: pointer;
+        }
+        
+        .notification-content strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1C1E21;
+            margin-bottom: 4px;
+        }
+        
+        .notification-content p {
+            font-size: 13px;
+            color: #606770;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            cursor: pointer;
+            color: #999;
+            font-size: 20px;
+            transition: color 0.2s;
+        }
+        
+        .notification-close:hover {
+            color: #666;
+        }
+        
+        /* Animação de pulso para badge */
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        /* Transição suave para iframe */
+        .content-frame {
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Nav item active effect */
+        .nav-item {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-item.active {
+            color: #4A90E2;
+        }
+        
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            background: linear-gradient(90deg, #4A90E2, #3A73B5);
+            border-radius: 3px;
+        }
+        
+        /* Ripple effect para botões */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(74, 144, 226, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-      
-        <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
+    <!-- Loading Overlay -->
+    <div id="loading" class="fixed inset-0 bg-white/90 backdrop-blur-sm hidden items-center justify-center z-[2000]">
+        <div class="flex flex-col items-center gap-4">
+            <div class="loading-spinner-custom"></div>
+            <p class="text-gray-500 text-sm animate-pulse">Carregando...</p>
         </div>
+    </div>
 
-        <div class="app-content">
-            <main class="main-content">
-                <iframe class="content-frame" id="contentFrame" src="aviso.html"></iframe>
+    <!-- Main Container -->
+    <div class="flex h-screen">
+        <!-- Content Area -->
+        <div class="flex-1 flex flex-col pb-[65px]">
+            <main class="flex-1 overflow-hidden relative">
+                <iframe id="contentFrame" class="content-frame w-full h-full border-none bg-gray-50" src="aviso.html"></iframe>
             </main>
         </div>
     </div>
-        <a href="chat.html" class="chat-toggle-link" title="Abrir Interfone Virtual">
+
+    <!-- Chat Button Flutuante -->
+    <a href="chat.html" class="chat-float-btn ripple" title="Interfone Virtual">
         <span class="material-icons">chat</span>
     </a>
-    <br>    <br>     <br>
-    <nav class="bottom-nav">
-        <button class="nav-item active" data-page="aviso.html" data-title="Avisos">
-            <i class="material-icons-outlined">campaign</i>
+
+    <!-- Bottom Navigation -->
+    <nav class="glass-nav fixed bottom-0 left-0 right-0 h-[65px] flex overflow-x-auto overflow-y-hidden shadow-lg z-[150] pb-safe hide-scrollbar">
+        <button class="nav-item active flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="aviso.html" data-title="Avisos">
+            <i class="material-icons-outlined text-2xl mb-0.5">campaign</i>
             <span>Avisos</span>
         </button>
-        <button class="nav-item" data-page="lojas.html" data-title="Lojas">
-            <i class="material-icons-outlined">storefront</i>
+        <button class="nav-item flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="lojas.html" data-title="Lojas">
+            <i class="material-icons-outlined text-2xl mb-0.5">storefront</i>
             <span>Lojas</span>
         </button>
-        <button class="nav-item" data-page="https://reinaldoleall.github.io/criarlojas/" data-title="Criar Loja">
-            <i class="material-icons-outlined">add_business</i>
+        <button class="nav-item flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="https://reinaldoleall.github.io/criarlojas/" data-title="Criar Loja">
+            <i class="material-icons-outlined text-2xl mb-0.5">add_business</i>
             <span>Criar Loja</span>
         </button>
-        <button class="nav-item" data-page="salao_festas.html" data-title="Salão de Festas">
-            <i class="material-icons-outlined">celebration</i>
-            <span>Salão de Festas</span>
+        <button class="nav-item flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="salao_festas.html" data-title="Salão de Festas">
+            <i class="material-icons-outlined text-2xl mb-0.5">celebration</i>
+            <span>Salão</span>
         </button>
-        <button class="nav-item" data-page="login.html" data-title="Usuários">
-            <i class="material-icons-outlined">people_alt</i>
+        <button class="nav-item flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="login.html" data-title="Usuários">
+            <i class="material-icons-outlined text-2xl mb-0.5">people_alt</i>
             <span>Usuários</span>
         </button>
-        <button class="nav-item" id="adminNavItem" data-page="admin.html" data-title="Admin">
-            <i class="material-icons-outlined">admin_panel_settings</i>
+        <button id="adminNavItem" class="nav-item flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="admin.html" data-title="Admin" style="display: none;">
+            <i class="material-icons-outlined text-2xl mb-0.5">admin_panel_settings</i>
             <span>Admin</span>
         </button>
-        <!-- NOVO ÍCONE ADICIONADO -->
-        <button class="nav-item" data-page="historico.html" data-title="Histórico de Encomendas">
-            <i class="material-icons-outlined">history</i>
+        <button class="nav-item flex flex-col items-center justify-center flex-shrink-0 min-w-[70px] px-3 py-2 text-gray-500 text-xs font-medium bg-transparent border-none cursor-pointer transition-colors" data-page="historico.html" data-title="Histórico de Encomendas">
+            <i class="material-icons-outlined text-2xl mb-0.5">history</i>
             <span>Histórico</span>
         </button>
     </nav>
-<style>
-  .persistent-notification {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background-color: #005A9C; /* Um azul mais chamativo */
-    color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    z-index: 10000;
-    font-family: Arial, sans-serif;
-    width: 320px;
-    max-width: 90%;
-    
-    /* Começa escondido */
-    display: none; 
-    
-    /* Configuração para o botão 'X' */
-    display: none;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-  
-  /* Animação de entrada */
-  .persistent-notification.show {
-    display: flex;
-    animation: homeFadeIn 0.3s ease-out;
-  }
-  @keyframes homeFadeIn {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
 
-  /* Conteúdo clicável (que leva ao chat) */
-  .notification-content {
-    padding: 16px;
-    cursor: pointer; /* Indica que é clicável */
-    flex: 1; /* Ocupa o espaço disponível */
-  }
-  .notification-content strong {
-    display: block;
-    font-size: 16px;
-    margin-bottom: 8px;
-  }
-  .notification-content p {
-    margin: 0;
-    font-size: 14px;
-    opacity: 0.9;
-    /* Limita o texto da mensagem a 2 linhas */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-  
-  /* Botão 'X' de fechar */
-  .notification-close {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 1;
-    padding: 14px 12px; /* Ajuste para centralizar */
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-    align-self: stretch; /* Estica para ter a mesma altura */
-  }
-  .notification-close:hover {
-    opacity: 1;
-  }
-</style>
-
-<div class="persistent-notification" id="persistentNotification">
-    <div class="notification-content" id="notificationContent">
-        <strong id="persistentSender">Nova Mensagem</strong>
-        <p id="persistentMessage">Você tem uma nova mensagem.</p>
+    <!-- Notificação Persistente -->
+    <div class="persistent-notification" id="persistentNotification">
+        <div class="notification-content" id="notificationContent">
+            <strong id="persistentSender">Nova Mensagem</strong>
+            <p id="persistentMessage">Você tem uma nova mensagem.</p>
+        </div>
+        <button class="notification-close" id="notificationClose" title="Fechar">×</button>
     </div>
-    <button class="notification-close" id="notificationClose" title="Fechar">&times;</button>
-</div>
 
-
-<!-- Adicione também o Material Icons se não estiver incluído -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-<!-- E o Firebase se não estiver incluído -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<script>
-  (function() {
-    
-    // ---------------------------------------------------------------
-    // ATENÇÃO: COPIE A MESMA CONFIGURAÇÃO DO SEU ARQUIVO DO INTERFONE
-    // ---------------------------------------------------------------
-    const firebaseConfig = {
-        apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc", // ⚠️ Lembre-se do aviso de segurança!
-        authDomain: "rifas-c414b.firebaseapp.com",
-        databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
-        projectId: "rifas-c414b",
-        storageBucket: "rifas-c414b.appspot.com",
-        messagingSenderId: "770195193538",
-        appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
-    };
-
-    // ---------------------------------------------------------------
-    // IMPORTANTE: Altere esta URL para o link do seu Interfone Virtual
-    // ---------------------------------------------------------------
-    // Você mencionou 'bate-papo.html', então eu coloquei aqui:
-    const URL_DO_INTERFONE = "chat.html";
-    
-    // Inicializa o Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const auth = firebase.auth();
-    const database = firebase.database();
-    
-    let currentUserId = null;
-    let conversationsListener = null;
-    const notifiedMessageTimestamps = new Set(); // Para evitar re-notificar
-
-    // Elementos da Notificação
-    const notificationPopup = document.getElementById('persistentNotification');
-    const notificationContent = document.getElementById('notificationContent');
-    const notificationClose = document.getElementById('notificationClose');
-    const notificationSender = document.getElementById('persistentSender');
-    const notificationMessage = document.getElementById('persistentMessage');
-
-    // Toca um som de notificação
-    function playNotificationSound() {
-        try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            oscillator.connect(audioContext.destination);
-            oscillator.frequency.value = 800;
-            oscillator.type = 'sine';
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.2);
-        } catch (e) {
-            console.warn("Não foi possível tocar o som de notificação.");
-        }
-    }
-
-    // Mostra a notificação na tela
-    function showNotification(senderName, messageText) {
-        notificationSender.textContent = `Nova Mensagem de ${senderName}`;
-        notificationMessage.textContent = messageText;
-        notificationPopup.classList.add('show');
-        playNotificationSound();
-
-        // IMPORTANTE: Removemos o 'setTimeout' que escondia a notificação.
-        // Ela agora ficará na tela até ser clicada.
-    }
-    
-    // --- NOVOS EVENT HANDLERS ---
-    
-    // Define o que acontece ao clicar no CONTEÚDO da notificação
-    notificationContent.onclick = () => {
-        // Abre o bate-papo (em uma nova aba, ou use window.location.href para ser na mesma)
-        window.open(URL_DO_INTERFONE, '_blank'); 
-        
-        // Opcional: Esconde a notificação SÓ DEPOIS que o usuário clicar nela
-        // notificationPopup.classList.remove('show');
-    };
-
-    // Define o que acontece ao clicar no 'X' para fechar
-    notificationClose.onclick = () => {
-        notificationPopup.classList.remove('show');
-    };
-
-    // Função principal para escutar novas mensagens (sem alterações)
-    function startListeningForMessages(userId) {
-        if (conversationsListener) {
-            conversationsListener.off(); 
-        }
-        
-        console.log("Iniciando listener de notificações para o usuário:", userId);
-        conversationsListener = database.ref('conversations');
-
-        const messageHandler = (snapshot) => {
-            handleNewMessage(snapshot, userId);
-        };
-        
-        conversationsListener.on('child_changed', messageHandler);
-        conversationsListener.on('child_added', messageHandler);
-    }
-
-    // Processa uma nova mensagem (sem alterações)
-    function handleNewMessage(snapshot, userId) {
-        const conversationId = snapshot.key;
-
-        if (conversationId.includes(userId)) {
-            const messages = snapshot.val();
-            if (!messages) return;
-
-            const messageKeys = Object.keys(messages);
-            const lastMessageKey = messageKeys[messageKeys.length - 1];
-            const lastMessage = messages[lastMessageKey];
-
-            if (lastMessage && lastMessage.senderId !== userId) {
-                
-                if (!notifiedMessageTimestamps.has(lastMessage.timestamp)) {
-                    notifiedMessageTimestamps.add(lastMessage.timestamp); 
-
-                    database.ref(`users/${lastMessage.senderId}`).once('value').then(userSnapshot => {
-                        const sender = userSnapshot.val();
-                        const senderName = sender ? sender.nome || 'Usuário' : 'Usuário';
-                        
-                        console.log(`Nova mensagem recebida de ${senderName}`);
-                        showNotification(senderName, lastMessage.text);
-                    });
-                }
-            }
-        }
-    }
-
-    // INICIALIZAÇÃO: Verifica a autenticação (sem alterações)
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            if (currentUserId !== user.uid) {
-                currentUserId = user.uid;
-                startListeningForMessages(currentUserId);
-            }
-        } else {
-            console.log('Usuário não logado. Notificações desativadas.');
-            if (conversationsListener) {
-                conversationsListener.off();
-            }
-            currentUserId = null;
-        }
-    });
-
-  })();
-</script>
-
-
-
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- Firebase e Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        const firebaseConfig = {
+        // Configuração Firebase para notificações
+        (function() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+                authDomain: "rifas-c414b.firebaseapp.com",
+                databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+                projectId: "rifas-c414b",
+                storageBucket: "rifas-c414b.appspot.com",
+                messagingSenderId: "770195193538",
+                appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+            };
+
+            const URL_DO_INTERFONE = "chat.html";
+            
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            
+            const auth = firebase.auth();
+            const database = firebase.database();
+            
+            let currentUserId = null;
+            let conversationsListener = null;
+            const notifiedMessageTimestamps = new Set();
+
+            const notificationPopup = document.getElementById('persistentNotification');
+            const notificationContent = document.getElementById('notificationContent');
+            const notificationClose = document.getElementById('notificationClose');
+            const notificationSender = document.getElementById('persistentSender');
+            const notificationMessage = document.getElementById('persistentMessage');
+
+            function playNotificationSound() {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    oscillator.connect(audioContext.destination);
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                } catch (e) {
+                    console.warn("Não foi possível tocar o som de notificação.");
+                }
+            }
+
+            function showNotification(senderName, messageText) {
+                notificationSender.textContent = `📬 ${senderName}`;
+                notificationMessage.textContent = messageText;
+                notificationPopup.classList.add('show');
+                playNotificationSound();
+            }
+            
+            notificationContent.onclick = () => {
+                window.open(URL_DO_INTERFONE, '_blank');
+            };
+
+            notificationClose.onclick = () => {
+                notificationPopup.classList.remove('show');
+            };
+
+            function startListeningForMessages(userId) {
+                if (conversationsListener) {
+                    conversationsListener.off(); 
+                }
+                
+                console.log("Iniciando listener de notificações para o usuário:", userId);
+                conversationsListener = database.ref('conversations');
+
+                const messageHandler = (snapshot) => {
+                    handleNewMessage(snapshot, userId);
+                };
+                
+                conversationsListener.on('child_changed', messageHandler);
+                conversationsListener.on('child_added', messageHandler);
+            }
+
+            function handleNewMessage(snapshot, userId) {
+                const conversationId = snapshot.key;
+
+                if (conversationId.includes(userId)) {
+                    const messages = snapshot.val();
+                    if (!messages) return;
+
+                    const messageKeys = Object.keys(messages);
+                    const lastMessageKey = messageKeys[messageKeys.length - 1];
+                    const lastMessage = messages[lastMessageKey];
+
+                    if (lastMessage && lastMessage.senderId !== userId) {
+                        
+                        if (!notifiedMessageTimestamps.has(lastMessage.timestamp)) {
+                            notifiedMessageTimestamps.add(lastMessage.timestamp); 
+
+                            database.ref(`users/${lastMessage.senderId}`).once('value').then(userSnapshot => {
+                                const sender = userSnapshot.val();
+                                const senderName = sender ? sender.nome || 'Usuário' : 'Usuário';
+                                
+                                console.log(`Nova mensagem recebida de ${senderName}`);
+                                showNotification(senderName, lastMessage.text);
+                            });
+                        }
+                    }
+                }
+            }
+
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    if (currentUserId !== user.uid) {
+                        currentUserId = user.uid;
+                        startListeningForMessages(currentUserId);
+                    }
+                } else {
+                    console.log('Usuário não logado. Notificações desativadas.');
+                    if (conversationsListener) {
+                        conversationsListener.off();
+                    }
+                    currentUserId = null;
+                }
+            });
+        })();
+    </script>
+
+    <script>
+        // Configuração Firebase para navegação
+        const firebaseConfigNav = {
             apiKey: "AIzaSyCwTNcpr_r75HH0igBtNyEbKvfuLkVFHiU",
             authDomain: "rifalidiane-fde3b.firebaseapp.com",
             databaseURL: "https://rifalidiane-fde3b-default-rtdb.firebaseio.com",
@@ -478,10 +468,11 @@
             appId: "1:649359518677:web:879b4ed9fa5150d24d2b5c"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.some(app => app.name === 'navApp')) {
+            const navApp = firebase.initializeApp(firebaseConfigNav, 'navApp');
         }
-        const database = firebase.database();
+        
+        const navDatabase = firebase.app('navApp').database();
 
         function getOrGenerateUserId() {
             let userId = localStorage.getItem('uniqueUserId');
@@ -493,34 +484,38 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const ui = {
-                loading: document.getElementById('loading'),
-                contentFrame: document.getElementById('contentFrame'),
-                menuItems: document.querySelectorAll('.nav-item')
-            };
+            const loading = document.getElementById('loading');
+            const contentFrame = document.getElementById('contentFrame');
+            const menuItems = document.querySelectorAll('.nav-item');
 
             const setActiveMenuItem = (pageUrl) => {
-                ui.menuItems.forEach(item => {
-                    item.classList.toggle('active', item.dataset.page === pageUrl);
+                menuItems.forEach(item => {
+                    if (item.dataset.page === pageUrl) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
                 });
             };
             
             const loadPage = (pageUrl, title) => {
-                ui.loading.style.display = 'flex';
+                loading.style.display = 'flex';
                 document.title = `${title} | Condomínio Cotovias`;
-                const currentSrc = ui.contentFrame.src.split('/').pop();
+                
+                const currentSrc = contentFrame.src.split('/').pop();
                 if (currentSrc !== pageUrl) {
-                    ui.contentFrame.src = pageUrl;
-                } else {
-                     ui.loading.style.display = 'none';
+                    contentFrame.src = pageUrl;
                 }
-                ui.contentFrame.onload = () => {
-                    ui.loading.style.display = 'none';
+                
+                contentFrame.onload = () => {
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                    }, 300);
                 };
+                
                 setActiveMenuItem(pageUrl);
             };
             
-            // Função genérica para solicitar acesso
             const requestAccess = async (accessType) => {
                 const userId = getOrGenerateUserId();
                 const dbPath = accessType === 'admin' ? 'admins/' : 'users/';
@@ -528,17 +523,17 @@
                 const pageTitle = accessType === 'admin' ? 'Administração' : 'Criar Loja';
                 const requestText = accessType === 'admin' ? 'acesso de Administrador' : 'acesso para criar uma loja';
                 
-                ui.loading.style.display = 'flex';
+                loading.style.display = 'flex';
                 
                 try {
-                    const snapshot = await database.ref(dbPath + userId).once('value');
+                    const snapshot = await navDatabase.ref(dbPath + userId).once('value');
                     const userData = snapshot.val();
 
                     if (userData && userData.status === 'active') {
                         loadPage(pageUrl, pageTitle);
                     } else {
                         if (!userData) {
-                            await database.ref(dbPath + userId).set({
+                            await navDatabase.ref(dbPath + userId).set({
                                 status: 'pending',
                                 requestedAt: new Date().toISOString()
                             });
@@ -550,40 +545,82 @@
 
                         alert(`Para obter ${requestText}, solicite a liberação.\n\nSeu ID de Solicitação é: ${userId}\n\nVocê será redirecionado para o WhatsApp.`);
                         window.open(urlWhatsApp, '_blank');
-                        ui.loading.style.display = 'none';
+                        loading.style.display = 'none';
                     }
                 } catch (error) {
                     console.error("Erro ao verificar status:", error);
                     alert("Ocorreu um erro. Tente novamente.");
-                    ui.loading.style.display = 'none';
+                    loading.style.display = 'none';
                 }
             };
             
-            // --- EVENT LISTENERS ATUALIZADOS ---
-            ui.menuItems.forEach(item => {
+            // Event Listeners
+            menuItems.forEach(item => {
                 const page = item.dataset.page;
 
                 if (page === 'admin.html') {
-                    // Botão Admin agora solicita acesso
-                    item.addEventListener('click', () => requestAccess('admin'));
-                } else if (page === 'criarlojas.html') {
-                    // Botão Criar Loja solicita acesso de usuário
-                    item.addEventListener('click', () => requestAccess('user'));
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        requestAccess('admin');
+                    });
+                } else if (page === 'https://reinaldoleall.github.io/criarlojas/') {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        requestAccess('user');
+                    });
                 } else {
-                    // Comportamento padrão para outros botões
                     item.addEventListener('click', () => {
                         loadPage(item.dataset.page, item.dataset.title);
                     });
                 }
             });
 
-            // --- INICIALIZAÇÃO ---
-            const initialItem = document.querySelector('.nav-item');
+            // Inicialização
+            const initialItem = document.querySelector('.nav-item.active');
             if (initialItem) {
-                 loadPage(initialItem.dataset.page, initialItem.dataset.title);
+                loadPage(initialItem.dataset.page, initialItem.dataset.title);
             }
         });
     </script>
 
+    <style>
+        /* Safe area para iOS */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* Esconde botão Criar Loja se necessário */
+        button.nav-item[data-page="https://reinaldoleall.github.io/criarlojas/"] {
+            display: flex;
+        }
+        
+        /* Responsividade para tablets */
+        @media (min-width: 768px) {
+            .chat-float-btn {
+                bottom: 100px;
+                right: 30px;
+                width: 64px;
+                height: 64px;
+            }
+            
+            .chat-float-btn .material-icons {
+                font-size: 32px;
+            }
+            
+            .persistent-notification {
+                bottom: 110px;
+                left: 30px;
+                max-width: 400px;
+            }
+        }
+        
+        /* Efeito de hover para desktop */
+        @media (hover: hover) {
+            .nav-item:hover {
+                color: #4A90E2;
+                transform: translateY(-2px);
+            }
+        }
+    </style>
 </body>
-</html>
+    </html>
