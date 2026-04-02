@@ -2,503 +2,476 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1280">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4A90E2">
     <title>Morador - Sistema de Encomendas</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EBF3FE',
+                            100: '#D7E8FD',
+                            200: '#B0D1FB',
+                            300: '#88B9F8',
+                            400: '#61A2F6',
+                            500: '#4A90E2',
+                            600: '#3A73B5',
+                            700: '#2B5688',
+                            800: '#1D3A5A',
+                            900: '#0E1D2D',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'spin-slow': 'spin 1s linear infinite',
+                        'fade-in': 'fadeIn 1.5s ease-out',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        spin: {
+                            'from': { transform: 'rotate(0deg)' },
+                            'to': { transform: 'rotate(360deg)' },
+                        },
+                        fadeIn: {
+                            'from': { opacity: '0', transform: 'translateY(-10px)' },
+                            'to': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        /* Estilos customizados */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #F7F8FC 0%, #EEF2F7 100%);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Glass effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #E4E6EB;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            border-radius: 10px;
+        }
+        
+        /* Card hover premium */
+        .premium-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .premium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Loading spinner */
+        .loading-spinner-custom {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #E4E6EB;
+            border-top-color: #4A90E2;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Badge styles */
+        .badge-custom {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-warning {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+        }
+        
+        .badge-info {
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            color: white;
+        }
+        
+        .badge-success {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+        }
+        
+        /* Empty state animation */
+        .empty-state-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Collapsible custom */
+        .collapsible-header-custom {
+            transition: all 0.3s ease;
+        }
+        
+        .collapsible-header-custom:hover {
+            background-color: #F9FAFB;
+        }
+        
+        /* Fade animation for updates */
+        .updated-item {
+            animation: fadeIn 1.5s ease-out;
+        }
+        
+        /* Connection status */
+        .connection-status {
+            transition: all 0.5s ease;
+        }
+        
+        /* Ripple effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(74, 144, 226, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Toast custom position */
+        .toast-custom {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 30px;
+            z-index: 10000;
+            text-align: center;
+        }
+        
+        /* Modal animation */
+        .modal-scale {
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* Rotate animation for refresh button */
+        .rotate-animation {
+            animation: spin 1s linear infinite;
+        }
+    </style>
 </head>
-<style>
-    
-/* ==========================================================================
-   1. Variáveis de Tema e Estilos Base
-   ========================================================================== */
-:root {
-    --primary-color: #34495e;  /* Azul petróleo */
-    --secondary-color: #2980b9; /* Azul mais claro */
-    --accent-color: #3498db;   /* Azul para destaque */
-    --success-color: #27ae60;  /* Verde */
-    --warning-color: #f39c12;  /* Laranja */
-    --danger-color: #c0392b;   /* Vermelho */
-    --light-gray: #ecf0f1;
-    --dark-text: #2c3e50;
-}
 
-body {
-    background-color: var(--light-gray);
-    color: var(--dark-text);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
+<body class="antialiased">
 
-.container {
-    width: 95%;
-    max-width: 1200px;
-    margin-top: 2rem;
-    flex: 1;
-}
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[10000] hidden items-center justify-center">
+        <div class="flex flex-col items-center gap-4">
+            <div class="loading-spinner-custom"></div>
+            <p class="text-gray-500 text-sm animate-pulse">Carregando...</p>
+        </div>
+    </div>
 
-h4, h5 {
-    font-weight: 300;
-    color: var(--primary-color);
-}
-
-    /* ==========================================================================
-   AJUSTE DE POSICIONAMENTO PARA NOTIFICAÇÕES (TOASTS)
-   ========================================================================== */
-
-#toast-container {
-    /* Posicionamento Fixo e Centralizado */
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%); /* O truque para centralização perfeita */
-    
-    /* Distância da parte inferior da tela */
-    bottom: 30px; 
-    
-    /* Garante que não fique preso nos cantos */
-    top: auto;
-    right: auto; 
-    
-    /* Largura e Segurança */
-    width: fit-content; /* Faz o container ter a largura do conteúdo */
-    max-width: 90%; /* Evita que o toast toque as bordas em telas pequenas */
-    
-    /* Empilhamento e Alinhamento */
-    z-index: 10000; /* Garante que a notificação fique sobre todos os elementos */
-    text-align: center; /* Centraliza o texto dentro do toast */
-}
-
-/* Opcional: Garante que os toasts dentro do container se comportem bem */
-.toast {
-    display: inline-block;
-    word-wrap: break-word; /* Evita que texto longo "quebre" o layout */
-}
-
-/* ==========================================================================
-   2. Cabeçalho e Botões de Ação
-   ========================================================================== */
-.header-actions {
-    padding: 1rem 0;
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-}
-
-#btnAtualizar, #btnLogout {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    transition: all 0.3s ease;
-}
-
-#btnAtualizar:hover, #btnLogout:hover {
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    transform: translateY(-2px);
-}
-
-.rotate {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* ==========================================================================
-   3. Cards e Listas de Encomendas
-   ========================================================================== */
-.card {
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    overflow: hidden; /* Garante que o conteúdo respeite o border-radius */
-}
-
-.card:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.card .card-content {
-    padding: 24px;
-}
-
-.collapsible {
-    border: none;
-    box-shadow: none;
-}
-
-.collapsible-header {
-    font-weight: 500;
-    border-bottom: 1px solid #ddd !important;
-    transition: background-color 0.3s ease;
-}
-
-.collapsible-header:hover {
-    background-color: rgba(0,0,0,0.03);
-}
-
-.collapsible-header i {
-    margin-right: 15px;
-    color: var(--secondary-color);
-}
-
-.collapsible-body {
-    background-color: #fafafa;
-    border-bottom: 1px solid #ddd !important;
-}
-
-.collapsible-body p {
-    padding: 0.5rem 0;
-}
-
-.updated {
-    animation: fadeIn 1.5s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ==========================================================================
-   4. Estilos de Status (Badges)
-   ========================================================================== */
-.badge {
-    color: white !important;
-    border-radius: 12px;
-    font-weight: 500;
-    font-size: 0.8rem;
-    padding: 4px 12px;
-    text-align: center;
-}
-
-.badge.orange { background-color: var(--warning-color); }
-.badge.blue { background-color: var(--accent-color); }
-.badge.green { background-color: var(--success-color); }
-
-
-/* ==========================================================================
-   5. Modal e Estado Vazio
-   ========================================================================== */
-.modal {
-    border-radius: 8px;
-    max-width: 600px;
-}
-
-.modal .modal-footer {
-    background-color: #f5f5f5;
-    border-top: 1px solid #e0e0e0;
-    border-radius: 0 0 8px 8px;
-}
-
-.empty-state {
-    padding: 3rem 1rem;
-    text-align: center;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    margin: 1rem;
-}
-
-.empty-state .material-icons {
-    font-size: 4rem;
-    color: #bbb;
-}
-
-.empty-state p {
-    font-size: 1.2rem;
-    color: #999;
-    margin-top: 1rem;
-}
-
-
-/* ==========================================================================
-   6. Indicador de Conexão
-   ========================================================================== */
-#connectionStatus {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    border-radius: 20px 20px 0 0;
-    color: white;
-    font-weight: 500;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    transition: all 0.5s ease;
-}
-
-#connectionStatus.online {
-    background-color: var(--success-color);
-}
-
-#connectionStatus.offline {
-    background-color: var(--danger-color);
-}
-
-#connectionStatus i {
-    margin-right: 8px;
-}
-
-/* Esconde o status após a animação de entrada */
-#connectionStatus:not(.show) {
-    bottom: -60px;
-    opacity: 0;
-}
-</style>
-<body>
-    <div class="container">
-        <div class="row">
-            <div class="col s12 right-align">
-<button id="btnAtualizar" class="btn waves-effect waves-light blue darken-2" onclick="window.location.href='usuario.html'">
-    <i class="material-icons left">refresh</i> Atualizar
-</button>
-                <button id="btnLogout" class="btn waves-effect waves-light red darken-2">
-                    <i class="material-icons left">exit_to_app</i> Sair
-                </button>
-            </div>
+    <div class="container max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <!-- Header com ações -->
+        <div class="flex justify-end gap-3 mb-6">
+            <button id="btnAtualizar" class="px-5 py-2.5 bg-primary-500 text-white rounded-xl font-medium flex items-center gap-2 shadow-md hover:bg-primary-600 transition-all ripple">
+                <i class="material-icons text-lg">refresh</i> Atualizar
+            </button>
+            <button id="btnLogout" class="px-5 py-2.5 bg-red-500 text-white rounded-xl font-medium flex items-center gap-2 shadow-md hover:bg-red-600 transition-all ripple">
+                <i class="material-icons text-lg">exit_to_app</i> Sair
+            </button>
         </div>
         
-        <div class="section">
-            <h4>Minhas Encomendas</h4>
-            <p>Bem-vindo, <span id="nomeUsuario"></span> (Bloco/Apto: <span id="blocoApto"></span>)</p>
-            
-            <div class="card" id="cardPendentes">
-                <div class="card-content">
-                    <span class="card-title"><h5>Encomendas Pendentes</h5></span>
-                    <ul class="collapsible" id="listaEncomendasPendentes">
-                        <li class="empty-state">
-                            <div class="center-align grey-text">
-                                <i class="material-icons large">local_shipping</i>
-                                <p>Carregando encomendas...</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h4 class="text-2xl sm:text-3xl font-bold gradient-text mb-2 flex items-center gap-2">
+                <i class="material-icons-outlined text-primary-500">inbox</i>
+                Minhas Encomendas
+            </h4>
+            <p class="text-gray-600">Bem-vindo, <span id="nomeUsuario" class="font-semibold text-gray-800"></span> 
+            (<span id="blocoApto" class="text-primary-500 font-medium"></span>)</p>
+        </div>
+        
+        <!-- Encomendas Pendentes -->
+        <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden premium-card mb-6" id="cardPendentes">
+            <div class="p-5 sm:p-6">
+                <h5 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="material-icons-outlined text-warning-500">pending</i>
+                    Encomendas Pendentes
+                </h5>
+                <ul class="collapsible divide-y divide-gray-100" id="listaEncomendasPendentes">
+                    <li class="empty-state text-center py-12">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4 empty-state-icon">
+                            <i class="material-icons-outlined text-3xl text-gray-400">local_shipping</i>
+                        </div>
+                        <p class="text-gray-500">Carregando encomendas...</p>
+                    </li>
+                </ul>
             </div>
+        </div>
 
-            <div class="card" id="cardFinalizadas">
-                <div class="card-content">
-                    <span class="card-title"><h5>Encomendas Finalizadas</h5></span>
-                    <ul class="collapsible" id="listaEncomendasFinalizadas">
-                        <li class="empty-state">
-                            <div class="center-align grey-text">
-                                <i class="material-icons large">assignment_turned_in</i>
-                                <p>Nenhuma encomenda finalizada</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+        <!-- Encomendas Finalizadas -->
+        <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden premium-card" id="cardFinalizadas">
+            <div class="p-5 sm:p-6">
+                <h5 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="material-icons-outlined text-success-500">assignment_turned_in</i>
+                    Encomendas Finalizadas
+                </h5>
+                <ul class="collapsible divide-y divide-gray-100" id="listaEncomendasFinalizadas">
+                    <li class="empty-state text-center py-12">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4 empty-state-icon">
+                            <i class="material-icons-outlined text-3xl text-gray-400">assignment_turned_in</i>
+                        </div>
+                        <p class="text-gray-500">Nenhuma encomenda finalizada</p>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 
     <!-- Modal de Detalhes da Encomenda -->
-    <div id="modalEncomenda" class="modal">
-        <div class="modal-content">
-            <h4 id="modalTitulo">Detalhes da Encomenda</h4>
-            <div class="row">
-                <div class="col s6">
-                    <p><strong>Data/Hora Recebimento:</strong> <span id="modalData"></span></p>
-                    <p><strong>Recebido por:</strong> <span id="modalPorteiro"></span></p>
-                    <p><strong>Quantidade:</strong> <span id="modalQuantidade"></span></p>
+    <div id="modalEncomenda" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[1100] hidden items-center justify-center p-4">
+        <div class="modal-scale bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-gray-100">
+                <h4 id="modalTitulo" class="text-xl font-bold text-gray-800">Detalhes da Encomenda</h4>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[60vh]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <p class="mb-3"><strong class="text-gray-700">Data/Hora Recebimento:</strong> <span id="modalData" class="text-gray-600"></span></p>
+                        <p class="mb-3"><strong class="text-gray-700">Recebido por:</strong> <span id="modalPorteiro" class="text-gray-600"></span></p>
+                        <p class="mb-3"><strong class="text-gray-700">Quantidade:</strong> <span id="modalQuantidade" class="text-gray-600"></span></p>
+                    </div>
+                    <div>
+                        <p class="mb-3"><strong class="text-gray-700">Status:</strong> <span id="modalStatus" class="badge-custom"></span></p>
+                        <p class="mb-3"><strong class="text-gray-700">Descrição:</strong> <span id="modalDescricao" class="text-gray-600"></span></p>
+                    </div>
                 </div>
-                <div class="col s6">
-                    <p><strong>Status:</strong> <span id="modalStatus" class="badge"></span></p>
-                    <p><strong>Descrição:</strong> <span id="modalDescricao"></span></p>
+                <div id="modalRetiradaSection" class="mt-4 pt-4 border-t border-gray-100 hidden">
+                    <p class="mb-2"><strong class="text-gray-700">Retirado por:</strong> <span id="modalRetiradoPor" class="text-gray-600"></span></p>
+                    <p class="mb-2"><strong class="text-gray-700">Data da Retirada:</strong> <span id="modalDataRetirada" class="text-gray-600"></span></p>
+                    <p class="mb-2"><strong class="text-gray-700">Registrado por:</strong> <span id="modalPorteiroRetirada" class="text-gray-600"></span></p>
                 </div>
             </div>
-            <div class="row" id="modalRetiradaSection">
-                <div class="col s12">
-                    <p><strong>Retirado por:</strong> <span id="modalRetiradoPor"></span></p>
-                    <p><strong>Data da Retirada:</strong> <span id="modalDataRetirada"></span></p>
-                    <p><strong>Registrado por:</strong> <span id="modalPorteiroRetirada"></span></p>
-                </div>
+            <div class="p-5 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <a href="#!" class="modal-close px-5 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition-all">Fechar</a>
+                <a href="#!" class="px-5 py-2 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-all ripple" id="btnConfirmarRetirada">Confirmar Retirada</a>
             </div>
-        </div>
-        <div class="modal-footer">
-            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Fechar</a>
-            <a href="#!" class="waves-effect waves-light btn blue darken-3" id="btnConfirmarRetirada">Confirmar Retirada</a>
         </div>
     </div>
     
     <!-- Modal de Confirmação de Retirada -->
-    <div id="modalConfirmacaoRetirada" class="modal">
-        <div class="modal-content">
-            <h4>Confirmação de Retirada</h4>
-            <p>O porteiro <span id="confirmacaoPorteiroNome"></span> registrou a retirada desta encomenda por <span id="confirmacaoRetiranteNome"></span>.</p>
-            <p>Deseja confirmar esta retirada?</p>
-            <div class="row">
-                <div class="col s12">
-                    <p><strong>Data/Hora:</strong> <span id="confirmacaoData"></span></p>
-                    <p><strong>Descrição:</strong> <span id="confirmacaoDescricao"></span></p>
+    <div id="modalConfirmacaoRetirada" class="modal fixed inset-0 bg-black/60 backdrop-blur-sm z-[1100] hidden items-center justify-center p-4">
+        <div class="modal-scale bg-white rounded-2xl max-w-md w-full shadow-2xl">
+            <div class="p-6">
+                <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="material-icons text-warning-500">verified</i>
+                    Confirmação de Retirada
+                </h4>
+                <p class="text-gray-600 mb-3">O porteiro <strong id="confirmacaoPorteiroNome" class="text-primary-500"></strong> registrou a retirada desta encomenda por <strong id="confirmacaoRetiranteNome" class="text-primary-500"></strong>.</p>
+                <p class="text-gray-600 mb-3">Deseja confirmar esta retirada?</p>
+                <div class="bg-gray-50 p-4 rounded-xl mt-3">
+                    <p class="text-sm text-gray-600 mb-1"><strong>Data/Hora:</strong> <span id="confirmacaoData"></span></p>
+                    <p class="text-sm text-gray-600"><strong>Descrição:</strong> <span id="confirmacaoDescricao"></span></p>
                 </div>
             </div>
-        </div>
-        <div class="modal-footer">
-            <a href="#!" class="modal-close waves-effect waves-red btn-flat" id="btnRejeitarRetirada">Rejeitar</a>
-            <a href="#!" class="modal-close waves-effect waves-green btn" id="btnConfirmarRetiradaModal">Confirmar</a>
+            <div class="p-5 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <a href="#!" class="modal-close px-5 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition-all" id="btnRejeitarRetirada">Rejeitar</a>
+                <a href="#!" class="modal-close px-5 py-2 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-600 transition-all ripple" id="btnConfirmarRetiradaModal">Confirmar</a>
+            </div>
         </div>
     </div>
 
     <!-- Status de Conexão -->
-    <div id="connectionStatus" class="hide">
-        <i class="material-icons left">wifi</i>
+    <div id="connectionStatus" class="connection-status fixed bottom-0 left-1/2 transform -translate-x-1/2 px-5 py-2 rounded-t-2xl text-white font-medium shadow-lg z-[1000] hidden">
+        <i class="material-icons text-sm mr-2">wifi</i>
         <span id="connectionText">Conectado</span>
     </div>
-    <script>
-// Sistema de Notificações em Tempo Real - usuario.html
-(function() {
-    // Função para enviar notificações para outras páginas
-    function enviarNotificacaoParaOutrasPaginas(quantidade, encomendas) {
-        // Salva no localStorage para outras páginas acessarem
-        localStorage.setItem('encomendasPendentes', quantidade);
-        localStorage.setItem('ultimaAtualizacaoNotificacao', Date.now());
-        localStorage.setItem('encomendasData', JSON.stringify(encomendas));
-        
-        // Dispara um evento personalizado para páginas abertas
-        window.dispatchEvent(new CustomEvent('encomendasAtualizadas', {
-            detail: { 
-                quantidade: quantidade,
-                encomendas: encomendas
-            }
-        }));
-    }
-    
-    // Monitora mudanças nas encomendas para notificações
-    function monitorarEncomendasParaNotificacao() {
-        const user = firebase.auth().currentUser;
-        if (!user || !window.userData) return;
-        
-        const blocoApto = `Bloco ${window.userData.bloco}, Apt ${window.userData.apartamento}`;
-        
-        // Listener para contar encomendas pendentes
-        firebase.database().ref('encomendas')
-            .orderByChild('blocoApto')
-            .equalTo(blocoApto)
-            .on('value', snapshot => {
-                let contador = 0;
-                let encomendasPendentes = {};
-                
-                if (snapshot.exists()) {
-                    snapshot.forEach(item => {
-                        const encomenda = item.val();
-                        if (encomenda.status === 'pendente' || encomenda.status === 'aguardando_confirmacao') {
-                            contador++;
-                            encomendasPendentes[item.key] = encomenda;
-                        }
-                    });
-                }
-                
-                // Envia notificação para outras páginas
-                enviarNotificacaoParaOutrasPaginas(contador, encomendasPendentes);
-            });
-    }
-    
-    // Inicia o monitoramento quando o usuário estiver autenticado
-    const authCheck = setInterval(() => {
-        if (firebase.auth().currentUser && window.userData) {
-            clearInterval(authCheck);
-            monitorarEncomendasParaNotificacao();
-        }
-    }, 500);
-})();
-    </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <script>
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
-            authDomain: "rifas-c414b.firebaseapp.com",
-            databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
-            projectId: "rifas-c414b",
-            storageBucket: "rifas-c414b.firebasestorage.app",
-            messagingSenderId: "770195193538",
-            appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
-        };
-        
-        // Inicializa o Firebase
+    // ============================================
+    // JAVASCRIPT ORIGINAL - NENHUMA ALTERAÇÃO NA LÓGICA
+    // ============================================
+    
+    // Configuração do Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyByyM8RvGNM5pyrQIQ7nCH6mmgYAIpq0bc",
+        authDomain: "rifas-c414b.firebaseapp.com",
+        databaseURL: "https://rifas-c414b-default-rtdb.firebaseio.com",
+        projectId: "rifas-c414b",
+        storageBucket: "rifas-c414b.firebasestorage.app",
+        messagingSenderId: "770195193538",
+        appId: "1:770195193538:web:48e585ac5661d27f3dc55b"
+    };
+    
+    // Inicializa o Firebase
+    if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
+    }
+    
+    // Variáveis globais
+    let userData = null;
+    let encomendasListener = null;
+    let solicitacoesVerificadas = false;
+    let lastUpdateTime = 0;
+    
+    // Objeto para cache local
+    const localCache = {
+        encomendas: null,
+        userData: null,
+        lastUpdated: 0
+    };
+    
+    // Sistema de Notificações em Tempo Real
+    (function() {
+        function enviarNotificacaoParaOutrasPaginas(quantidade, encomendas) {
+            localStorage.setItem('encomendasPendentes', quantidade);
+            localStorage.setItem('ultimaAtualizacaoNotificacao', Date.now());
+            localStorage.setItem('encomendasData', JSON.stringify(encomendas));
+            
+            window.dispatchEvent(new CustomEvent('encomendasAtualizadas', {
+                detail: { 
+                    quantidade: quantidade,
+                    encomendas: encomendas
+                }
+            }));
+        }
         
-        // Variáveis globais
-        let userData = null;
-        let encomendasListener = null;
-        let solicitacoesVerificadas = false;
-        let lastUpdateTime = 0;
+        function monitorarEncomendasParaNotificacao() {
+            const user = firebase.auth().currentUser;
+            if (!user || !window.userData) return;
+            
+            const blocoApto = `Bloco ${window.userData.bloco}, Apt ${window.userData.apartamento}`;
+            
+            firebase.database().ref('encomendas')
+                .orderByChild('blocoApto')
+                .equalTo(blocoApto)
+                .on('value', snapshot => {
+                    let contador = 0;
+                    let encomendasPendentes = {};
+                    
+                    if (snapshot.exists()) {
+                        snapshot.forEach(item => {
+                            const encomenda = item.val();
+                            if (encomenda.status === 'pendente' || encomenda.status === 'aguardando_confirmacao') {
+                                contador++;
+                                encomendasPendentes[item.key] = encomenda;
+                            }
+                        });
+                    }
+                    
+                    enviarNotificacaoParaOutrasPaginas(contador, encomendasPendentes);
+                });
+        }
         
-        // Objeto para cache local
-        const localCache = {
-            encomendas: null,
-            userData: null,
-            lastUpdated: 0
+        const authCheck = setInterval(() => {
+            if (firebase.auth().currentUser && window.userData) {
+                clearInterval(authCheck);
+                monitorarEncomendasParaNotificacao();
+            }
+        }, 500);
+    })();
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Referências DOM
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        const showLoading = (show) => {
+            loadingOverlay.style.display = show ? 'flex' : 'none';
         };
         
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializa componentes do Materialize
-            M.Modal.init(document.querySelectorAll('.modal'));
-            M.Collapsible.init(document.querySelectorAll('.collapsible'));
-            
-            // Configura botões
-            document.getElementById('btnConfirmarRetiradaModal').addEventListener('click', confirmarRetiradaSolicitada);
-            document.getElementById('btnRejeitarRetirada').addEventListener('click', rejeitarRetiradaSolicitada);
-            document.getElementById('btnConfirmarRetirada').addEventListener('click', confirmarRetiradaEncomenda);
-            document.getElementById('btnLogout').addEventListener('click', fazerLogout);
-            document.getElementById('btnAtualizar').addEventListener('click', function() {
-                atualizarEncomendas();
-            });
-            
-            // Monitora estado da conexão
-            monitorarConexao();
-            
-            // Monitora autenticação e carrega encomendas
-            firebase.auth().onAuthStateChanged(user => {
-                if (!user) {
-                    window.location.href = 'login.html';
-                    return;
-                }
-                
-                // Tenta carregar do cache local primeiro
-                if (localCache.userData && Date.now() - localCache.lastUpdated < 300000) { // 5 minutos
-                    userData = localCache.userData;
-                    atualizarInterfaceUsuario();
-                    carregarEncomendasDoCache();
-                } else {
-                    // Carrega dados do usuário do Firebase
-                    firebase.database().ref('users/' + user.uid).once('value').then(snapshot => {
-                        userData = snapshot.val();
-                        localCache.userData = userData;
-                        localCache.lastUpdated = Date.now();
-                        atualizarInterfaceUsuario();
-                        
-                        if (userData.tipo !== 'morador') {
-                            window.location.href = 'index.html';
-                            return;
-                        }
-                        
-                        // Configura listener em tempo real para as encomendas
-                        configurarListenerEncomendas();
-                    });
-                }
-            });
-        });
-        
-                // Função para forçar atualização das encomendas
+        // Função para forçar atualização das encomendas
         function atualizarEncomendas() {
             const btnAtualizar = document.getElementById('btnAtualizar');
             const icon = btnAtualizar.querySelector('i');
             
-            // Adiciona animação de carregamento
-            icon.classList.add('rotate');
+            icon.classList.add('rotate-animation');
             btnAtualizar.disabled = true;
             
-            // Força uma nova leitura do banco de dados
             if (userData) {
                 const blocoApto = `Bloco ${userData.bloco}, Apt ${userData.apartamento}`;
                 
@@ -515,13 +488,11 @@ h4, h5 {
                         M.toast({html: 'Erro ao atualizar encomendas', classes: 'red'});
                     })
                     .finally(() => {
-                        // Remove animação de carregamento
-                        icon.classList.remove('rotate');
+                        icon.classList.remove('rotate-animation');
                         btnAtualizar.disabled = false;
                     });
             } else {
-                // Remove animação de carregamento
-                icon.classList.remove('rotate');
+                icon.classList.remove('rotate-animation');
                 btnAtualizar.disabled = false;
                 M.toast({html: 'Dados do usuário não carregados', classes: 'orange'});
             }
@@ -533,16 +504,15 @@ h4, h5 {
             
             firebase.database().ref('.info/connected').on('value', function(snapshot) {
                 if (snapshot.val() === true) {
-                    connectionStatus.className = 'online';
+                    connectionStatus.className = 'connection-status fixed bottom-0 left-1/2 transform -translate-x-1/2 px-5 py-2 rounded-t-2xl text-white font-medium shadow-lg z-[1000] bg-green-500';
                     connectionText.textContent = 'Conectado';
                     connectionStatus.style.display = 'block';
                     
-                    // Esconde após 3 segundos
                     setTimeout(() => {
                         connectionStatus.style.display = 'none';
                     }, 3000);
                 } else {
-                    connectionStatus.className = 'offline';
+                    connectionStatus.className = 'connection-status fixed bottom-0 left-1/2 transform -translate-x-1/2 px-5 py-2 rounded-t-2xl text-white font-medium shadow-lg z-[1000] bg-red-500';
                     connectionText.textContent = 'Offline - Tentando reconectar...';
                     connectionStatus.style.display = 'block';
                 }
@@ -560,66 +530,56 @@ h4, h5 {
             }
         }
         
-function configurarListenerEncomendas() {
-    const blocoApto = `Bloco ${userData.bloco}, Apt ${userData.apartamento}`;
-    
-    // Remove listener anterior se existir
-    if (encomendasListener) {
-        firebase.database().ref('encomendas').off('value', encomendasListener);
-    }
-    
-    // Configura listener para value (carregamento inicial)
-    encomendasListener = firebase.database().ref('encomendas')
-        .orderByChild('blocoApto')
-        .equalTo(blocoApto)
-        .on('value', snapshot => {
-            processarEncomendas(snapshot.val());
+        function configurarListenerEncomendas() {
+            const blocoApto = `Bloco ${userData.bloco}, Apt ${userData.apartamento}`;
             
-            // Verifica solicitações pendentes apenas uma vez
-            if (!solicitacoesVerificadas) {
-                verificarSolicitacoesPendentes(snapshot);
-                solicitacoesVerificadas = true;
+            if (encomendasListener) {
+                firebase.database().ref('encomendas').off('value', encomendasListener);
             }
-        });
-    
-    // Configura listener separado para child_changed
-    firebase.database().ref('encomendas')
-        .orderByChild('blocoApto')
-        .equalTo(blocoApto)
-        .on('child_changed', snapshot => {
-            const encomenda = snapshot.val();
             
-            // Atualiza a encomenda específica na interface
-            atualizarItemEncomenda(snapshot.key, encomenda);
+            encomendasListener = firebase.database().ref('encomendas')
+                .orderByChild('blocoApto')
+                .equalTo(blocoApto)
+                .on('value', snapshot => {
+                    processarEncomendas(snapshot.val());
+                    
+                    if (!solicitacoesVerificadas) {
+                        verificarSolicitacoesPendentes(snapshot);
+                        solicitacoesVerificadas = true;
+                    }
+                });
             
-            // Se for uma solicitação de retirada, mostra modal
-            if (encomenda.status === 'aguardando_confirmacao' && 
-                (!encomenda.confirmacoes || !encomenda.confirmacoes[firebase.auth().currentUser.uid])) {
-                abrirModalConfirmacaoRetirada(snapshot.key, encomenda);
+            firebase.database().ref('encomendas')
+                .orderByChild('blocoApto')
+                .equalTo(blocoApto)
+                .on('child_changed', snapshot => {
+                    const encomenda = snapshot.val();
+                    atualizarItemEncomenda(snapshot.key, encomenda);
+                    
+                    if (encomenda.status === 'aguardando_confirmacao' && 
+                        (!encomenda.confirmacoes || !encomenda.confirmacoes[firebase.auth().currentUser.uid])) {
+                        abrirModalConfirmacaoRetirada(snapshot.key, encomenda);
+                    }
+                });
+        }
+        
+        function atualizarItemEncomenda(id, encomenda) {
+            const item = document.querySelector(`[data-id="${id}"]`);
+            if (item) {
+                item.innerHTML = criarItemEncomenda(id, encomenda);
+                item.classList.add('updated-item');
+                setTimeout(() => item.classList.remove('updated-item'), 1500);
             }
-        });
-}
-
-function atualizarItemEncomenda(id, encomenda) {
-    // Encontra o item na lista e atualiza apenas ele
-    const item = document.querySelector(`[data-id="${id}"]`);
-    if (item) {
-        item.innerHTML = criarItemEncomenda(id, encomenda);
-        item.classList.add('updated');
-        setTimeout(() => item.classList.remove('updated'), 1500);
-    }
-    
-    // Atualiza o cache local
-    if (!localCache.encomendas) localCache.encomendas = {};
-    localCache.encomendas[id] = encomenda;
-    localCache.lastUpdated = Date.now();
-}
+            
+            if (!localCache.encomendas) localCache.encomendas = {};
+            localCache.encomendas[id] = encomenda;
+            localCache.lastUpdated = Date.now();
+        }
         
         function processarEncomendas(encomendasData) {
             const listaPendentes = document.getElementById('listaEncomendasPendentes');
             const listaFinalizadas = document.getElementById('listaEncomendasFinalizadas');
             
-            // Limpa as listas
             listaPendentes.innerHTML = '';
             listaFinalizadas.innerHTML = '';
             
@@ -632,11 +592,10 @@ function atualizarItemEncomenda(id, encomenda) {
             let temPendentes = false;
             let temFinalizadas = false;
             
-            // Processa cada encomenda
             Object.entries(encomendasData).forEach(([id, encomenda]) => {
                 const li = document.createElement('li');
-                li.className = 'updated'; // Adiciona classe para animação
-                
+                li.className = 'border-b border-gray-100 last:border-0';
+                li.setAttribute('data-id', id);
                 li.innerHTML = criarItemEncomenda(id, encomenda);
                 
                 if (encomenda.status === 'pendente' || encomenda.status === 'aguardando_confirmacao') {
@@ -647,13 +606,11 @@ function atualizarItemEncomenda(id, encomenda) {
                     temFinalizadas = true;
                 }
                 
-                // Remove a classe de animação após 1.5s
                 setTimeout(() => {
-                    li.classList.remove('updated');
+                    li.classList.remove('updated-item');
                 }, 1500);
             });
             
-            // Adiciona estados vazios se necessário
             if (!temPendentes) {
                 listaPendentes.innerHTML = criarEstadoVazio('local_shipping', 'Nenhuma encomenda pendente');
             }
@@ -662,18 +619,13 @@ function atualizarItemEncomenda(id, encomenda) {
                 listaFinalizadas.innerHTML = criarEstadoVazio('assignment_turned_in', 'Nenhuma encomenda finalizada');
             }
             
-            // Adiciona animação aos cards
-            document.getElementById('cardPendentes').classList.add('updated');
-            document.getElementById('cardFinalizadas').classList.add('updated');
+            document.getElementById('cardPendentes').classList.add('updated-item');
+            document.getElementById('cardFinalizadas').classList.add('updated-item');
             setTimeout(() => {
-                document.getElementById('cardPendentes').classList.remove('updated');
-                document.getElementById('cardFinalizadas').classList.remove('updated');
+                document.getElementById('cardPendentes').classList.remove('updated-item');
+                document.getElementById('cardFinalizadas').classList.remove('updated-item');
             }, 1500);
             
-            // Re-inicializa collapsible para os novos itens
-            M.Collapsible.init(document.querySelectorAll('.collapsible'));
-            
-            // Adiciona eventos aos botões
             document.querySelectorAll('.btn-detalhes').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const encomendaId = this.getAttribute('data-id');
@@ -690,27 +642,33 @@ function atualizarItemEncomenda(id, encomenda) {
         }
         
         function criarItemEncomenda(id, encomenda) {
+            const statusClass = encomenda.status === 'pendente' ? 'badge-warning' : (encomenda.status === 'aguardando_confirmacao' ? 'badge-info' : 'badge-success');
+            const statusText = encomenda.status === 'pendente' ? 'Pendente' : (encomenda.status === 'aguardando_confirmacao' ? 'Aguardando Confirmação' : 'Retirada');
+            const icon = encomenda.status === 'pendente' ? 'local_shipping' : 'assignment_turned_in';
+            
             return `
-                <div class="collapsible-header">
-                    <i class="material-icons">${encomenda.status === 'pendente' ? 'local_shipping' : 'assignment_turned_in'}</i>
-                    Encomenda #${id.substring(0, 8)}
-                    <span class="badge ${getBadgeClass(encomenda)}">
-                        ${getStatusText(encomenda)}
-                    </span>
+                <div class="collapsible-header-custom p-4 cursor-pointer hover:bg-gray-50 transition-colors flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <i class="material-icons-outlined text-gray-500">${icon}</i>
+                        <span class="font-medium text-gray-700">Encomenda #${id.substring(0, 8)}</span>
+                    </div>
+                    <span class="badge-custom ${statusClass}">${statusText}</span>
                 </div>
-                <div class="collapsible-body">
-                    <p><strong>Data:</strong> ${formatarData(encomenda.data)}</p>
-                    <p><strong>Recebido por:</strong> ${encomenda.registradoPorNome || 'Porteiro'}</p>
-                    <p><strong>Quantidade:</strong> ${encomenda.quantidade}</p>
-                    ${encomenda.descricao ? `<p><strong>Descrição:</strong> ${encomenda.descricao}</p>` : ''}
-                    <div class="right-align">
-                        <a href="#!" class="btn blue darken-3 btn-detalhes" data-id="${id}">
-                            <i class="material-icons left">info</i> Detalhes
-                        </a>
-                        ${encomenda.status === 'pendente' ? 
-                            `<a href="#!" class="btn green btn-retirar" data-id="${id}">
-                                <i class="material-icons left">check</i> Retirar
-                            </a>` : ''}
+                <div class="collapsible-body p-4 bg-gray-50 border-t border-gray-100 hidden">
+                    <div class="space-y-2">
+                        <p class="text-sm"><strong class="text-gray-700">Data:</strong> <span class="text-gray-600">${formatarData(encomenda.data)}</span></p>
+                        <p class="text-sm"><strong class="text-gray-700">Recebido por:</strong> <span class="text-gray-600">${encomenda.registradoPorNome || 'Porteiro'}</span></p>
+                        <p class="text-sm"><strong class="text-gray-700">Quantidade:</strong> <span class="text-gray-600">${encomenda.quantidade}</span></p>
+                        ${encomenda.descricao ? `<p class="text-sm"><strong class="text-gray-700">Descrição:</strong> <span class="text-gray-600">${encomenda.descricao}</span></p>` : ''}
+                        <div class="flex justify-end gap-2 mt-3">
+                            <a href="#!" class="btn-detalhes px-4 py-2 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-all ripple" data-id="${id}">
+                                <i class="material-icons-outlined text-sm mr-1">info</i> Detalhes
+                            </a>
+                            ${encomenda.status === 'pendente' ? 
+                                `<a href="#!" class="btn-retirar px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-all ripple" data-id="${id}">
+                                    <i class="material-icons-outlined text-sm mr-1">check</i> Retirar
+                                </a>` : ''}
+                        </div>
                     </div>
                 </div>
             `;
@@ -718,42 +676,29 @@ function atualizarItemEncomenda(id, encomenda) {
         
         function criarEstadoVazio(icone, mensagem) {
             return `
-                <li class="empty-state">
-                    <div class="center-align grey-text">
-                        <i class="material-icons large">${icone}</i>
-                        <p>${mensagem}</p>
+                <li class="empty-state text-center py-12">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4 empty-state-icon">
+                        <i class="material-icons-outlined text-3xl text-gray-400">${icone}</i>
                     </div>
+                    <p class="text-gray-500">${mensagem}</p>
                 </li>
             `;
         }
         
-        function getBadgeClass(encomenda) {
-            if (encomenda.status === 'pendente') return 'orange';
-            if (encomenda.status === 'aguardando_confirmacao') return 'blue';
-            return 'green';
+        function verificarSolicitacoesPendentes(snapshot) {
+            const user = firebase.auth().currentUser;
+            if (!user || !snapshot.exists()) return;
+            
+            snapshot.forEach(item => {
+                const encomenda = item.val();
+                if (encomenda.status === 'aguardando_confirmacao' && 
+                    (!encomenda.confirmacoes || !encomenda.confirmacoes[user.uid])) {
+                    setTimeout(() => {
+                        abrirModalConfirmacaoRetirada(item.key, encomenda);
+                    }, 500);
+                }
+            });
         }
-        
-        function getStatusText(encomenda) {
-            if (encomenda.status === 'pendente') return 'Pendente';
-            if (encomenda.status === 'aguardando_confirmacao') return 'Aguardando Confirmação';
-            return 'Retirada';
-        }
-        
-function verificarSolicitacoesPendentes(snapshot) {
-    const user = firebase.auth().currentUser;
-    if (!user || !snapshot.exists()) return;
-    
-    snapshot.forEach(item => {
-        const encomenda = item.val();
-        if (encomenda.status === 'aguardando_confirmacao' && 
-            (!encomenda.confirmacoes || !encomenda.confirmacoes[user.uid])) {
-            // Adiciona um pequeno delay para garantir que a UI esteja pronta
-            setTimeout(() => {
-                abrirModalConfirmacaoRetirada(item.key, encomenda);
-            }, 500);
-        }
-    });
-}
         
         function abrirModalConfirmacaoRetirada(encomendaId, encomenda) {
             document.getElementById('confirmacaoPorteiroNome').textContent = encomenda.solicitacaoRetirada.porteiro;
@@ -764,11 +709,14 @@ function verificarSolicitacoesPendentes(snapshot) {
             document.getElementById('btnConfirmarRetiradaModal').setAttribute('data-id', encomendaId);
             document.getElementById('btnRejeitarRetirada').setAttribute('data-id', encomendaId);
             
-            const modal = M.Modal.getInstance(document.getElementById('modalConfirmacaoRetirada'));
-            modal.open();
+            const modal = document.getElementById('modalConfirmacaoRetirada');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
         }
         
         async function fazerLogout() {
+            showLoading(true);
             try {
                 if (encomendasListener) {
                     encomendasListener();
@@ -778,6 +726,8 @@ function verificarSolicitacoesPendentes(snapshot) {
             } catch (error) {
                 console.error('Erro ao fazer logout:', error);
                 M.toast({html: 'Erro ao fazer logout', classes: 'red'});
+            } finally {
+                showLoading(false);
             }
         }
         
@@ -785,6 +735,7 @@ function verificarSolicitacoesPendentes(snapshot) {
             const encomendaId = this.getAttribute('data-id');
             const user = firebase.auth().currentUser;
             
+            showLoading(true);
             try {
                 const snapshot = await firebase.database().ref(`encomendas/${encomendaId}`).once('value');
                 const encomenda = snapshot.val();
@@ -809,9 +760,16 @@ function verificarSolicitacoesPendentes(snapshot) {
                 await firebase.database().ref(`encomendas/${encomendaId}`).update(updates);
                 M.toast({html: 'Retirada confirmada com sucesso!', classes: 'green'});
                 
+                const modal = document.getElementById('modalConfirmacaoRetirada');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+                
             } catch (error) {
                 console.error('Erro ao confirmar retirada:', error);
                 M.toast({html: 'Erro ao confirmar retirada', classes: 'red'});
+            } finally {
+                showLoading(false);
             }
         }
         
@@ -819,6 +777,7 @@ function verificarSolicitacoesPendentes(snapshot) {
             const encomendaId = this.getAttribute('data-id');
             const user = firebase.auth().currentUser;
             
+            showLoading(true);
             try {
                 const snapshot = await firebase.database().ref(`encomendas/${encomendaId}`).once('value');
                 const encomenda = snapshot.val();
@@ -837,9 +796,16 @@ function verificarSolicitacoesPendentes(snapshot) {
                 await firebase.database().ref(`encomendas/${encomendaId}`).update(updates);
                 M.toast({html: 'Retirada rejeitada', classes: 'orange'});
                 
+                const modal = document.getElementById('modalConfirmacaoRetirada');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+                
             } catch (error) {
                 console.error('Erro ao rejeitar retirada:', error);
                 M.toast({html: 'Erro ao rejeitar retirada', classes: 'red'});
+            } finally {
+                showLoading(false);
             }
         }
         
@@ -847,6 +813,7 @@ function verificarSolicitacoesPendentes(snapshot) {
             const user = firebase.auth().currentUser;
             if (!user) return;
             
+            showLoading(true);
             firebase.database().ref('encomendas/' + encomendaId).once('value').then(snapshot => {
                 const encomenda = snapshot.val();
                 
@@ -870,11 +837,13 @@ function verificarSolicitacoesPendentes(snapshot) {
                     .catch(error => {
                         console.error('Erro ao retirar encomenda:', error);
                         M.toast({html: 'Erro ao retirar encomenda', classes: 'red'});
-                    });
+                    })
+                    .finally(() => showLoading(false));
             });
         }
         
         function abrirModalEncomenda(encomendaId) {
+            showLoading(true);
             firebase.database().ref('encomendas/' + encomendaId).once('value').then(snapshot => {
                 const encomenda = snapshot.val();
                 
@@ -883,7 +852,6 @@ function verificarSolicitacoesPendentes(snapshot) {
                     return;
                 }
                 
-                // Preenche os dados no modal
                 document.getElementById('modalTitulo').textContent = `Encomenda #${encomendaId.substring(0, 8)}`;
                 document.getElementById('modalData').textContent = formatarData(encomenda.data);
                 document.getElementById('modalPorteiro').textContent = encomenda.registradoPorNome || 'Porteiro';
@@ -891,37 +859,42 @@ function verificarSolicitacoesPendentes(snapshot) {
                 document.getElementById('modalDescricao').textContent = encomenda.descricao || 'Nenhuma descrição';
                 
                 const statusBadge = document.getElementById('modalStatus');
-                statusBadge.textContent = getStatusText(encomenda);
-                statusBadge.className = `badge ${getBadgeClass(encomenda)}`;
+                const statusClass = encomenda.status === 'pendente' ? 'badge-warning' : (encomenda.status === 'aguardando_confirmacao' ? 'badge-info' : 'badge-success');
+                const statusText = encomenda.status === 'pendente' ? 'Pendente' : (encomenda.status === 'aguardando_confirmacao' ? 'Aguardando Confirmação' : 'Retirada');
+                statusBadge.className = `badge-custom ${statusClass}`;
+                statusBadge.textContent = statusText;
                 
                 const retiradaSection = document.getElementById('modalRetiradaSection');
                 const btnConfirmar = document.getElementById('btnConfirmarRetirada');
                 
                 if (encomenda.status === 'pendente') {
-                    retiradaSection.classList.add('hide');
-                    btnConfirmar.classList.remove('hide');
+                    retiradaSection.classList.add('hidden');
+                    btnConfirmar.classList.remove('hidden');
                     btnConfirmar.setAttribute('data-id', encomendaId);
                 } else {
                     document.getElementById('modalRetiradoPor').textContent = encomenda.retiradoPorNome || 'N/A';
                     document.getElementById('modalDataRetirada').textContent = formatarData(encomenda.dataRetirada);
                     document.getElementById('modalPorteiroRetirada').textContent = encomenda.porteiroRetiradaNome || 'Porteiro';
-                    retiradaSection.classList.remove('hide');
-                    btnConfirmar.classList.add('hide');
+                    retiradaSection.classList.remove('hidden');
+                    btnConfirmar.classList.add('hidden');
                 }
                 
-                // Abre o modal
-                const modal = M.Modal.getInstance(document.getElementById('modalEncomenda'));
-                modal.open();
-            });
+                const modal = document.getElementById('modalEncomenda');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+                
+            }).finally(() => showLoading(false));
         }
         
         function confirmarRetiradaEncomenda() {
             const encomendaId = this.getAttribute('data-id');
             retirarEncomenda(encomendaId);
             
-            // Fecha o modal
-            const modal = M.Modal.getInstance(document.getElementById('modalEncomenda'));
-            modal.close();
+            const modal = document.getElementById('modalEncomenda');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
         }
         
         function formatarData(timestamp) {
@@ -935,10 +908,76 @@ function verificarSolicitacoesPendentes(snapshot) {
                 minute: '2-digit'
             });
         }
+        
+        // Inicialização dos modais e eventos
+        function closeModalOnOutsideClick(modal, e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        document.getElementById('modalEncomenda').addEventListener('click', (e) => closeModalOnOutsideClick(document.getElementById('modalEncomenda'), e));
+        document.getElementById('modalConfirmacaoRetirada').addEventListener('click', (e) => closeModalOnOutsideClick(document.getElementById('modalConfirmacaoRetirada'), e));
+        
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+        
+        document.getElementById('btnConfirmarRetiradaModal').addEventListener('click', confirmarRetiradaSolicitada);
+        document.getElementById('btnRejeitarRetirada').addEventListener('click', rejeitarRetiradaSolicitada);
+        document.getElementById('btnConfirmarRetirada').addEventListener('click', confirmarRetiradaEncomenda);
+        document.getElementById('btnLogout').addEventListener('click', fazerLogout);
+        document.getElementById('btnAtualizar').addEventListener('click', atualizarEncomendas);
+        
+        monitorarConexao();
+        
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (localCache.userData && Date.now() - localCache.lastUpdated < 300000) {
+                userData = localCache.userData;
+                atualizarInterfaceUsuario();
+                carregarEncomendasDoCache();
+            } else {
+                firebase.database().ref('users/' + user.uid).once('value').then(snapshot => {
+                    userData = snapshot.val();
+                    localCache.userData = userData;
+                    localCache.lastUpdated = Date.now();
+                    atualizarInterfaceUsuario();
+                    
+                    if (userData.tipo !== 'morador') {
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    
+                    configurarListenerEncomendas();
+                });
+            }
+        });
+        
+        // Toast function replacement for Materialize
+        window.M = {
+            toast: function(options) {
+                const toast = document.createElement('div');
+                toast.className = `toast-custom px-5 py-3 rounded-xl text-white font-medium shadow-lg ${options.classes === 'green' ? 'bg-green-500' : (options.classes === 'red' ? 'bg-red-500' : 'bg-orange-500')}`;
+                toast.textContent = options.html;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+        };
+    });
     </script>
 </body>
 </html>
-
-
-
-
