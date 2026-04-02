@@ -2,259 +2,297 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portal de Lojas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4A90E2">
+    <title>Portal de Lojas - Condomínio Cotovias</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EBF3FE',
+                            100: '#D7E8FD',
+                            200: '#B0D1FB',
+                            300: '#88B9F8',
+                            400: '#61A2F6',
+                            500: '#4A90E2',
+                            600: '#3A73B5',
+                            700: '#2B5688',
+                            800: '#1D3A5A',
+                            900: '#0E1D2D',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'pulse-slow': 'pulse 2s infinite',
+                        'shimmer': 'shimmer 2s infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    
     <style>
-        :root {
-            --md-sys-color-primary: #6750A4;
-            --md-sys-color-on-primary: #FFFFFF;
-            --md-sys-color-primary-container: #EADDFF;
-            --md-sys-color-on-primary-container: #21005D;
-            --md-sys-color-secondary: #625B71;
-            --md-sys-color-background: #F8F9FA;
-            --md-sys-color-surface: #FFFFFF;
-            --md-sys-color-on-surface: #1C1B1F;
-            --md-sys-color-on-surface-variant: #49454F;
-            --md-sys-color-outline: #CAC4D0;
-            --md-sys-font-family: 'Inter', sans-serif;
-            --md-sys-border-radius: 16px;
-            --md-sys-elevation-1: 0 2px 4px rgba(0,0,0,0.05);
-            --md-sys-elevation-2: 0 4px 12px rgba(0,0,0,0.1);
+        /* Estilos customizados */
+        * {
+            -webkit-tap-highlight-color: transparent;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: var(--md-sys-font-family);
-            background-color: var(--md-sys-color-background);
-            color: var(--md-sys-color-on-surface);
-            -webkit-font-smoothing: antialiased;
+            background: linear-gradient(135deg, #F7F8FC 0%, #EEF2F7 100%);
+            font-family: 'Inter', sans-serif;
         }
         
-        /* --- HEADER FIXO E PROFISSIONAL --- */
-        .page-header {
-            background-color: var(--md-sys-color-surface);
-            padding: 16px;
-            border-bottom: 1px solid #E0E0E0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-        }
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .header-content h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--md-sys-color-on-surface);
-            text-align: left;
-            margin-bottom: 16px;
-        }
-        .controls-wrapper {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-        .search-container {
-            position: relative;
-            flex-grow: 1;
-        }
-        .search-input {
-            width: 100%;
-            padding: 14px 20px 14px 48px;
-            font-size: 1rem;
-            border: 1px solid var(--md-sys-color-outline);
-            border-radius: 28px;
-            background-color: var(--md-sys-color-background);
-            transition: all 0.2s ease;
-        }
-        .search-input:focus {
-            outline: none;
-            border-color: var(--md-sys-color-primary);
-            box-shadow: 0 0 0 3px var(--md-sys-color-primary-container);
-        }
-        .search-container .material-icons-outlined {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--md-sys-color-on-surface-variant);
-        }
-        .sort-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 48px;
-            height: 48px;
-            background: none;
-            border: 1px solid var(--md-sys-color-outline);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-        .sort-button:hover {
-            background-color: #f0f0f0;
-            border-color: var(--md-sys-color-primary);
-        }
-        .sort-button .material-icons-outlined {
-            font-size: 24px;
-            color: var(--md-sys-color-on-surface-variant);
-            transition: transform 0.3s ease;
-        }
-
-        /* --- CONTEÚDO PRINCIPAL --- */
-        .page-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 32px 16px;
+        /* Header com efeito glass */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(74, 144, 226, 0.1);
         }
         
-        /* --- GRID DE RESULTADOS --- */
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        .store-card, .product-card {
-            background-color: var(--md-sys-color-surface);
-            border-radius: var(--md-sys-border-radius);
-            box-shadow: var(--md-sys-elevation-1);
-            overflow: hidden;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.2s ease;
-            border: 1px solid #E0E0E0;
+        
+        ::-webkit-scrollbar-track {
+            background: #E4E6EB;
+            border-radius: 10px;
         }
-        .store-card:hover, .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--md-sys-elevation-2);
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            border-radius: 10px;
         }
-        .card-banner {
-            height: 0;
-            padding-top: 56.25%; /* Proporção 16:9 */
-            background-size: cover;
-            background-position: center;
-            background-color: #f0f0f0;
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #3A73B5, #2B5688);
         }
-        .card-content {
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+        
+        /* Card premium effect */
+        .premium-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .store-card__title, .product-card__title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            line-height: 1.3;
+        
+        .premium-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15), 0 4px 18px rgba(0, 0, 0, 0.05);
         }
-        .store-card__description {
-            font-size: 0.95rem;
-            color: var(--md-sys-color-on-surface-variant);
-            line-height: 1.5;
-            flex-grow: 1;
-            margin-bottom: 16px;
+        
+        /* Input focus effect */
+        .search-input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
         }
-        .product-card__store-name {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--md-sys-color-secondary);
-            margin-bottom: 4px;
-        }
-        .product-card__price {
-            font-size: 1.2rem;
-            color: var(--md-sys-color-primary);
-            font-weight: 700;
-            margin-top: auto; /* Alinha o preço na base */
-        }
-        .store-card__button {
-            margin-top: auto; /* Alinha o botão na base */
-            color: var(--md-sys-color-primary);
-            font-weight: 700;
-            text-decoration: none;
-            align-self: flex-end;
-        }
-
-        /* --- SKELETON LOADER --- */
-        .skeleton-card {
-             background-color: var(--md-sys-color-surface);
-             border-radius: var(--md-sys-border-radius);
-             overflow: hidden;
-             border: 1px solid #E0E0E0;
-        }
-        .skeleton-banner {
-            padding-top: 56.25%;
-            background: #f0f0f0;
-        }
-        .skeleton-content { padding: 20px; }
-        .skeleton-line {
-            height: 16px;
-            border-radius: 8px;
+        
+        /* Shimmer loading */
+        .shimmer-bg {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
-            animation: skeleton-shine 1.5s linear infinite;
         }
-        .skeleton-line.title { height: 22px; width: 70%; margin-bottom: 12px; }
-        .skeleton-line.text { width: 100%; margin-bottom: 8px; }
-        .skeleton-line.text-short { width: 85%; }
-        @keyframes skeleton-shine {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        
+        /* Card animation */
+        .card-enter {
+            animation: slideUp 0.5s ease-out forwards;
+            opacity: 0;
         }
-
-        /* --- ESTADO VAZIO --- */
-        .empty-state {
-            text-align: center;
-            padding: 64px 24px;
-            color: var(--md-sys-color-on-surface-variant);
-            grid-column: 1 / -1;
-        }
-        .empty-state .material-icons-outlined { font-size: 4rem; margin-bottom: 16px; }
-
-        /* --- RESPONSIVIDADE --- */
-        @media (max-width: 768px) {
-            .page-container { padding: 24px 16px; }
-            .results-grid { gap: 16px; }
-        }
-        @media (max-width: 480px) {
-             .results-grid {
-                grid-template-columns: 1fr; /* Uma coluna em telas muito pequenas */
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #4A90E2, #3A73B5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Badge effect */
+        .badge-new {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .badge-new::before {
+            content: '✨';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 20px;
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        /* Ripple effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(74, 144, 226, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        
+        /* Banner image hover */
+        .card-banner {
+            transition: transform 0.3s ease;
+        }
+        
+        .store-card:hover .card-banner,
+        .product-card:hover .card-banner {
+            transform: scale(1.05);
+        }
+        
+        /* Loading spinner */
+        .loading-spinner-custom {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #E4E6EB;
+            border-top-color: #4A90E2;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty state animation */
+        .empty-state-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Sort button rotation */
+        .sort-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .sort-icon.rotated {
+            transform: rotate(180deg);
         }
     </style>
 </head>
 <body>
-    <header class="page-header">
-        <div class="header-content">
-            <h1 id="pageTitle">Explorar Lojas</h1>
-            <div class="controls-wrapper">
-                <div class="search-container">
-                    <i class="material-icons-outlined">search</i>
-                    <input type="search" id="searchInput" class="search-input" placeholder="Buscar por loja ou produto...">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 backdrop-blur-sm hidden items-center justify-center z-[2000]">
+        <div class="flex flex-col items-center gap-4">
+            <div class="loading-spinner-custom"></div>
+            <p class="text-gray-500 text-sm animate-pulse">Carregando lojas...</p>
+        </div>
+    </div>
+
+    <!-- Header com efeito glass -->
+    <header class="glass-header sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="material-icons text-white text-2xl">storefront</i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold gradient-text">Portal de Lojas</h1>
+                        <p class="text-xs text-gray-500 hidden sm:block">Encontre produtos e serviços</p>
+                    </div>
                 </div>
-                <button class="sort-button" id="sortButton" aria-label="Ordenar resultados">
-                    <i class="material-icons-outlined">arrow_downward</i>
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/50 rounded-full">
+                    <i class="material-icons-outlined text-primary-500 text-sm">verified</i>
+                    <span class="text-xs text-gray-600">Lojas Parceiras</span>
+                </div>
+            </div>
+            
+            <!-- Barra de busca e ordenação -->
+            <div class="flex gap-3 items-center">
+                <div class="relative flex-1">
+                    <i class="material-icons-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">search</i>
+                    <input type="search" id="searchInput" 
+                           placeholder="Buscar por loja ou produto..." 
+                           class="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-primary-500 transition-all shadow-sm search-input-focus">
+                </div>
+                <button id="sortButton" class="sort-button w-12 h-12 bg-white border border-gray-200 rounded-xl flex items-center justify-center hover:border-primary-500 hover:shadow-md transition-all ripple flex-shrink-0">
+                    <i class="material-icons-outlined text-gray-600 sort-icon">arrow_downward</i>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="page-container">
-        <div class="results-grid" id="resultsGrid">
-            <!-- As lojas fixas serão adicionadas aqui via JavaScript -->
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div class="results-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6" id="resultsGrid">
+            <!-- Skeletons serão inseridos aqui -->
         </div>
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <i class="material-icons-outlined">search_off</i>
-            <h2>Nenhum resultado encontrado</h2>
-            <p>Tente ajustar sua busca ou explore todas as nossas lojas.</p>
+        
+        <!-- Estado vazio -->
+        <div id="emptyState" class="hidden text-center py-16">
+            <div class="inline-flex items-center justify-center w-24 h-24 bg-gray-100 rounded-full mb-4 empty-state-icon">
+                <i class="material-icons-outlined text-5xl text-gray-400">search_off</i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nenhum resultado encontrado</h3>
+            <p class="text-gray-500 max-w-md mx-auto">Tente ajustar sua busca ou explore todas as nossas lojas disponíveis.</p>
         </div>
     </main>
 
@@ -273,6 +311,7 @@
                 appId: "1:768552546759:web:4367fc4a161ecf90c469e2",
                 measurementId: "G-7HHR78MHDP"
             };
+            
             const app = initializeApp(firebaseConfig);
             const db = getDatabase(app);
 
@@ -280,31 +319,32 @@
             const searchInput = document.getElementById('searchInput');
             const sortButton = document.getElementById('sortButton');
             const emptyState = document.getElementById('emptyState');
+            const loadingOverlay = document.getElementById('loadingOverlay');
             
             let allStores = [];
             let sortOrder = 'asc'; // 'asc' para A-Z
 
             // Lojas fixas
             const fixedStores = [
-              {
-    id: 'loja-nova',
-    name: 'Crie sua Loja',
-    description: '✅ FÁCIL, RÁPIDO E SEM COMPLICAÇÕES! Configuração simplificada, interface intuitiva e mensalidades que cabem no seu bolso! 🎯 Em apenas 3 passos: Cadastre-se — 30 segundos. Personalize sua loja — 5 minutos. Comece a vender — imediatamente! 🔥 NÃO PERCA TEMPO! ⏰ SEUS CLIENTES ESTÃO ESPERANDO! Cada minuto sem sua loja online é uma venda perdida!',
-    logo: 'https://i.postimg.cc/YS5W4ctK/Criacao-de-Loja-Virtual-Gratis.gif',
-    url: 'https://reinaldoleall.github.io/criarlojas/', // Altere para o link da sua nova loja
-    type: 'store',
-    isFixed: true
-},
-  {
+                {
+                    id: 'loja-nova',
+                    name: 'Crie sua Loja',
+                    description: '✅ FÁCIL, RÁPIDO E SEM COMPLICAÇÕES! Configuração simplificada, interface intuitiva e mensalidades que cabem no seu bolso! 🎯 Em apenas 3 passos: Cadastre-se — 30 segundos. Personalize sua loja — 5 minutos. Comece a vender — imediatamente! 🔥 NÃO PERCA TEMPO! ⏰ SEUS CLIENTES ESTÃO ESPERANDO!',
+                    logo: 'https://i.postimg.cc/YS5W4ctK/Criacao-de-Loja-Virtual-Gratis.gif',
+                    url: 'https://reinaldoleall.github.io/criarlojas/',
+                    type: 'store',
+                    isFixed: true,
+                    isFeatured: true
+                },
+                {
                     id: 'magazine-luiza',
                     name: 'Magazine Luiza',
-                    description: 'Tudo que você precisa em um só lugar! Eletrônicos, móveis, eletrodomésticos e muito mais.',
+                    description: 'Tudo que você precisa em um só lugar! Eletrônicos, móveis, eletrodomésticos e muito mais com as melhores ofertas.',
                     logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_FSBujTblqbK8XqF25lLhiwbVnse-eEm3V_YiSxE3hQ&s=10',
                     url: 'https://www.magazinevoce.com.br/magazinereinaldoleal/',
                     type: 'store',
                     isFixed: true
                 }
-
             ];
 
             const debounce = (func, delay) => {
@@ -317,22 +357,22 @@
 
             const showSkeletons = (count = 6) => {
                 resultsGrid.innerHTML = '';
-                emptyState.style.display = 'none';
-                const fragment = document.createDocumentFragment();
+                emptyState.classList.add('hidden');
                 for (let i = 0; i < count; i++) {
-                    const card = document.createElement('div');
-                    card.className = 'skeleton-card';
-                    card.innerHTML = `
-                        <div class="skeleton-banner"></div>
-                        <div class="skeleton-content">
-                            <div class="skeleton-line title"></div>
-                            <div class="skeleton-line text"></div>
-                            <div class="skeleton-line text-short"></div>
+                    resultsGrid.innerHTML += `
+                        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm animate-pulse">
+                            <div class="pt-[56.25%] bg-gray-200 shimmer-bg"></div>
+                            <div class="p-5">
+                                <div class="h-5 bg-gray-200 rounded-lg w-3/4 mb-3 shimmer-bg"></div>
+                                <div class="space-y-2">
+                                    <div class="h-4 bg-gray-200 rounded w-full shimmer-bg"></div>
+                                    <div class="h-4 bg-gray-200 rounded w-5/6 shimmer-bg"></div>
+                                    <div class="h-4 bg-gray-200 rounded w-4/6 shimmer-bg"></div>
+                                </div>
+                            </div>
                         </div>
                     `;
-                    fragment.appendChild(card);
                 }
-                resultsGrid.appendChild(fragment);
             };
 
             async function fetchStores() {
@@ -348,66 +388,68 @@
                         }));
                         sortAndFilter();
                     } else {
-                        showEmptyState(true, 'Nenhuma loja encontrada.');
+                        renderResults([]);
                     }
                 } catch (error) {
                     console.error("Erro ao buscar lojas:", error);
-                    showEmptyState(true, 'Ocorreu um erro ao carregar as lojas.');
+                    renderResults([]);
                 }
             }
 
             function renderResults(itemsToRender) {
                 resultsGrid.innerHTML = '';
-                if (itemsToRender.length === 0 && fixedStores.length === 0) {
-                    showEmptyState(true);
+                
+                const allItems = [...fixedStores, ...itemsToRender];
+                
+                if (allItems.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    resultsGrid.classList.add('hidden');
                     return;
                 }
                 
-                showEmptyState(false);
+                emptyState.classList.add('hidden');
+                resultsGrid.classList.remove('hidden');
+                
                 const fragment = document.createDocumentFragment();
                 
-                // Adiciona as lojas fixas primeiro
-                fixedStores.forEach(fixedStore => {
-                    const fixedStoreCard = document.createElement('a');
-                    fixedStoreCard.href = fixedStore.url;
-                    fixedStoreCard.target = "_blank";
-                    fixedStoreCard.className = 'store-card';
-                    fixedStoreCard.innerHTML = `
-                        <div class="card-banner" style="background-image: url('${fixedStore.logo}')"></div>
-                        <div class="card-content">
-                            <h3 class="store-card__title">${fixedStore.name}</h3>
-                            <p class="store-card__description">${fixedStore.description}</p>
-                            <span class="store-card__button">Visitar Loja →</span>
-                        </div>
-                    `;
-                    fragment.appendChild(fixedStoreCard);
-                });
-                
-                // Adiciona as outras lojas
-                itemsToRender.forEach(item => {
+                allItems.forEach((item, index) => {
                     const card = document.createElement('a');
-                    card.target = "_blank"; // Abrir em nova aba
-
+                    card.target = "_blank";
+                    card.className = `bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all premium-card card-enter`;
+                    card.style.animationDelay = `${index * 0.05}s`;
+                    
                     if (item.type === 'store') {
-                        card.href = `loja.html?userId=${item.id}`;
-                        card.className = 'store-card';
+                        card.href = item.isFixed ? item.url : `loja.html?userId=${item.id}`;
+                        const isFeatured = item.isFeatured ? 'badge-new' : '';
                         card.innerHTML = `
-                            <div class="card-banner" style="background-image: url('${item.logo || 'https://placehold.co/600x340/EADDFF/21005D?text=Loja'}')"></div>
-                            <div class="card-content">
-                                <h3 class="store-card__title">${item.name}</h3>
-                                <p class="store-card__description">${item.description || 'Visite nossa loja para ver os produtos.'}</p>
-                                <span class="store-card__button">Ver Loja →</span>
+                            <div class="relative overflow-hidden">
+                                <div class="card-banner pt-[56.25%] bg-cover bg-center bg-gray-100 transition-transform duration-300" style="background-image: url('${item.logo || 'https://placehold.co/600x340/EADDFF/21005D?text=Loja'}')"></div>
+                                ${item.isFeatured ? '<div class="absolute top-3 right-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">✨ Destaque</div>' : ''}
+                            </div>
+                            <div class="p-5">
+                                <h3 class="text-lg font-bold text-gray-800 mb-2 line-clamp-2">${escapeHtml(item.name)}</h3>
+                                <p class="text-sm text-gray-600 leading-relaxed line-clamp-3 mb-4">${escapeHtml(item.description || 'Visite nossa loja para ver os produtos disponíveis.')}</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-primary-500 font-semibold text-sm flex items-center gap-1">
+                                        Visitar Loja
+                                        <i class="material-icons-outlined text-base">arrow_forward</i>
+                                    </span>
+                                    ${!item.isFixed ? '<span class="text-xs text-gray-400 flex items-center gap-1"><i class="material-icons-outlined text-sm">verified</i> Parceiro</span>' : ''}
+                                </div>
                             </div>
                         `;
                     } else { // type === 'product'
                         card.href = `loja.html?userId=${item.storeId}`;
-                        card.className = 'product-card';
                         card.innerHTML = `
-                            <div class="card-banner" style="background-image: url('${item.image || 'https://placehold.co/600x340/EADDFF/21005D?text=Produto'}')"></div>
-                            <div class="card-content">
-                                <span class="product-card__store-name">${item.storeName}</span>
-                                <h3 class="product-card__title">${item.name}</h3>
-                                <p class="product-card__price">R$ ${(item.price || 0).toFixed(2).replace('.',',')}</p>
+                            <div class="relative overflow-hidden">
+                                <div class="card-banner pt-[56.25%] bg-cover bg-center bg-gray-100 transition-transform duration-300" style="background-image: url('${item.image || 'https://placehold.co/600x340/EADDFF/21005D?text=Produto'}')"></div>
+                            </div>
+                            <div class="p-5">
+                                <span class="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-1 rounded-full inline-block mb-2">${escapeHtml(item.storeName)}</span>
+                                <h3 class="text-base font-bold text-gray-800 mb-2 line-clamp-2">${escapeHtml(item.name)}</h3>
+                                <p class="text-xl font-bold text-primary-500 mt-3">
+                                    R$ ${(item.price || 0).toFixed(2).replace('.', ',')}
+                                </p>
                             </div>
                         `;
                     }
@@ -425,6 +467,7 @@
                 };
 
                 const query = searchInput.value.toLowerCase().trim();
+                
                 if (!query) {
                     const sortedStores = [...allStores].sort(sortByName);
                     renderResults(sortedStores.map(s => ({ type: 'store', ...s })));
@@ -438,7 +481,7 @@
                     }
                     if (store.products) {
                         store.products.forEach(product => {
-                             if (product.name && product.name.toLowerCase().includes(query)) {
+                            if (product.name && product.name.toLowerCase().includes(query)) {
                                 foundItems.set(`product-${store.id}-${product.id}`, {
                                     type: 'product',
                                     ...product,
@@ -456,28 +499,70 @@
 
             function toggleSortOrder() {
                 sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-                const icon = sortButton.querySelector('i');
+                const icon = sortButton.querySelector('.sort-icon');
                 icon.textContent = sortOrder === 'asc' ? 'arrow_downward' : 'arrow_upward';
-                icon.style.transform = sortOrder === 'asc' ? 'rotate(0deg)' : 'rotate(180deg)';
+                icon.classList.toggle('rotated');
                 sortAndFilter();
             }
 
-            function showEmptyState(show, message = 'Nenhum resultado para sua busca') {
-                if (show) {
-                    resultsGrid.innerHTML = '';
-                    emptyState.style.display = 'block';
-                    emptyState.querySelector('h2').textContent = message;
-                } else {
-                    emptyState.style.display = 'none';
-                }
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/[&<>]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    return m;
+                });
             }
             
             searchInput.addEventListener('input', debounce(sortAndFilter, 300));
             sortButton.addEventListener('click', toggleSortOrder);
 
+            // Inicializa com skeletons
             showSkeletons();
-            fetchStores();
+            
+            // Carrega as lojas
+            setTimeout(() => {
+                fetchStores();
+            }, 500);
         });
     </script>
+    
+    <style>
+        /* Utilidades adicionais */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Responsividade extra */
+        @media (max-width: 640px) {
+            .results-grid {
+                gap: 16px;
+            }
+        }
+        
+        /* Efeito de hover para desktop */
+        @media (hover: hover) {
+            .store-card:hover .card-banner,
+            .product-card:hover .card-banner {
+                transform: scale(1.05);
+            }
+        }
+        
+        /* Safe area para iOS */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
 </body>
 </html>
